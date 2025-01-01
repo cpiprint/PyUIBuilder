@@ -569,7 +569,7 @@ export class TkinterWidgetBase extends TkinterBase{
             config["bd"] = this.getAttrValue("styling.borderWidth")
 
         if (this.getAttrValue("styling.relief"))
-            config["relief"] = `"${this.getAttrValue("styling.relief")}"`
+            config["relief"] = `tk.${this.getAttrValue("styling.relief")}`
 
         if (this.getAttrValue("font.fontFamily") || this.getAttrValue("font.fontSize")){
             config["font"] = `("${this.getAttrValue("font.fontFamily")}", ${this.getAttrValue("font.fontSize") || 12}, )`
