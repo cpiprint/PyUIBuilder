@@ -1087,7 +1087,10 @@ class Canvas extends React.Component {
                     </ButtonModal>
                 </div>
 
-                <Droppable className={"tw-w-full tw-h-full"} id="canvas-droppable">
+                <Droppable className={"tw-w-full tw-h-full"} 
+                            droppableTags={{ exclude: ["image", "video"] }}
+                            onDrop={this.handleDropEvent}
+                            id="canvas-droppable">
                 {/* <ActiveWidgetProvider> */}
                 {/* <DroppableWrapper id="canvas-droppable"
                     droppableTags={{ exclude: ["image", "video"] }}

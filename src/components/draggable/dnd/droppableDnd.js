@@ -1,83 +1,95 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useDroppable } from '@dnd-kit/core'
+import { useDndMonitor, useDroppable } from '@dnd-kit/core'
 import { useDragContext } from '../draggableContext'
+
 
 function Droppable(props) {
 
+    const droppableRef = useRef(null)
 
-	const droppableRef = useRef(null) 
+    const { isOver, setNodeRef } = useDroppable({
+        id: props.id,
+    })
 
-	const { isOver, setNodeRef } = useDroppable({
-		id: props.id,
-	})
+    const style = {
+        backgroundColor: isOver ? 'green' : '',
+    }
 
-	console.log("IS over: ", isOver)
+    useDndMonitor({
+        onDragStart: (event) => {
+            if (event.over?.id === props.id)
+                handleDragEnter(event)
+        },
+        onDragMove: (event) => {
+            console.log("Drag start")
+            if (event.over?.id === props.id)
+                handleDragOver(event)
+        },
+        onDragEnd: (event) => {
+      
+            if (event.over?.id === props.id){
+                if (event.over) {
+                    handleDropEvent(event) // Item was dropped inside a valid container
+                } else {
+                    handleDragLeave(event) // Drag was canceled
+                }
+            }
+        },
+    })
 
-	const style = {
-		backgroundColor: isOver ? 'green' : '',
-	}
+    const { droppableTags, onDrop } = props
 
-	const {droppableTags, onDrop} = props
+    const { draggedElement, overElement, setOverElement, widgetClass } = useDragContext()
 
-	const { draggedElement, overElement, setOverElement, widgetClass } = useDragContext()
+    // const {}
 
-	
-    const [showDroppable, setShowDroppable] = useState({
-                                                            show: false, 
-                                                            allow: false
-                                                        })
-    
-	useEffect(() => {
-
-		if (droppableRef.current)
-			setNodeRef(droppableRef.current)
-	
-	}, [droppableRef.current, setNodeRef])
+    const [allowDrop, setAllowDrop] = useState(false) // indicator if the draggable can be dropped on the droppable
 
     useEffect(() => {
 
-        if (draggedElement === null){
-            setShowDroppable({
-                show: false, 
+        if (droppableRef.current)
+            setNodeRef(droppableRef.current)
+
+    }, [droppableRef.current, setNodeRef])
+
+    useEffect(() => {
+
+        if (draggedElement === null) {
+            setAllowDrop({
+                show: false,
                 allow: false
             })
         }
 
     }, [draggedElement])
 
+    // TODO: handle Drop on Canvas
     const handleDragEnter = (e) => {
-        
-        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")){
+
+        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
             return
         }
 
         const dragElementType = draggedElement.getAttribute("data-draggable-type")
 
+        console.log("Drag eneter:", e, e.over.id)
+        setOverElement(document.getElementById(e.over.id))
 
-        setOverElement(e.currentTarget)
+        const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
+            (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
+            (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
+        ))
 
-        const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 || 
-                            (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) || 
-                            (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
-                        ))
+        console.log("allow drop: ", allowDrop)
 
-        if (allowDrop){
-            setShowDroppable({
-                allow: true, 
-                show: true
-            })
-        }else{
-            setShowDroppable({
-                allow: false, 
-                show: true
-            })
-        }
+        setAllowDrop(allowDrop)
+       
     }
 
     const handleDragOver = (e) => {
 
-        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")){
+        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
             return
         }
@@ -85,41 +97,43 @@ function Droppable(props) {
         // console.log("Drag over: ", e.dataTransfer.getData("text/plain"), e.dataTransfer)
         const dragElementType = draggedElement.getAttribute("data-draggable-type")
 
-        const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 || 
-                            (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) || 
-                            (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
-                        ))
+        const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
+            (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
+            (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
+        ))
 
-        if (allowDrop){
-            e.preventDefault() // this is necessary to allow drop to take place
-        }
-        
+        console.log("allow drop: ", allowDrop)
+        setAllowDrop({allow: allowDrop})
+        // if (allowDrop) {
+        //     e.preventDefault() // this is necessary to allow drop to take place
+        // }
+
     }
 
     const handleDropEvent = (e) => {
 
-        setShowDroppable({
-            allow: false, 
+        setAllowDrop({
+            allow: false,
             show: false
         })
 
-        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")){
+        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
             return
         }
 
-        e.stopPropagation()
+        // e.stopPropagation()
 
 
         const dragElementType = draggedElement.getAttribute("data-draggable-type")
 
 
-        const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 || 
-                            (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) || 
-                            (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
-                        ))
+        const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
+            (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
+            (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
+        ))
 
-        if(onDrop && allowDrop){
+        if (onDrop && allowDrop) {
             onDrop(e, draggedElement, widgetClass)
         }
     }
@@ -127,19 +141,19 @@ function Droppable(props) {
 
     const handleDragLeave = (e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) {
-            setShowDroppable({
-                allow: false, 
+            setAllowDrop({
+                allow: false,
                 show: false
             })
         }
     }
 
 
-	// TODO: from here
-	return (
-		<div ref={droppableRef} style={style} className={props.className || ''}>
-			{props.children}
-			{/* {
+    // TODO: from here
+    return (
+        <div ref={droppableRef} style={style} className={props.className || ''}>
+            {props.children}
+            {/* {
                 showDroppable.show && 
                     <div className={`${showDroppable.allow ? "tw-border-green-600" : "tw-border-red-600"} 
                                     tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[2]
@@ -148,16 +162,16 @@ function Droppable(props) {
                     </div>
             } */}
 
-			{	
-                isOver && 
-                    <div className={`${showDroppable.allow ? "tw-bg-[#82ff1c6e]" : "tw-bg-[#eb5d366e]"} 
+            {
+                isOver &&
+                <div className={`${allowDrop ? "tw-bg-[#82ff1c6e]" : "tw-bg-[#eb5d366e]"} 
                                     tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[999]
                                     tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
                                     `}>
-                    </div>
+                </div>
             }
-		</div>
-	)
+        </div>
+    )
 }
 
 export default Droppable
