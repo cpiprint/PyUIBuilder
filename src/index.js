@@ -12,6 +12,8 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import "./styles/tailwind.css";
 import "./styles/index.css";
 import { FileUploadProvider } from "./contexts/fileUploadContext";
+import { DndContext } from "@dnd-kit/core";
+import { DragProvider } from "./components/draggable/draggableContext";
 
 const originalSetItem = localStorage.setItem;
 // triggers itemsChaned event whenever the item in localstorage is chanegd.
@@ -69,7 +71,9 @@ root.render(
             <Provider store={store}>
                 <QueryClientProvider client={queryClient} >
 					<FileUploadProvider>
-						<App />
+						<DragProvider>
+							<App />
+						</DragProvider>
 					</FileUploadProvider>
 				</QueryClientProvider>
             </Provider>

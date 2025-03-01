@@ -11,16 +11,10 @@ export const DragProvider = ({ children }) => {
     const [draggedElement, setDraggedElement] = useState(null)
     const [overElement, setOverElement] = useState(null) // the element the dragged items is over
 
-    const [dragElementMetaData, setDragElementMetaData] = useState({})
-
     const [widgetClass, setWidgetClass] = useState(null) // helper to help pass the widget type from sidebar to canvas
 
-    const [isDragging, setIsDragging] = useState(false)
-
-    const onDragStart = (element, widgetClass=null, metaData={}) => {
+    const onDragStart = (element, widgetClass=null) => {
         setDraggedElement(element)
-        setIsDragging(true)
-        setDragElementMetaData(metaData)
 
         if (widgetClass && !isSubClassOfWidget(widgetClass))
             throw new Error("widgetClass must inherit from the Widget base class")
@@ -31,18 +25,12 @@ export const DragProvider = ({ children }) => {
     const onDragEnd = () => {
         setDraggedElement(null)
         setWidgetClass(null)
-        setIsDragging(false)
-
-        setDragElementMetaData({})
-
     }
 
     return (
-        <DragContext.Provider value={{ draggedElement, overElement, setOverElement, 
-                                            widgetClass, onDragStart, onDragEnd, isDragging,
-                                            dragElementMetaData, setDragElementMetaData
-                                            }}>
+        <DragDropProvider value={{ draggedElement, overElement, setOverElement, 
+                                            widgetClass, onDragStart, onDragEnd }}>
             {children}
-        </DragContext.Provider>
+        </DragDropProvider>
     )
 }

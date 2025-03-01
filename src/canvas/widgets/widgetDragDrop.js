@@ -33,7 +33,7 @@ const WidgetDraggable = memo(({ widgetRef, enableDrag=true, dragElementType="wid
 
         onDragStart(widgetRef?.current || null)
 
-        console.log("Drag start: ", widgetRef.current)
+        // console.log("Drag start: ", widgetRef.current)
 
         // Create custom drag image with full opacity, this will ensure the image isn't taken from part of the canvas
         const dragImage = widgetRef?.current.cloneNode(true)

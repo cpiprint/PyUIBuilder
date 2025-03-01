@@ -3,6 +3,7 @@
  * Github: PaulleDemon
  */
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from "react-dom"
 
 import { LayoutFilled, ProductFilled, CloudUploadOutlined, DatabaseFilled } from "@ant-design/icons"
 // import { DndContext, useSensors, useSensor, PointerSensor, closestCorners, DragOverlay, rectIntersection } from '@dnd-kit/core'
@@ -14,7 +15,7 @@ import Sidebar from './sidebar/sidebar'
 import UploadsContainer from './sidebar/uploadsContainer'
 import WidgetsContainer from './sidebar/widgetsContainer'
 
-import { DragProvider } from './components/draggable/draggableContext'
+import { DragProvider, useDragContext } from './components/draggable/draggableContext'
 import PluginsContainer from './sidebar/pluginsContainer'
 
 import { FileUploadProvider, useFileUploadContext } from './contexts/fileUploadContext'
@@ -31,6 +32,8 @@ import generateTkinterCode from './frameworks/tkinter/engine/code'
 
 import TkMainWindow from './frameworks/tkinter/widgets/mainWindow' 
 import CTkMainWindow from './frameworks/customtk/widgets/mainWindow' 
+import { DndContext, DragOverlay } from '@dnd-kit/core'
+import { SidebarOverlayWidgetCard, SidebarWidgetCard } from './components/cards'
 
 
 function App() {
@@ -45,6 +48,8 @@ function App() {
 
     // const [uploadedAssets, setUploadedAssets] = useState([]) //  a global storage for assets, since redux can't store files(serialize files)
 
+	const { draggedElement, overElement, setOverElement, widgetClass, dragElementMetaData } = useDragContext()
+
 	const [sidebarWidgets, setSidebarWidgets] = useState(TkinterWidgets || [])
 	const [sidebarPlugins, setSidebarPlugins] = useState(TkinterPluginWidgets || [])
 
@@ -52,6 +57,7 @@ function App() {
 
 	// NOTE: the below reference is no longer required
 	const [canvasWidgets, setCanvasWidgets] = useState([]) // contains the reference to the widgets inside the canvas
+
 
 	const sidebarTabs = [
 		{
@@ -196,6 +202,9 @@ function App() {
 
 	}
 
+
+	// console.log("dragged element: ", dragElementMetaData)
+ 
 	return (
 		<div className="tw-w-full tw-h-[100vh] tw-flex tw-flex-col tw-bg-primaryBg">
 			<Header className="tw-h-[6vh]" onExportClick={handleCodeGen} 
@@ -208,7 +217,7 @@ function App() {
                 <p>Are you sure you want to change the framework? This will clear the canvas.</p>
             </Modal> */}
 
-				<DragProvider>
+				<DndContext autoScroll={false}>
 					<div className="tw-w-full tw-h-[94vh] tw-flex">
 						<Sidebar tabs={sidebarTabs}/>
 						
@@ -217,9 +226,25 @@ function App() {
 						{/* </ActiveWidgetProvider> */}
 					</div>
 					{/* dragOverlay (dnd-kit) helps move items from one container to another */}
-				</DragProvider>
+					
+					{
+						createPortal(
+							<DragOverlay dropAnimation={null}>
+								{
+									draggedElement ? 
+										<SidebarOverlayWidgetCard {...dragElementMetaData} />
+										: 
+										null
+								}
+							</DragOverlay>, 
+							document.body
+						)
+					}
+					
+				</DndContext>
+
 		</div>
 	)
 }
 
-export default App;
+export default App

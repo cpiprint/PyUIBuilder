@@ -1118,7 +1118,8 @@ class Widget extends React.Component {
         // FIXME: if the parent container has tw-overflow-none, then the resizable indicator are also hidden
         return (
 
-            <DragContext.Consumer>
+            // <DragContext.Consumer>
+            <>
                 {
                     ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement }) => {
 
@@ -1258,7 +1259,7 @@ class Widget extends React.Component {
                     }
                 }
 
-            </DragContext.Consumer>
+            </>
         )
 
     }

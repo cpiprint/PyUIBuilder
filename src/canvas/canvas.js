@@ -28,6 +28,7 @@ import WidgetContainer from "./constants/containers"
 import { isSubClassOfWidget } from "../utils/widget"
 import { ButtonModal } from "../components/modals"
 import ResizeWidgetContainer from "./resizeContainer"
+import Droppable from "../components/draggable/dnd/droppableDnd"
 
 // const DotsBackground = require("../assets/background/dots.svg")
 
@@ -1086,11 +1087,12 @@ class Canvas extends React.Component {
                     </ButtonModal>
                 </div>
 
+                <Droppable className={"tw-w-full tw-h-full"} id="canvas-droppable">
                 {/* <ActiveWidgetProvider> */}
-                <DroppableWrapper id="canvas-droppable"
+                {/* <DroppableWrapper id="canvas-droppable"
                     droppableTags={{ exclude: ["image", "video"] }}
                     className="tw-w-full tw-h-full"
-                    onDrop={this.handleDropEvent}>
+                    onDrop={this.handleDropEvent}> */}
                     {/* <DragWidgetProvider> */}
                     <Dropdown trigger={['contextMenu']} mouseLeaveDelay={0} menu={{ items: this.state.contextMenuItems, }}>
                         <div className="tw-w-full tw-h-full tw-outline-none tw-flex tw-relative tw-bg-[#f2f2f2] tw-overflow-hidden"
@@ -1127,8 +1129,8 @@ class Canvas extends React.Component {
                         </div>
                     </Dropdown>
                     {/* </DragWidgetProvider> */}
-                </DroppableWrapper>
-
+                {/* </DroppableWrapper> */}
+                </Droppable>
                 <CanvasToolBar isOpen={this.state.toolbarOpen}
                     widgetType={this.state.selectedWidget?.getWidgetType() || ""}
                     attrs={this.state.toolbarAttrs}
