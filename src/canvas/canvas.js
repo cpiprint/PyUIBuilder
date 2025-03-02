@@ -695,30 +695,30 @@ class Canvas extends React.Component {
 
         // const {x: draggedElementInitialX, y: draggedElementInitialY} = draggedElement.getBoundingClientRect()
         
-        // const { clientX, clientY } = e
-        const { x: clientX, y: clientY} = e.delta;
-        const {clientX: draggedElementInitialX, clientY: draggedElementInitialY} = e.activatorEvent
+        const { clientX, clientY } = e.nativeEvent
+        // const { x: clientX, y: clientY} = e.delta;
+        // const {clientX: draggedElementInitialX, clientY: draggedElementInitialY} = e.activatorEvent
 
-        console.log("wirking: ", clientX, clientY, e, draggedElementInitialX, draggedElementInitialY)
+        // console.log("wirking: ", clientX, clientY, e, draggedElementInitialX, draggedElementInitialY)
 
 
-        // let finalPosition = {
-        //     x: (clientX - canvasRect.left) / this.state.zoom,
-        //     y: (clientY - canvasRect.top) / this.state.zoom,
-        // }
+        let finalPosition = {
+            x: (clientX - canvasRect.left) / this.state.zoom,
+            y: (clientY - canvasRect.top) / this.state.zoom,
+        }
         // let finalPosition = {
         //     x: ((draggedElementInitialX + clientX) - canvasRect.left) / (this.state.zoom),
         //     y: ((draggedElementInitialY + clientY) - canvasRect.top) / (this.state.zoom),
         // }
-        let finalPosition = {
-            x: (e.activatorEvent.pageX - canvasRect.left) / (this.state.zoom),
-            y: (e.activatorEvent.pageY - canvasRect.top) / (this.state.zoom),
-        }
+        // let finalPosition = {
+        //     x: (e.activatorEvent.pageX - canvasRect.left) / (this.state.zoom),
+        //     y: (e.activatorEvent.pageY - canvasRect.top) / (this.state.zoom),
+        // }
 
         // FIXME: error in canvasRect.top
 
-        console.log("final position: ", finalPosition,  draggedElementInitialX, clientX, canvasRect, "Top: ", 
-                            canvasRect.top, clientY, draggedElementInitialY)
+        // console.log("final position: ", finalPosition,  draggedElementInitialX, clientX, canvasRect, "Top: ", 
+        //                     canvasRect.top, clientY, draggedElementInitialY)
 
 
         if (container === WidgetContainer.SIDEBAR) {

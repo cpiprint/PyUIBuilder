@@ -47,35 +47,29 @@ function Droppable(props) {
 
     const manager = useDragDropManager()
 
-    useEffect(() => {
-
-        manager?.monitor?.addEventListener("dragstart", handleDragEnter)
-        manager?.monitor?.addEventListener("dragend", handleDragLeave)
-        manager?.monitor?.addEventListener("dragover", handleDragOver)
-
-
-        return () => {
-            manager?.monitor?.removeEventListener("dragstart", handleDragEnter)
-            manager?.monitor?.removeEventListener("dragend", handleDragLeave)
-            manager?.monitor?.removeEventListener("dragover", handleDragOver)
-        }
-    }, [manager])
-
 
     const { droppableTags, onDrop } = props
 
     const { draggedElement, overElement, setOverElement, widgetClass } = useDragContext()
 
     // const {}
-
+    
     const [allowDrop, setAllowDrop] = useState(false) // indicator if the draggable can be dropped on the droppable
 
-    // useEffect(() => {
+    useEffect(() => {
 
-    //     if (droppableRef.current)
-    //         setNodeRef(droppableRef.current)
+        manager?.monitor?.addEventListener("dragstart", handleDragEnter)
+        manager?.monitor?.addEventListener("dragend", handleDragLeave)
+        manager?.monitor?.addEventListener("dragmove", handleDragOver)
 
-    // }, [droppableRef.current, setNodeRef])
+
+        return () => {
+            manager?.monitor?.removeEventListener("dragstart", handleDragEnter)
+            manager?.monitor?.removeEventListener("dragend", handleDragLeave)
+            manager?.monitor?.removeEventListener("dragmove", handleDragOver)
+        }
+    }, [manager, draggedElement])
+
 
 
     // TODO: handle Drop on Canvas
@@ -87,6 +81,7 @@ function Droppable(props) {
         if (target && target?.id !== props?.id){
             return
         }
+        console.log("Over element: ", e)
 
         if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
@@ -95,6 +90,7 @@ function Droppable(props) {
 
         const dragElementType = draggedElement.getAttribute("data-draggable-type")
 
+        console.log("Over element: ", e)
         setOverElement(document.getElementById(e.over.id))
 
         const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
@@ -113,7 +109,7 @@ function Droppable(props) {
         if (target && target?.id !== props?.id){
             return
         }
-        console.log("Over sir1: ", draggedElement)
+        // console.log("Over sir1: ", draggedElement)
 
 
         if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
@@ -128,9 +124,6 @@ function Droppable(props) {
             (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
             (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
         ))
-
-        console.log("Over sir: ", allowDrop)
-
 
         setAllowDrop(allowDrop)
         // if (allowDrop) {
