@@ -34,6 +34,7 @@ import TkMainWindow from './frameworks/tkinter/widgets/mainWindow'
 import CTkMainWindow from './frameworks/customtk/widgets/mainWindow' 
 import { DndContext, DragOverlay } from '@dnd-kit/core'
 import { SidebarOverlayWidgetCard, SidebarWidgetCard } from './components/cards'
+import { DragDropProvider } from '@dnd-kit/react'
 
 
 function App() {
@@ -217,7 +218,7 @@ function App() {
                 <p>Are you sure you want to change the framework? This will clear the canvas.</p>
             </Modal> */}
 
-				<DndContext autoScroll={false}>
+				<DragDropProvider onDragStart={(e) => {console.log("Drag start event: ", e)}}>
 					<div className="tw-w-full tw-h-[94vh] tw-flex">
 						<Sidebar tabs={sidebarTabs}/>
 						
@@ -241,7 +242,7 @@ function App() {
 						)
 					}
 					
-				</DndContext>
+				</DragDropProvider>
 
 		</div>
 	)

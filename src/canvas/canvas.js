@@ -687,30 +687,38 @@ class Canvas extends React.Component {
         }
 
         const container = draggedElement.getAttribute("data-container")
+        
         const canvasRect = this.canvasRef.current.getBoundingClientRect()
-
         const draggedElementRect = draggedElement.getBoundingClientRect()
         const elementWidth = draggedElementRect.width
         const elementHeight = draggedElementRect.height
 
-        const {x: draggedElementInitialX, y: draggedElementInitialY} = draggedElement.getBoundingClientRect()
-
+        // const {x: draggedElementInitialX, y: draggedElementInitialY} = draggedElement.getBoundingClientRect()
+        
         // const { clientX, clientY } = e
         const { x: clientX, y: clientY} = e.delta;
+        const {clientX: draggedElementInitialX, clientY: draggedElementInitialY} = e.activatorEvent
 
-        console.log("wirking: ", clientX, clientY, draggedElement.getBoundingClientRect())
+        console.log("wirking: ", clientX, clientY, e, draggedElementInitialX, draggedElementInitialY)
 
 
         // let finalPosition = {
         //     x: (clientX - canvasRect.left) / this.state.zoom,
         //     y: (clientY - canvasRect.top) / this.state.zoom,
         // }
+        // let finalPosition = {
+        //     x: ((draggedElementInitialX + clientX) - canvasRect.left) / (this.state.zoom),
+        //     y: ((draggedElementInitialY + clientY) - canvasRect.top) / (this.state.zoom),
+        // }
         let finalPosition = {
-            x: ((draggedElementInitialX + clientX) - canvasRect.left) / (1 || this.state.zoom),
-            y: ((draggedElementInitialY + clientY) - canvasRect.top) / (1 ||this.state.zoom),
+            x: (e.activatorEvent.pageX - canvasRect.left) / (this.state.zoom),
+            y: (e.activatorEvent.pageY - canvasRect.top) / (this.state.zoom),
         }
 
-        console.log("final position: ", finalPosition, draggedElementInitialX, clientX, canvasRect.left)
+        // FIXME: error in canvasRect.top
+
+        console.log("final position: ", finalPosition,  draggedElementInitialX, clientX, canvasRect, "Top: ", 
+                            canvasRect.top, clientY, draggedElementInitialY)
 
 
         if (container === WidgetContainer.SIDEBAR) {

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react'
 import { isSubClassOfWidget } from '../../utils/widget'
+import { useDndContext } from '@dnd-kit/core'
 // import Widget from '../../canvas/widgets/base'
 
 export const DragContext = createContext()
@@ -11,13 +12,14 @@ export const DragProvider = ({ children }) => {
     const [draggedElement, setDraggedElement] = useState(null)
     const [overElement, setOverElement] = useState(null) // the element the dragged items is over
 
+
     const [dragElementMetaData, setDragElementMetaData] = useState({})
 
     const [widgetClass, setWidgetClass] = useState(null) // helper to help pass the widget type from sidebar to canvas
 
     const [isDragging, setIsDragging] = useState(false)
 
-    const onDragStart = (element, widgetClass=null, metaData={}) => {
+    const onDragStart = (element, widgetClass=null, metaData={}, pos={x: 0, y: 0}) => {
         setDraggedElement(element)
         setIsDragging(true)
         setDragElementMetaData(metaData)
@@ -26,9 +28,11 @@ export const DragProvider = ({ children }) => {
             throw new Error("widgetClass must inherit from the Widget base class")
 
         setWidgetClass(() => widgetClass) // store the class so later it can be passed to the canvas from sidebar
+
+        
     }
 
-    const onDragEnd = () => {
+    const onDragEnd = (pos) => {
         setDraggedElement(null)
         setWidgetClass(null)
         setIsDragging(false)
@@ -40,7 +44,7 @@ export const DragProvider = ({ children }) => {
     return (
         <DragContext.Provider value={{ draggedElement, overElement, setOverElement, 
                                             widgetClass, onDragStart, onDragEnd, isDragging,
-                                            dragElementMetaData, setDragElementMetaData
+                                            dragElementMetaData, setDragElementMetaData,
                                             }}>
             {children}
         </DragContext.Provider>
