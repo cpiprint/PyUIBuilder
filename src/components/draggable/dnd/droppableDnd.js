@@ -7,6 +7,13 @@ function Droppable(props) {
 
     const droppableRef = useRef(null)
 
+    // const [dragPosition, setDragPosition] = useState({
+    //     startX: 0, 
+    //     startY: 0,
+    //     endX: 0,
+    //     endY: 0
+    // })
+
     const { isOver, setNodeRef } = useDroppable({
         id: props.id,
     })
@@ -17,16 +24,23 @@ function Droppable(props) {
 
     useDndMonitor({
         onDragStart: (event) => {
-            if (event.over?.id === props.id)
+            if (event.over?.id === props.id){
                 handleDragEnter(event)
+                // setDragPosition({
+                //     ...dragPosition,
+                //     startX: event.over.
+                // })
+
+                console.log("starting: ", event)
+            }
         },
         onDragMove: (event) => {
-            console.log("Drag start")
+            console.log("Drag move: ", event.active.rect)
             if (event.over?.id === props.id)
                 handleDragOver(event)
         },
         onDragEnd: (event) => {
-      
+
             if (event.over?.id === props.id){
                 if (event.over) {
                     handleDropEvent(event) // Item was dropped inside a valid container
@@ -73,15 +87,12 @@ function Droppable(props) {
 
         const dragElementType = draggedElement.getAttribute("data-draggable-type")
 
-        console.log("Drag eneter:", e, e.over.id)
         setOverElement(document.getElementById(e.over.id))
 
         const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
             (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
             (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
         ))
-
-        console.log("allow drop: ", allowDrop)
 
         setAllowDrop(allowDrop)
        
@@ -102,8 +113,7 @@ function Droppable(props) {
             (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
         ))
 
-        console.log("allow drop: ", allowDrop)
-        setAllowDrop({allow: allowDrop})
+        setAllowDrop(allowDrop)
         // if (allowDrop) {
         //     e.preventDefault() // this is necessary to allow drop to take place
         // }
@@ -123,7 +133,7 @@ function Droppable(props) {
         }
 
         // e.stopPropagation()
-
+        console.log("Drag ended: ", e)
 
         const dragElementType = draggedElement.getAttribute("data-draggable-type")
 
@@ -148,8 +158,6 @@ function Droppable(props) {
         }
     }
 
-
-    // TODO: from here
     return (
         <div ref={droppableRef} style={style} className={props.className || ''}>
             {props.children}

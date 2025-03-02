@@ -191,6 +191,8 @@ class Canvas extends React.Component {
     getWidgetFromTarget(target) {
         // TODO: improve search, currently O(n), but can be improved via this.state.widgets or something
 
+        console.log("Target: ", target, )
+
         let innerWidget = null
         for (let [key, ref] of Object.entries(this.widgetRefs)) {
 
@@ -199,9 +201,11 @@ class Canvas extends React.Component {
                 break
             }
 
+            console.log("ref: ", ref.current)
+
             // console.log("refs: ", ref)
             // TODO: remove the ref.current? if there are bugs it would become hard to debug
-            if (ref.current?.getElement().contains(target)) {
+            if (ref.current?.getElement()?.contains(target)) {
 
                 if (!innerWidget) {
                     innerWidget = ref.current
@@ -668,12 +672,16 @@ class Canvas extends React.Component {
      */
       handleDropEvent = (e, draggedElement, widgetClass = null) => {
 
-        e.preventDefault()
-        // console.log("Drop event")
+        console.log("event: ", e, draggedElement, widgetClass)
+
+        // e.preventDefault()
 
         this.setState({ isWidgetDragging: false })
 
+        console.log("Drop outside1")
         if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
+            console.log("Drop outside")
+
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
             return
         }
@@ -685,12 +693,24 @@ class Canvas extends React.Component {
         const elementWidth = draggedElementRect.width
         const elementHeight = draggedElementRect.height
 
-        const { clientX, clientY } = e
+        const {x: draggedElementInitialX, y: draggedElementInitialY} = draggedElement.getBoundingClientRect()
 
+        // const { clientX, clientY } = e
+        const { x: clientX, y: clientY} = e.delta;
+
+        console.log("wirking: ", clientX, clientY, draggedElement.getBoundingClientRect())
+
+
+        // let finalPosition = {
+        //     x: (clientX - canvasRect.left) / this.state.zoom,
+        //     y: (clientY - canvasRect.top) / this.state.zoom,
+        // }
         let finalPosition = {
-            x: (clientX - canvasRect.left) / this.state.zoom,
-            y: (clientY - canvasRect.top) / this.state.zoom,
+            x: ((draggedElementInitialX + clientX) - canvasRect.left) / (1 || this.state.zoom),
+            y: ((draggedElementInitialY + clientY) - canvasRect.top) / (1 ||this.state.zoom),
         }
+
+        console.log("final position: ", finalPosition, draggedElementInitialX, clientX, canvasRect.left)
 
 
         if (container === WidgetContainer.SIDEBAR) {
@@ -699,9 +719,13 @@ class Canvas extends React.Component {
                 throw new Error("WidgetClass has to be passed for widgets dropped from sidebar")
             }
 
+
             // if the widget is being dropped from the sidebar, use the info to create the widget first
             this.createWidget(widgetClass, ({ id, widgetRef }) => {
                 widgetRef.current.setPos(finalPosition.x, finalPosition.y)
+                // widgetRef.current.setPos(10, 10)
+                console.log("hell ya ", widgetRef.current.setPos, finalPosition)
+
             })
 
         } else if ([WidgetContainer.CANVAS, WidgetContainer.WIDGET].includes(container)) {
@@ -783,7 +807,7 @@ class Canvas extends React.Component {
         // console.log("event: ", event)
         // widgets data structure { id, widgetType: widgetComponentType, children: [], parent: "" }
         const dropWidgetObj = this.findWidgetFromListById(parentWidgetId)
-        // Find the dragged widget object
+        // Find the dragged wihandleAddWidgetChilddget object
         let dragWidgetObj = this.findWidgetFromListById(dragElementID)
 
         // console.log("Drag widget obj: ", dragWidgetObj, dropWidgetObj)

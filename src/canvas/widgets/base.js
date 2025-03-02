@@ -365,6 +365,7 @@ class Widget extends React.Component {
     }
 
     setPos(x, y) {
+        console.log("position set: ", x, y)
 
         this.setState({
             pos: { x, y }
@@ -1119,7 +1120,7 @@ class Widget extends React.Component {
         return (
 
             // <DragContext.Consumer>
-            <>
+            <DragContext.Consumer>
                 {
                     ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement }) => {
 
@@ -1259,7 +1260,7 @@ class Widget extends React.Component {
                     }
                 }
 
-            </>
+            </DragContext.Consumer>
         )
 
     }

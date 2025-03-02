@@ -57,17 +57,19 @@ function Draggable(props) {
 	}
 
 
-
+	// TODO: remove element meta data from props
 	return (
-		<div className={`${props.className}`}
+		<div 
+			{...props}
 			ref={draggableRef}
+			className={`${props.className}`}
 			// style={!disableStyle ? style : null} //enable this to show like the original item is moving, if commented out the original item will not have css effects
 			draggable
 			data-drag-start-within // this attribute indicates that the drag is occurring from within the project and not a outside file drop
 			data-draggable-type={dragElementType}
+
 			{...listeners}
 			{...attributes}
-			{...props}
 		>
 			{props.children}
 		</div>
