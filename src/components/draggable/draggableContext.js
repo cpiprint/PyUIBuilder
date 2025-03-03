@@ -20,7 +20,7 @@ export const DragProvider = ({ children }) => {
     const [isDragging, setIsDragging] = useState(false)
 
     const onDragStart = (element, widgetClass=null, metaData={}, pos={x: 0, y: 0}) => {
-        console.log("element yaa: ", element)
+        
         setDraggedElement(element)
         setIsDragging(true)
         setDragElementMetaData(metaData)

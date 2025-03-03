@@ -9,8 +9,9 @@ function Draggable(props) {
 	const draggableRef = useRef(null);
 
 	const { ref } = useDraggable({
-		id: props.id,
-		feedback: "clone"
+		id: props.dragElementType,
+		feedback: "clone",
+		type: props.dragElementType
 		// data: { title: props.children }
 	})
 
@@ -31,19 +32,6 @@ function Draggable(props) {
 
 	}, [manager])
 
-	// useDndMonitor({
-    //     onDragStart(event){
-	// 		if (event.active.id === props.id) {  // Ensure only this element triggers it
-	// 			handleDragStart()
-	// 		}
-	// 	}, 
-    //     onDragEnd(event){
-	// 		if (event.active.id === props.id) {  // Ensure only this element triggers it
-	// 			handleDragEnd()
-	// 		}
-	// 	}, 
-    // })
-
 
 	const { dragElementType, dragWidgetClass = null, elementMetaData } = props
 	// const style = transform ? {
@@ -59,11 +47,12 @@ function Draggable(props) {
 	const handleDragStart = (event) => {
 
 		const {source} = event.operation
-        
-        if (source && source?.id !== props?.id){
+		
+        if (!source || (source && source.id !== props.dragElementType)){
+            return
+        } if (!source || (source && source.id !== props.dragElementType)){
             return
         }
-		
 		// event.dataTransfer.setData("text/plain", "")
 		// onDragStart(draggableRef?.current, dragWidgetClass)
 		onDragStart(draggableRef?.current, dragWidgetClass, elementMetaData)
@@ -74,11 +63,10 @@ function Draggable(props) {
 		// console.log("Drag end: ", e, e.target.closest('div'))
 		const {source} = event.operation
         
-        if (source && source?.id !== props?.id){
+		if (!source || (source && source.id !== props.dragElementType)){
             return
         }
 
-		console.log("Drage ended")
 		onDragEnd()
 	}
 
