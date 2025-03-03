@@ -34,6 +34,7 @@ export function SidebarWidgetCard({ name, img, url, license, widgetClass, innerR
             data-container={"sidebar"} 
             dragElementType={widgetClass.widgetType} 
             dragWidgetClass={widgetClass}
+            draggableType={"clone"}
             elementMetaData={{
                 name, 
                 url, 

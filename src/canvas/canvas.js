@@ -191,8 +191,6 @@ class Canvas extends React.Component {
     getWidgetFromTarget(target) {
         // TODO: improve search, currently O(n), but can be improved via this.state.widgets or something
 
-        console.log("Target: ", target, )
-
         let innerWidget = null
         for (let [key, ref] of Object.entries(this.widgetRefs)) {
 
@@ -200,9 +198,6 @@ class Canvas extends React.Component {
                 innerWidget = ref.current
                 break
             }
-
-            console.log("ref: ", ref.current)
-
             // console.log("refs: ", ref)
             // TODO: remove the ref.current? if there are bugs it would become hard to debug
             if (ref.current?.getElement()?.contains(target)) {

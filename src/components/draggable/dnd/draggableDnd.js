@@ -10,7 +10,7 @@ function Draggable(props) {
 
 	const { ref } = useDraggable({
 		id: props.dragElementType,
-		feedback: "clone",
+		feedback: props.draggableType || "default",
 		type: props.dragElementType
 		// data: { title: props.children }
 	})
