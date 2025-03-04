@@ -8,7 +8,7 @@ function Droppable(props) {
     const droppableRef = useRef(null)
     const { droppableTags, onDrop } = props
 
-    const { draggedElement, overElement, setOverElement, widgetClass } = useDragContext()
+    const { draggedElement, setOverElement, widgetClass, initialPosition } = useDragContext()
 
     const { ref, isDropTarget, droppable} = useDroppable({
         id: props.id,
@@ -40,7 +40,7 @@ function Droppable(props) {
             manager?.monitor?.removeEventListener("dragend", handleDragLeave)
             manager?.monitor?.removeEventListener("dragmove", handleDragOver)
         }
-    }, [manager, draggedElement, widgetClass])
+    }, [manager, draggedElement, widgetClass, initialPosition])
 
 
     const handleRef = (node) => {
@@ -71,8 +71,6 @@ function Droppable(props) {
             (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
             (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
         ))
-
-        console.log("droppable tags: ", dropAllowed)
 
 
         setAllowDrop({allow: dropAllowed, show: true})
@@ -137,10 +135,9 @@ function Droppable(props) {
             (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
         ))
 
-        console.log("Widget class1: ", widgetClass, draggedElement)
-
+        console.log("initial POs: ", initialPosition)
         if (onDrop && dropAllowed) {
-            onDrop(e, draggedElement, widgetClass)
+            onDrop(e, draggedElement, widgetClass, initialPosition)
         }
     }
 
@@ -165,7 +162,7 @@ function Droppable(props) {
 
             {
                 allowDrop.show &&
-                <div className={`${allowDrop.allow ? "tw-bg-[#82ff1c6e]" : "tw-bg-[#eb5d366e]"} 
+                <div className={`${allowDrop.allow ? "tw-bg-[#82ff1c31]" : "tw-bg-[#eb5d3646]"} 
                                     tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[0]
                                     tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
                                     `}>

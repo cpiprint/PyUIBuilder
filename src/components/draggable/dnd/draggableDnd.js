@@ -59,7 +59,6 @@ function Draggable({dragElementType, dragWidgetClass = null, elementMetaData, ..
 
 	const handleDragEnd = (event) => {
 		// console.log("Drag end: ", e, e.target.closest('div'))
-		const {source} = event.operation
         
 		if (!draggable.isDragSource){
             return

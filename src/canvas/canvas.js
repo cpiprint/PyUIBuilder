@@ -665,9 +665,9 @@ class Canvas extends React.Component {
      * Handles drop event to canvas from the sidebar and on canvas widget movement
      * @param {DragEvent} e 
      */
-      handleDropEvent = (e, draggedElement, widgetClass = null) => {
+      handleDropEvent = (e, draggedElement, widgetClass = null, initialPos={x: 0, y: 0}) => {
 
-        console.log("event: ", e, draggedElement, widgetClass)
+        console.log("event: ", e, draggedElement, widgetClass, initialPos)
 
         // e.preventDefault()
 
@@ -689,24 +689,21 @@ class Canvas extends React.Component {
         // const {x: draggedElementInitialX, y: draggedElementInitialY} = draggedElement.getBoundingClientRect()
         
         const { clientX, clientY } = e.nativeEvent
+
+        const { initial } = e.operation.shape
+        console.log("event: ", e)
         // const { x: clientX, y: clientY} = e.delta;
         // const {clientX: draggedElementInitialX, clientY: draggedElementInitialY} = e.activatorEvent
 
         // console.log("wirking: ", clientX, clientY, e, draggedElementInitialX, draggedElementInitialY)
 
-
+        // TODO: + initial cursor position - final cursor position
         let finalPosition = {
-            x: (clientX - canvasRect.left) / this.state.zoom,
-            y: (clientY - canvasRect.top) / this.state.zoom,
+            x: ((clientX - canvasRect.left) / this.state.zoom) - (initial.left) / this.state.zoom,
+            y: ((clientY - canvasRect.top) / this.state.zoom) - (initial.top) / this.state.zoom,
         }
-        // let finalPosition = {
-        //     x: ((draggedElementInitialX + clientX) - canvasRect.left) / (this.state.zoom),
-        //     y: ((draggedElementInitialY + clientY) - canvasRect.top) / (this.state.zoom),
-        // }
-        // let finalPosition = {
-        //     x: (e.activatorEvent.pageX - canvasRect.left) / (this.state.zoom),
-        //     y: (e.activatorEvent.pageY - canvasRect.top) / (this.state.zoom),
-        // }
+
+        console.log("container: ", container)
 
         if (container === WidgetContainer.SIDEBAR) {
 
@@ -719,25 +716,28 @@ class Canvas extends React.Component {
             this.createWidget(widgetClass, ({ id, widgetRef }) => {
                 widgetRef.current.setPos(finalPosition.x, finalPosition.y)
                 // widgetRef.current.setPos(10, 10)
-                console.log("hell ya ", widgetRef.current.setPos, finalPosition)
-
             })
 
         } else if ([WidgetContainer.CANVAS, WidgetContainer.WIDGET].includes(container)) {
 
             // snaps to center
-            finalPosition = {
-                x: (clientX - canvasRect.left) / this.state.zoom - (elementWidth / 2) / this.state.zoom,
-                y: (clientY - canvasRect.top) / this.state.zoom - (elementHeight / 2) / this.state.zoom,
-            }
+            // finalPosition = {
+            //     x: (clientX - canvasRect.left) / this.state.zoom - (elementWidth / 2) / this.state.zoom,
+            //     y: (clientY - canvasRect.top) / this.state.zoom - (elementHeight / 2) / this.state.zoom,
+            // }
 
             let widgetId = draggedElement.getAttribute("data-widget-id")
 
             const widgetObj = this.getWidgetById(widgetId)
+
+            console.log("current pos: ", finalPosition, widgetId, widgetObj)
+
             // console.log("WidgetObj: ", widgetObj)
             if (container === WidgetContainer.CANVAS) {
 
                 widgetObj.current.setPos(finalPosition.x, finalPosition.y)
+
+                console.log("current pos: ", finalPosition)
 
             } else if (container === WidgetContainer.WIDGET) {
 
