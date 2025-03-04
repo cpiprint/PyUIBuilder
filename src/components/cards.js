@@ -43,49 +43,44 @@ export function SidebarWidgetCard({ name, img, url, license, widgetClass, innerR
                 widgetClass,
             }}
             >
-            {/* <DraggableWrapper data-container={"sidebar"} 
-                                dragElementType={widgetClass.widgetType} 
-                                dragWidgetClass={widgetClass}
-                                className="tw-cursor-pointer tw-w-fit tw-bg-white tw-h-fit"> */}
-                
-                <div ref={innerRef} className="tw-select-none  tw-h-[200px] tw-w-[230px] tw-flex tw-flex-col 
-                                                tw-rounded-md tw-overflow-hidden 
-                                                tw-gap-2 tw-text-gray-600 tw-bg-[#ffffff44] tw-border-solid tw-border-[1px]
-                                                tw-border-blue-500 tw-shadow-md">
-                    <div className="tw-h-[200px] tw-pointer-events-none tw-w-full tw-overflow-hidden">
-                        <img src={img} alt={name} className="tw-object-contain tw-h-full tw-w-full tw-select-none" />
-                    </div>
-                    <span className="tw-text-center tw-text-black tw-text-lg">{name}</span>
-                    <div className="tw-flex tw-text-lg tw-place tw-px-4">
-
-                        <a href={url} className="tw-text-gray-600" target="_blank" rel="noopener noreferrer">
-                            {urlIcon}
-                        </a>
-
-                        {license?.name && 
-
-                            <div className="tw-ml-auto tw-text-sm">
-                                {
-                                license.url ? 
-                                    <a href={license.url} target="_blank" rel="noreferrer noopener"
-                                        className="tw-p-[1px] tw-px-2 tw-text-blue-500 tw-border-[1px]
-                                                                        tw-border-solid tw-rounded-sm tw-border-blue-500
-                                                                        tw-shadow-md tw-text-center tw-no-underline">
-                                        {license.name}
-                                    </a>
-                                    :
-                                    <div className="tw-p-[1px] tw-px-2 tw-text-blue-500 tw-border-[1px]
-                                                    tw-border-solid tw-rounded-sm tw-border-blue-500
-                                                    tw-shadow-md tw-text-center">
-                                        {license.name}
-                                    </div>
-                                }
-                            </div>    
-                        }
-                    </div>
-                    
+       
+            <div ref={innerRef} className="tw-select-none  tw-h-[200px] tw-w-[230px] tw-flex tw-flex-col 
+                                            tw-rounded-md tw-overflow-hidden 
+                                            tw-gap-2 tw-text-gray-600 tw-bg-[#ffffff44] tw-border-solid tw-border-[1px]
+                                            tw-border-blue-500 tw-shadow-md">
+                <div className="tw-h-[200px] tw-pointer-events-none tw-w-full tw-overflow-hidden">
+                    <img src={img} alt={name} className="tw-object-contain tw-h-full tw-w-full tw-select-none" />
                 </div>
-            {/* </DraggableWrapper> */}
+                <span className="tw-text-center tw-text-black tw-text-lg">{name}</span>
+                <div className="tw-flex tw-text-lg tw-place tw-px-4">
+
+                    <a href={url} className="tw-text-gray-600" target="_blank" rel="noopener noreferrer">
+                        {urlIcon}
+                    </a>
+
+                    {license?.name && 
+
+                        <div className="tw-ml-auto tw-text-sm">
+                            {
+                            license.url ? 
+                                <a href={license.url} target="_blank" rel="noreferrer noopener"
+                                    className="tw-p-[1px] tw-px-2 tw-text-blue-500 tw-border-[1px]
+                                                                    tw-border-solid tw-rounded-sm tw-border-blue-500
+                                                                    tw-shadow-md tw-text-center tw-no-underline">
+                                    {license.name}
+                                </a>
+                                :
+                                <div className="tw-p-[1px] tw-px-2 tw-text-blue-500 tw-border-[1px]
+                                                tw-border-solid tw-rounded-sm tw-border-blue-500
+                                                tw-shadow-md tw-text-center">
+                                    {license.name}
+                                </div>
+                            }
+                        </div>    
+                    }
+                </div>
+                
+            </div>
         </Draggable> 
     )
 

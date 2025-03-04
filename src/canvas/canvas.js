@@ -673,9 +673,7 @@ class Canvas extends React.Component {
 
         this.setState({ isWidgetDragging: false })
 
-        console.log("Drop outside1")
         if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
-            console.log("Drop outside")
 
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
             return
@@ -709,12 +707,6 @@ class Canvas extends React.Component {
         //     x: (e.activatorEvent.pageX - canvasRect.left) / (this.state.zoom),
         //     y: (e.activatorEvent.pageY - canvasRect.top) / (this.state.zoom),
         // }
-
-        // FIXME: error in canvasRect.top
-
-        // console.log("final position: ", finalPosition,  draggedElementInitialX, clientX, canvasRect, "Top: ", 
-        //                     canvasRect.top, clientY, draggedElementInitialY)
-
 
         if (container === WidgetContainer.SIDEBAR) {
 

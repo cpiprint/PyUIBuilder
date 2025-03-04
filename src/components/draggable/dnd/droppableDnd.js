@@ -23,9 +23,8 @@ function Droppable(props) {
         }
     })
 
- 
-    const manager = useDragDropManager()
 
+    const manager = useDragDropManager()
     // const {}
     
     const [allowDrop, setAllowDrop] = useState({show: false, allow: false}) // indicator if the draggable can be dropped on the droppable
@@ -41,7 +40,7 @@ function Droppable(props) {
             manager?.monitor?.removeEventListener("dragend", handleDragLeave)
             manager?.monitor?.removeEventListener("dragmove", handleDragOver)
         }
-    }, [manager, draggedElement])
+    }, [manager, draggedElement, widgetClass])
 
 
     const handleRef = (node) => {
@@ -138,6 +137,8 @@ function Droppable(props) {
             (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
         ))
 
+        console.log("Widget class1: ", widgetClass, draggedElement)
+
         if (onDrop && dropAllowed) {
             onDrop(e, draggedElement, widgetClass)
         }
@@ -159,24 +160,18 @@ function Droppable(props) {
 
     return (
         <div ref={handleRef} className={props.className || ''}>
+
             {props.children}
-            {/* {
-                showDroppable.show && 
-                    <div className={`${showDroppable.allow ? "tw-border-green-600" : "tw-border-red-600"} 
-                                    tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[2]
-                                    tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
-                                    `}>
-                    </div>
-            } */}
 
             {
                 allowDrop.show &&
                 <div className={`${allowDrop.allow ? "tw-bg-[#82ff1c6e]" : "tw-bg-[#eb5d366e]"} 
-                                    tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[999]
+                                    tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[0]
                                     tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
                                     `}>
                 </div>
             }
+   
         </div>
     )
 }

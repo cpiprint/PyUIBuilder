@@ -3,8 +3,7 @@ import { useDragDropManager, useDroppable, useDraggable } from '@dnd-kit/react'
 import { useDragContext } from '../../components/draggable/draggableContext'
 
 
-// FIXME: fix the issue of self drop
-function WidgetDnd({droppableTags,
+function WidgetDnd({widgetId, droppableTags, onDrop,
                             ...props}) {
 
     const dndRef = useRef(null)
@@ -14,7 +13,7 @@ function WidgetDnd({droppableTags,
     const { draggedElement, setOverElement, widgetClass } = useDragContext()
 
     const { ref: dropRef, isDropTarget, droppable} = useDroppable({
-        id: props.id,
+        id: widgetId,
         // accept: (draggable) => {
             
         //     const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
@@ -27,7 +26,7 @@ function WidgetDnd({droppableTags,
     })
 
     const { ref: dragRef, draggable } = useDraggable({
-		id: dragElementType,
+		id: widgetId,
 		feedback: "default",
 		type: dragElementType,
         disabled: props.disabled,
@@ -68,66 +67,75 @@ function WidgetDnd({droppableTags,
     const handleDragEnter = (e) => {
 
         const {target, source} = e.operation
-        
-        console.log("is drag source: ", props.id, draggable.isDragSource)
 
 
         if (draggable.isDragSource){
-		    onDragStart(dndRef?.current, widgetClass)
+		    // if the current widget is being dragged
+            onDragStart(dndRef?.current, widgetClass)
 
-        }
+            dndRef.current.style.zIndex = 10
 
-            if (target && target?.id !== props?.id){
+            return 
+        }else if (droppable.isDropTarget){
+
+            if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
+                // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
                 return
             }
-
-
-        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
-            // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
-            return
+    
+            const dragElementType = draggedElement.getAttribute("data-draggable-type")
+    
+            setOverElement(dndRef.current)
+    
+            const dropAllowed = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
+                (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
+                (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
+            ))
+    
+            console.log("droppable tags: ", dropAllowed)
+    
+    
+            setAllowDrop({allow: dropAllowed, show: true})
+          
         }
 
-        const dragElementType = draggedElement.getAttribute("data-draggable-type")
-
-        setOverElement(document.getElementById(source.id))
-
-        const dropAllowed = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
-            (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
-            (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
-        ))
-
-        console.log("droppable tags: ", dropAllowed)
 
 
-        setAllowDrop({allow: dropAllowed, show: true})
        
     }
 
     const handleDragOver = (e) => {
-
         const {target} = e.operation
+
+        // if (draggable.isDragSource){
+		//     onDragStart(dndRef?.current, widgetClass)
+            
+        //     // TODO
+        //     dndRef.current.style.zIndex = 10 
+        // }
+
         
-        if (target && target?.id !== props?.id){
-            return
+        if (droppable.isDropTarget){
+            if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
+                // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
+                return
+            }
+    
+            // console.log("Drag over: ", e.dataTransfer.getData("text/plain"), e.dataTransfer)
+            const dragElementType = draggedElement.getAttribute("data-draggable-type")
+            
+            const dropAllowed = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
+                (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
+                (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
+            ))
+    
+    
+            setAllowDrop({allow: dropAllowed, show: true})
+
         }
         // console.log("Over sir1: ", draggedElement)
 
 
-        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
-            // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
-            return
-        }
-
-        // console.log("Drag over: ", e.dataTransfer.getData("text/plain"), e.dataTransfer)
-        const dragElementType = draggedElement.getAttribute("data-draggable-type")
-        
-        const dropAllowed = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
-            (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
-            (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
-        ))
-
-
-        setAllowDrop({allow: dropAllowed, show: true})
 
         // if (allowDrop) {
         //     e.preventDefault() // this is necessary to allow drop to take place
@@ -139,31 +147,34 @@ function WidgetDnd({droppableTags,
 
         const {target} = e.operation
         
-        if (target && target?.id !== props?.id){
-            return
-        }
+        if (draggable.isDragSource){
+    		onDragEnd()
 
-        setAllowDrop({allow: false, show: false})
-
-
-        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
-            // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
-            return
-        }
-
-        // e.stopPropagation()
-
-        const dragElementType = draggedElement.getAttribute("data-draggable-type")
+        }else if (droppable.isDropTarget){
+            setAllowDrop({allow: false, show: false})
 
 
-        const dropAllowed = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
-            (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
-            (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
-        ))
+            if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
+                // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
+                return
+            }
 
-        // if (onDrop && dropAllowed) {
-        //     onDrop(e, draggedElement, widgetClass)
-        // }
+            // e.stopPropagation()
+
+            const dragElementType = draggedElement.getAttribute("data-draggable-type")
+
+
+            const dropAllowed = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
+                (droppableTags.include?.length > 0 && droppableTags.include?.includes(dragElementType)) ||
+                (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
+            ))
+
+            if (onDrop && dropAllowed && (droppable.isDropTarget && !draggable.isDragSource)) {
+                onDrop(e, draggedElement, widgetClass)
+            }
+        }   
+
+        
     }
 
 
@@ -208,21 +219,16 @@ function WidgetDnd({droppableTags,
 
     return (
         <div ref={handleRef} data-drag-start-within 
+                {...props}
                 draggable
                 data-draggable-type={dragElementType}
-                className={`${props.className} tw-relative` || ''} {...props} style={{zIndex: 10}}>
+                className={`${props.className} tw-relative tw-h-fit tw-w-fit tw-outline-none`}  
+                >
+
             {props.children}
-            {/* {
-                showDroppable.show && 
-                    <div className={`${showDroppable.allow ? "tw-border-green-600" : "tw-border-red-600"} 
-                                    tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[2]
-                                    tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
-                                    `}>
-                    </div>
-            } */}
 
             {
-                droppable.isDropTarget &&
+                (droppable.isDropTarget && !draggable.isDragSource) &&
                 <div className={`${allowDrop.allow ? "tw-bg-[#82ff1c6e]" : "tw-bg-[#eb5d366e]"} 
                                     tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[3]
                                     tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none

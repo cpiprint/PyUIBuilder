@@ -4,14 +4,14 @@ import { CSS } from "@dnd-kit/utilities"
 import { useDragContext } from "../draggableContext"
 
 
-function Draggable(props) {
+function Draggable({dragElementType, dragWidgetClass = null, elementMetaData, ...props}) {
 
 	const draggableRef = useRef(null);
 
-	const { ref } = useDraggable({
-		id: props.dragElementType,
+	const { ref, draggable } = useDraggable({
+		id: dragElementType,
 		feedback: props.draggableType || "default",
-		type: props.dragElementType
+		type: dragElementType
 		// data: { title: props.children }
 	})
 
@@ -33,7 +33,6 @@ function Draggable(props) {
 	}, [manager])
 
 
-	const { dragElementType, dragWidgetClass = null, elementMetaData } = props
 	// const style = transform ? {
 	// 	transform: CSS.Translate.toString(transform),
 	// } : undefined
@@ -48,11 +47,10 @@ function Draggable(props) {
 
 		const {source} = event.operation
 		
-        if (!source || (source && source.id !== props.dragElementType)){
-            return
-        } if (!source || (source && source.id !== props.dragElementType)){
+        if (!draggable.isDragSource){
             return
         }
+
 		// event.dataTransfer.setData("text/plain", "")
 		// onDragStart(draggableRef?.current, dragWidgetClass)
 		onDragStart(draggableRef?.current, dragWidgetClass, elementMetaData)
@@ -63,7 +61,7 @@ function Draggable(props) {
 		// console.log("Drag end: ", e, e.target.closest('div'))
 		const {source} = event.operation
         
-		if (!source || (source && source.id !== props.dragElementType)){
+		if (!draggable.isDragSource){
             return
         }
 
@@ -74,13 +72,12 @@ function Draggable(props) {
 	// TODO: remove element meta data from props
 	return (
 		<div 
-			{...props}
 			ref={handleRef}
 			className={`${props.className}`}
 			// style={!disableStyle ? style : null} //enable this to show like the original item is moving, if commented out the original item will not have css effects
-			draggable
 			data-drag-start-within // this attribute indicates that the drag is occurring from within the project and not a outside file drop
 			data-draggable-type={dragElementType}
+			{...props}
 
 		>
 			{props.children}

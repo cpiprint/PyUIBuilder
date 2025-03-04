@@ -1105,9 +1105,9 @@ class Widget extends React.Component {
             ...this.state.widgetOuterStyling,
             cursor: this.cursor,
             zIndex: this.state.zIndex,
-            // position: this.state.positionType, //  don't change this if it has to be movable on the canvas
-            // top: `${this.state.pos.y}px`,
-            // left: `${this.state.pos.x}px`,
+            position: this.state.positionType, //  don't change this if it has to be movable on the canvas
+            top: `${this.state.pos.y}px`,
+            left: `${this.state.pos.x}px`,
             width: width,
             height: height,
             minWidth: minWidth, 
@@ -1128,10 +1128,11 @@ class Widget extends React.Component {
                         
                         return ( 
 
-                            <WidgetDnd id={this.__id} 
+                            <WidgetDnd widgetId={this.__id} 
                                         disabled={false && this.state.dragEnabled}
                                         data-draggable-type={this.getWidgetType()} // helps with droppable 
                                         dragElementType={this.getWidgetType()}
+                                        droppableTags={this.droppableTags}
                                         // onDragOver={(e) => this.handleDragOver(e, draggedElement)}
                                         // onDrop={(e) => {this.handleDropEvent(e, draggedElement, widgetClass); onDragEnd()}}
 
@@ -1140,7 +1141,7 @@ class Widget extends React.Component {
 
                                         // onDragStart={(e) => this.handleDragStart(e, onDragStart)}
                                         // onDragEnd={(e) => this.handleDragEnd(onDragEnd)}
-                                        // style={outerStyle}
+                                        style={outerStyle}
 
                                         >
                                 <div data-widget-id={this.__id}
