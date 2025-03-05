@@ -8,7 +8,7 @@ function Droppable(props) {
     const droppableRef = useRef(null)
     const { droppableTags, onDrop } = props
 
-    const { draggedElement, setOverElement, widgetClass, initialOffset } = useDragContext()
+    const { draggedElement, setOverElement, widgetClass, posMetaData } = useDragContext()
 
     const { ref, isDropTarget, droppable} = useDroppable({
         id: props.id,
@@ -40,7 +40,7 @@ function Droppable(props) {
             manager?.monitor?.removeEventListener("dragend", handleDragLeave)
             manager?.monitor?.removeEventListener("dragmove", handleDragOver)
         }
-    }, [manager, draggedElement, widgetClass, initialOffset])
+    }, [manager, draggedElement, widgetClass, posMetaData])
 
 
     const handleRef = (node) => {
@@ -132,9 +132,9 @@ function Droppable(props) {
             (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
         ))
 
-        console.log("initial POs: ", initialOffset)
+        console.log("initial POs: ", posMetaData)
         if (onDrop && dropAllowed) {
-            onDrop(e, draggedElement, widgetClass, initialOffset)
+            onDrop(e, draggedElement, widgetClass, posMetaData)
         }
 
         setTimeout(() => setAllowDrop({allow: true, show: false}), 10)

@@ -665,9 +665,9 @@ class Canvas extends React.Component {
      * Handles drop event to canvas from the sidebar and on canvas widget movement
      * @param {DragEvent} e 
      */
-      handleDropEvent = (e, draggedElement, widgetClass = null, initialOffset={x: 0, y: 0}) => {
+      handleDropEvent = (e, draggedElement, widgetClass = null, posMetaData) => {
 
-        console.log("event: ", e, draggedElement, widgetClass, initialOffset)
+        console.log("event: ", e, draggedElement, widgetClass, posMetaData)
 
         // e.preventDefault()
 
@@ -693,18 +693,16 @@ class Canvas extends React.Component {
         const { transform } = e.operation
         console.log("event: ", e)
         // const { x: clientX, y: clientY} = e.delta;
-        const {clientX: draggedElementInitialX, clientY: draggedElementInitialY} = e.operation.activatorEvent
         const { initial, current } = e.operation.shape
 
         console.log("wirking: ", transform)
 
-        // TODO: + initial cursor position - final cursor position
         let finalPosition = {
             x: ((clientX - canvasRect.left) / this.state.zoom),
             y: ((clientY - canvasRect.top) / this.state.zoom),
         }
 
-        console.log("container: ", container)
+        console.log("container: ", initial, current)
 
         if (container === WidgetContainer.SIDEBAR) {
 
@@ -727,11 +725,26 @@ class Canvas extends React.Component {
             //     y: (clientY - canvasRect.top) / this.state.zoom - (elementHeight / 2) / this.state.zoom,
             // }
 
-            finalPosition = {
-                x: finalPosition.x - initialOffset.x,
-                y: finalPosition.y - initialOffset.y
+            // const initialOffset = {
+            //     x: (clientX - canvasBoundingRect.left) - currentPos.x,
+            //     y: (clientY - canvasBoundingRect.top) - currentPos.y
+            // }
+
+            const canvasBoundingRect = this.getCanvasBoundingRect()
+
+            console.log("meta data: ")
+
+            const {dragStartCursorPos, initialPos} = posMetaData
+
+            const initialOffset = {
+                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
+                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
             }
-            console.log(initial, current)
+
+            finalPosition = {
+                x: finalPosition.x - initialOffset.x  - this.state.currentTranslate.x,
+                y: finalPosition.y - initialOffset.y  - this.state.currentTranslate.y
+            }
             let widgetId = draggedElement.getAttribute("data-widget-id")
 
             const widgetObj = this.getWidgetById(widgetId)

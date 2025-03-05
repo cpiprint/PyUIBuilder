@@ -14,7 +14,7 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
 
     const {dragElementType} = props
 
-    const { draggedElement, setOverElement, widgetClass, setInitialOffset } = useDragContext()
+    const { draggedElement, setOverElement, widgetClass, setPosMetaData } = useDragContext()
 
     const [isDropDisabled, setIsDropDisabled] = useState(false);
 
@@ -80,7 +80,7 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
 
 
         }
-    }, [manager, draggedElement, widgetClass, canvas])
+    }, [manager, draggedElement, widgetClass, canvas, currentPos])
 
 
     const handleRef = (node) => {
@@ -97,19 +97,20 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
             return
         }
 
-        console.log("canvas bounding rect: ", canvas.getBoundingClientRect())
+        console.log("canvas bounding rect: ", canvas.getBoundingClientRect(), widgetRef.current)
 
         const {clientX, clientY} = e
 
         const canvasBoundingRect = canvas.getBoundingClientRect()
 
-        const initialOffset = {
-            x: clientX - (currentPos.x + canvasBoundingRect.left),
-            y: clientY - (currentPos.y + canvasBoundingRect.top)
+        // FIXME: initial offset is off
+        const posMetaData = {
+            dragStartCursorPos: {x: clientX, y: clientY},
+            initialPos: currentPos
         }
 
-        setInitialOffset(initialOffset)
-        console.log("initial position calc: ", initialOffset, clientX, clientY)
+        setPosMetaData(posMetaData)
+        console.log("initial position calc: ", posMetaData, currentPos, (clientX - canvasBoundingRect.left), (clientY - canvasBoundingRect.top), "client: ", clientX, clientY, canvasBoundingRect)
 
     }
 
