@@ -62,6 +62,7 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
 
     useEffect(() => {
 
+        canvas?.addEventListener("pointerdown", handleInitialPosOffset)
         canvas?.addEventListener("mousedown", handleInitialPosOffset)
 
         manager?.monitor?.addEventListener("dragstart", handleDragEnter)
@@ -73,7 +74,10 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
             manager?.monitor?.removeEventListener("dragstart", handleDragEnter)
             manager?.monitor?.removeEventListener("dragend", handleDropEvent)
             manager?.monitor?.removeEventListener("dragmove", handleDragOver)
+            
             canvas?.removeEventListener("mousedown", handleInitialPosOffset)
+            canvas?.removeEventListener("pointerdown", handleInitialPosOffset)
+
 
         }
     }, [manager, draggedElement, widgetClass, canvas])
@@ -87,6 +91,11 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
 	}
 
     const handleInitialPosOffset = (e) => {
+
+
+        if (!widgetRef?.current.contains(e.target)){
+            return
+        }
 
         console.log("canvas bounding rect: ", canvas.getBoundingClientRect())
 

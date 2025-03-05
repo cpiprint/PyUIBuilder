@@ -39,6 +39,7 @@ export const DragProvider = ({ children }) => {
         setWidgetClass(null)
         setIsDragging(false)
 
+        // setInitialOffset({x: 0, y: 0})
         setDragElementMetaData({})
 
     }
