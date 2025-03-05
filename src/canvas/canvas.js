@@ -665,9 +665,9 @@ class Canvas extends React.Component {
      * Handles drop event to canvas from the sidebar and on canvas widget movement
      * @param {DragEvent} e 
      */
-      handleDropEvent = (e, draggedElement, widgetClass = null, initialPos={x: 0, y: 0}) => {
+      handleDropEvent = (e, draggedElement, widgetClass = null, initialOffset={x: 0, y: 0}) => {
 
-        console.log("event: ", e, draggedElement, widgetClass, initialPos)
+        console.log("event: ", e, draggedElement, widgetClass, initialOffset)
 
         // e.preventDefault()
 
@@ -690,17 +690,18 @@ class Canvas extends React.Component {
         
         const { clientX, clientY } = e.nativeEvent
 
-        const { initial } = e.operation.shape
+        const { transform } = e.operation
         console.log("event: ", e)
         // const { x: clientX, y: clientY} = e.delta;
-        // const {clientX: draggedElementInitialX, clientY: draggedElementInitialY} = e.activatorEvent
+        const {clientX: draggedElementInitialX, clientY: draggedElementInitialY} = e.operation.activatorEvent
+        const { initial, current } = e.operation.shape
 
-        // console.log("wirking: ", clientX, clientY, e, draggedElementInitialX, draggedElementInitialY)
+        console.log("wirking: ", transform)
 
         // TODO: + initial cursor position - final cursor position
         let finalPosition = {
-            x: ((clientX - canvasRect.left) / this.state.zoom) - (initial.left) / this.state.zoom,
-            y: ((clientY - canvasRect.top) / this.state.zoom) - (initial.top) / this.state.zoom,
+            x: ((clientX - canvasRect.left) / this.state.zoom),
+            y: ((clientY - canvasRect.top) / this.state.zoom),
         }
 
         console.log("container: ", container)
@@ -726,6 +727,11 @@ class Canvas extends React.Component {
             //     y: (clientY - canvasRect.top) / this.state.zoom - (elementHeight / 2) / this.state.zoom,
             // }
 
+            finalPosition = {
+                x: finalPosition.x - initialOffset.x,
+                y: finalPosition.y - initialOffset.y
+            }
+            console.log(initial, current)
             let widgetId = draggedElement.getAttribute("data-widget-id")
 
             const widgetObj = this.getWidgetById(widgetId)
@@ -1083,6 +1089,7 @@ class Canvas extends React.Component {
     }
 
     render() {
+        // FIXME: inner canvas not recognized as droppable or some thing
 
         return (
             <div className="tw-relative tw-overflow-hidden tw-flex tw-w-full tw-h-full tw-max-h-[100vh]">
@@ -1120,7 +1127,7 @@ class Canvas extends React.Component {
                         <div className="tw-w-full tw-h-full tw-outline-none tw-flex tw-relative tw-bg-[#f2f2f2] tw-overflow-hidden"
                             ref={this.canvasContainerRef}
                             style={{
-                                transition: " transform 0.3s ease-in-out",
+                                // transition: " transform 0.3s ease-in-out",
                                 backgroundImage: `url(${DotsBackground})`,
                                 backgroundSize: 'cover', // Ensure proper sizing if needed
                                 backgroundRepeat: 'no-repeat',
@@ -1135,7 +1142,7 @@ class Canvas extends React.Component {
                                 }}
                             />
                             {/* Canvas */}
-                            <div data-canvas className="tw-w-full tw-h-full tw-absolute tw-top-0 tw-select-none"
+                            <div data-canvas className="tw-w-full tw-h-full tw-absolute tw-bg-transparent tw-top-0 tw-select-none"
                                 ref={this.canvasRef}>
                                 <div className="tw-relative tw-w-full tw-h-full">
                                     {

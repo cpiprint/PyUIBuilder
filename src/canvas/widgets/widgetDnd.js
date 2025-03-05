@@ -2,21 +2,25 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useDragDropManager, useDroppable, useDraggable } from '@dnd-kit/react'
 import { useDragContext } from '../../components/draggable/draggableContext'
 import WidgetContainer from '../constants/containers'
+import { useSortable } from '@dnd-kit/react/sortable'
 
 
 // FIXME: widget class is null
-function WidgetDnd({widgetId, widgetRef, droppableTags, onDrop, onDragStart, 
-                        onDragEnd, onDragEnter, onDragOver, initialPos,
+function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onDrop, onDragStart, 
+                        onDragEnd, onDragEnter, onDragOver, currentPos={x: 0, y: 0},
                             ...props}) {
 
     const dndRef = useRef(null)
 
     const {dragElementType} = props
 
-    const { draggedElement, setOverElement, widgetClass } = useDragContext()
+    const { draggedElement, setOverElement, widgetClass, setInitialOffset } = useDragContext()
 
-    const { ref: dropRef, isDropTarget, droppable} = useDroppable({
+    const [isDropDisabled, setIsDropDisabled] = useState(false);
+
+    const { ref: dropRef, droppable} = useDroppable({
         id: widgetId,
+        disabled: isDropDisabled,
         // accept: (draggable) => {
             
         //     const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
@@ -37,6 +41,8 @@ function WidgetDnd({widgetId, widgetRef, droppableTags, onDrop, onDragStart,
 		// data: { title: props.children }
 	})
 
+
+    // const sortable = useSortable()
  
     const manager = useDragDropManager()
 
@@ -45,6 +51,18 @@ function WidgetDnd({widgetId, widgetRef, droppableTags, onDrop, onDragStart,
     const [allowDrop, setAllowDrop] = useState(false) // indicator if the draggable can be dropped on the droppable
 
     useEffect(() => {
+        
+        if (draggable.isDragging){
+            setIsDropDisabled(true)
+        }else{
+            setIsDropDisabled(false)
+        }
+
+    }, [draggable.isDragging])
+
+    useEffect(() => {
+
+        canvas?.addEventListener("mousedown", handleInitialPosOffset)
 
         manager?.monitor?.addEventListener("dragstart", handleDragEnter)
         manager?.monitor?.addEventListener("dragend", handleDropEvent)
@@ -55,8 +73,10 @@ function WidgetDnd({widgetId, widgetRef, droppableTags, onDrop, onDragStart,
             manager?.monitor?.removeEventListener("dragstart", handleDragEnter)
             manager?.monitor?.removeEventListener("dragend", handleDropEvent)
             manager?.monitor?.removeEventListener("dragmove", handleDragOver)
+            canvas?.removeEventListener("mousedown", handleInitialPosOffset)
+
         }
-    }, [manager, draggedElement, widgetClass])
+    }, [manager, draggedElement, widgetClass, canvas])
 
 
     const handleRef = (node) => {
@@ -66,15 +86,32 @@ function WidgetDnd({widgetId, widgetRef, droppableTags, onDrop, onDragStart,
 		dragRef(node)
 	}
 
+    const handleInitialPosOffset = (e) => {
+
+        console.log("canvas bounding rect: ", canvas.getBoundingClientRect())
+
+        const {clientX, clientY} = e
+
+        const canvasBoundingRect = canvas.getBoundingClientRect()
+
+        const initialOffset = {
+            x: clientX - (currentPos.x + canvasBoundingRect.left),
+            y: clientY - (currentPos.y + canvasBoundingRect.top)
+        }
+
+        setInitialOffset(initialOffset)
+        console.log("initial position calc: ", initialOffset, clientX, clientY)
+
+    }
+
     const handleDragEnter = (e) => {
 
 
         if (draggable.isDragSource){
-
-            console.log("widget class: ", widgetClass)
+            
 
 		    // if the current widget is being dragged
-            onDragContextStart(dndRef?.current, widgetClass, {}, initialPos)
+            onDragContextStart(dndRef?.current, widgetClass, {})
 
             dndRef.current.style.zIndex = 10
 
@@ -121,7 +158,7 @@ function WidgetDnd({widgetId, widgetRef, droppableTags, onDrop, onDragStart,
                 (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
             ))
     
-    
+            console.log("Drop allowed: ", dropAllowed, dragElementType )
             setAllowDrop(dropAllowed)
 
             onDragOver(e)
@@ -136,7 +173,7 @@ function WidgetDnd({widgetId, widgetRef, droppableTags, onDrop, onDragStart,
             onDragEnd(e)
 
         }else if (droppable.isDropTarget){
-            setAllowDrop(false)
+            // setAllowDrop(false)
 
 
             if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
@@ -167,14 +204,14 @@ function WidgetDnd({widgetId, widgetRef, droppableTags, onDrop, onDragStart,
                 data-widget-id={widgetId}
                 data-container={WidgetContainer.CANVAS} 
                 data-draggable-type={dragElementType}
-                className={`${props.className || ''} tw-relative tw-h-max tw-w-max tw-outline-none`}  
+                className={`${props.className || ''} ${draggable.isDragging && "tw-pointer-events-none"} tw-relative tw-h-max tw-w-max tw-outline-none`}  
                 >
 
             {props.children}
 
             {
                 (droppable.isDropTarget && !draggable.isDragSource) &&
-                <div className={`${allowDrop.allow ? "tw-bg-[#82ff1c55]" : "tw-bg-[#eb5d3662]"} 
+                <div className={`${allowDrop ? "tw-bg-[#82ff1c55]" : "tw-bg-[#eb5d3662]"} 
                                     tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[3]
                                     tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
                                     `}>

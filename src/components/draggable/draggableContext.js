@@ -12,7 +12,7 @@ export const DragProvider = ({ children }) => {
     const [draggedElement, setDraggedElement] = useState(null)
     const [overElement, setOverElement] = useState(null) // the element the dragged items is over
 
-    const [initialPosition, setInitialPosition] = useState({x: 0, y: 0})
+    const [initialOffset, setInitialOffset] = useState({x: 0, y: 0})
 
     const [dragElementMetaData, setDragElementMetaData] = useState({})
 
@@ -20,11 +20,10 @@ export const DragProvider = ({ children }) => {
 
     const [isDragging, setIsDragging] = useState(false)
 
-    const onDragStart = (element, widgetClass=null, metaData={}, initialPos={x: 0, y: 0}) => {
+    const onDragStart = (element, widgetClass=null, metaData={}) => {
         
         setDraggedElement(element)
         setIsDragging(true)
-        setInitialPosition(initialPos)
         setDragElementMetaData(metaData)
 
         if (widgetClass && !isSubClassOfWidget(widgetClass))
@@ -48,7 +47,7 @@ export const DragProvider = ({ children }) => {
         <DragContext.Provider value={{ draggedElement, overElement, setOverElement, 
                                             widgetClass, onDragStart, onDragEnd, isDragging,
                                             dragElementMetaData, setDragElementMetaData, 
-                                            initialPosition
+                                            initialOffset, setInitialOffset
                                             }}>
             {children}
         </DragContext.Provider>

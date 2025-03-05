@@ -8,7 +8,7 @@ function Droppable(props) {
     const droppableRef = useRef(null)
     const { droppableTags, onDrop } = props
 
-    const { draggedElement, setOverElement, widgetClass, initialPosition } = useDragContext()
+    const { draggedElement, setOverElement, widgetClass, initialOffset } = useDragContext()
 
     const { ref, isDropTarget, droppable} = useDroppable({
         id: props.id,
@@ -40,7 +40,7 @@ function Droppable(props) {
             manager?.monitor?.removeEventListener("dragend", handleDragLeave)
             manager?.monitor?.removeEventListener("dragmove", handleDragOver)
         }
-    }, [manager, draggedElement, widgetClass, initialPosition])
+    }, [manager, draggedElement, widgetClass, initialOffset])
 
 
     const handleRef = (node) => {
@@ -117,9 +117,6 @@ function Droppable(props) {
             return
         }
 
-        setAllowDrop({allow: false, show: false})
-
-
         if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
             return
@@ -135,18 +132,21 @@ function Droppable(props) {
             (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(dragElementType))
         ))
 
-        console.log("initial POs: ", initialPosition)
+        console.log("initial POs: ", initialOffset)
         if (onDrop && dropAllowed) {
-            onDrop(e, draggedElement, widgetClass, initialPosition)
+            onDrop(e, draggedElement, widgetClass, initialOffset)
         }
+
+        setTimeout(() => setAllowDrop({allow: true, show: false}), 10)
+
     }
 
 
     const handleDragLeave = (e) => {
         
-        const {target} = e.operation
+        // const {target} = e.operation
         
-        if (target && target.id === props.id){
+        if (droppable.isDropTarget){
             handleDropEvent(e)
         }else{
             setAllowDrop({allow: false, show: false})
@@ -161,11 +161,15 @@ function Droppable(props) {
             {props.children}
 
             {
-                allowDrop.show &&
-                <div className={`${allowDrop.allow ? "tw-bg-[#82ff1c31]" : "tw-bg-[#eb5d3646]"} 
-                                    tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[0]
+                droppable.isDropTarget &&
+                <div className={`
+                                    tw-absolute tw-top-0 tw-left-0 tw-w-full tw-h-full tw-z-[0] tw-p-3
                                     tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
                                     `}>
+
+                    <div className={`${allowDrop.allow ? "tw-bg-[#82ff1c31]" : "tw-bg-[#eb5d3646]"} tw-w-full tw-h-full tw-pointer-events-none`}>
+
+                    </div>
                 </div>
             }
    

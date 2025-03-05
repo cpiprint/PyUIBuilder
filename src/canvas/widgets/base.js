@@ -805,7 +805,7 @@ class Widget extends React.Component {
 
     handleDragStart = (e, ) => {
         // NOTE: this line will prevent problem's such as self-drop or dropping inside its own children
-        setTimeout(this.disablePointerEvents, 1)
+        // setTimeout(this.disablePointerEvents, 1)
 
         this.setState({ isDragging: true })
     }
@@ -972,7 +972,8 @@ class Widget extends React.Component {
 
     handleDragEnd = () => {
         this.setState({ isDragging: false })
-        this.enablePointerEvents()
+        // this.enablePointerEvents()
+        // console.log("enable pointer events: ")
         // this.props.onWidgetDragEnd(this.elementRef?.current)
     }
 
@@ -1062,15 +1063,14 @@ class Widget extends React.Component {
         }
 
         // const boundingRect = this.getBoundingRect
-        // TODO: rewrite Drag and drop
         // FIXME: if the parent container has tw-overflow-none, then the resizable indicator are also hidden
-        // FIXME: renable pointer events
+        // FIXME: re-enable pointer events
         return (
 
             // <DragContext.Consumer>
             <DragContext.Consumer>
                 {
-                    ({ draggedElement, widgetClass }) => {
+                    ({ draggedElement, widgetClass, setInitialOffset }) => {
 
 
                         return (
@@ -1081,7 +1081,7 @@ class Widget extends React.Component {
                                 dragElementType={this.getWidgetType()}
                                 droppableTags={this.droppableTags}
                                 className="tw-shadow-xl tw-w-fit tw-h-fit"
-                                initialPos={{ ...this.state.pos }}
+                                currentPos={{ ...this.state.pos }}
                                 onDragStart={this.handleDragStart}
                                 onDragOver={(e) => {this.handleDragOver(e, draggedElement)}}
                                 onDragEnd={(e) => this.handleDragEnd()}
@@ -1089,6 +1089,8 @@ class Widget extends React.Component {
                                 onDrop={(e) => {this.handleDropEvent(e, draggedElement, widgetClass)}} // handle by droppable
                                 onDragEnter={(e) => this.handleDragEnter(e, draggedElement)} // this is by droppable
                                 widgetRef={this.elementRef}
+
+                                canvas={this.canvas}
 
                                 // onDragOver={(e) => this.handleDragOver(e, draggedElement)}
                                 // onDrop={(e) => {this.handleDropEvent(e, draggedElement, widgetClass); onDragEnd()}}
