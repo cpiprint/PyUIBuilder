@@ -12,7 +12,7 @@ import WidgetContainer from "../constants/containers"
 import { DragContext } from "../../components/draggable/draggableContext"
 import { isNumeric, removeKeyFromObject } from "../../utils/common"
 import { info } from "autoprefixer"
-import { message } from "antd"
+import { Layout, message } from "antd"
 import WidgetDnd from "./widgetDnd"
 
 
@@ -1062,6 +1062,7 @@ class Widget extends React.Component {
             opacity: this.state.isDragging ? 0.6 : 1,
         }
 
+        const isSortable = this.getParentLayout() === Layouts.FLEX || this.getParentLayout() === Layouts.GRID
         // const boundingRect = this.getBoundingRect
         // FIXME: if the parent container has tw-overflow-none, then the resizable indicator are also hidden
         // FIXME: re-enable pointer events
@@ -1089,6 +1090,9 @@ class Widget extends React.Component {
                                 onDrop={(e) => {this.handleDropEvent(e, draggedElement, widgetClass)}} // handle by droppable
                                 onDragEnter={(e) => this.handleDragEnter(e, draggedElement)} // this is by droppable
                                 widgetRef={this.elementRef}
+
+                                isSortable={isSortable}
+                                sortableIndex={0}
 
                                 canvas={this.canvas}
 

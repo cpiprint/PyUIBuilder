@@ -5,9 +5,9 @@ import WidgetContainer from '../constants/containers'
 import { useSortable } from '@dnd-kit/react/sortable'
 
 
-// FIXME: widget class is null
 function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onDrop, onDragStart, 
                         onDragEnd, onDragEnter, onDragOver, currentPos={x: 0, y: 0},
+                        isSortable=false, sortableIndex=0,
                             ...props}) {
 
     const dndRef = useRef(null)
@@ -42,7 +42,11 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
 	})
 
 
-    // const sortable = useSortable()
+    const {ref: sortableRef} = useSortable({
+        id: widgetId,
+        index: sortableIndex,
+        disabled: isSortable
+    })
  
     const manager = useDragDropManager()
 
@@ -88,6 +92,7 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
         widgetRef.current = node
 		dropRef(node)
 		dragRef(node)
+        sortableRef(node)
 	}
 
     const handleInitialPosOffset = (e) => {
