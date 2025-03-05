@@ -9,7 +9,6 @@ The source code for PyUIBuilder is Dual licensed, most parts of the code comes u
 some parts under a different non-commercial use license. Read the second part after the definition of the AGPL license.
 
 Sub-folders with non-commercial use license will contain the second license as well. 
- - Only the code inside src/canvas/ is kept under a non-commercial use license.
 
 --------------------------
 
@@ -677,8 +676,7 @@ For more information on this, and how to apply and follow the GNU AGPL, see
 
 
 --------------------------
-
-Below is the license for code under src/canvas/
+This license can be found in multiple folders
 
 License for non-commercial use in short
 * You are free fork, modify and redistribute it given the original or derived works is kept free and open-source and under the same licese.
