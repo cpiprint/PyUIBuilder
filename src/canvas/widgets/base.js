@@ -1261,8 +1261,9 @@ class Widget extends React.Component {
                                             // FIXME: from here
                                             // left:   ((elementRect?.left || 0) - 10 - canvasPan.x) / canvasZoom ,
                                             // top:   ((elementRect?.top || 0) - 10 - canvasPan.y) / canvasZoom ,
-                                            left: 1,
-                                            top: 1,
+                                            // left: ,
+                                            // top: ,
+                                            // NOTE: also subtract canvas inner ref thats passed
                                             position: "fixed",
                                             width: this.state.size.width + 20,
                                             height: this.state.size.height + 20,

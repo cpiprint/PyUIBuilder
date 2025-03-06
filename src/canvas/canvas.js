@@ -1063,7 +1063,7 @@ class Canvas extends React.Component {
                 ref={this.widgetRefs[id]}
                 initialData={initialData}
                 canvasRef={this.canvasContainerRef}
-
+                canvasInnerContainerRef={this.canvasRef}
                 canvasMetaData={{
                     zoom: this.state.zoom,
                     pan: this.state.currentTranslate
