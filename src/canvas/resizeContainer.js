@@ -16,6 +16,8 @@ const ResizeWidgetContainer = ({selectedWidget, onResize}) => {
     const [pos, setPos] = useState({x: 0, y: 0})
     const [size, setSize] = useState({width: 0, height: 0})
 
+    console.log("selected widget: ", selectedWidget)
+
     useEffect(() => {
 
         if (selectedWidget){
@@ -25,15 +27,15 @@ const ResizeWidgetContainer = ({selectedWidget, onResize}) => {
 
         console.log("selected widget resizable: ", selectedWidget)
 
-    }, [selectedWidget, selectedWidget?.getPos(), selectedWidget?.getSize()])
+    }, [selectedWidget])
 
-
+    console.log("pos: ", pos, size)
 
     return (
-        <div className={`tw-absolute tw-bg-transparent tw-top-[-20px] tw-left-[-20px] tw-opacity-100 
-            tw-w-full tw-h-full tw-z-[-1] tw-border-2 tw-border-solid tw-border-blue-500`}
+        <div className={`tw-absolute tw-opacity-100 
+            tw-w-full tw-h-full tw-z-[2] tw-border-2 tw-border-solid tw-border-blue-500 tw-bg-red-300`}
             style={{
-                top: `${pos.y - 40}px`,
+                top: `${pos.y - 20}px`,
                 left: `${pos.x - 20}px`,
                 width: `${size.width + 40}px`,
                 height: `${size.height + 40}px`,

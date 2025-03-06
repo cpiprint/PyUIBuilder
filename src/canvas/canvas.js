@@ -851,7 +851,8 @@ class Canvas extends React.Component {
                 let updatedWidgets = this.removeWidgetFromCurrentList(dragElementID)
 
                 const parentLayout = parentWidget.getLayout()?.layout || null
-
+                // FIXME: if the layout is flex or grid the position should be different
+                
                 dragWidget.current.setPos(finalPosition.x, finalPosition.y)
                 const updatedDragWidget = {
                     ...dragWidgetObj,
@@ -1063,6 +1064,12 @@ class Canvas extends React.Component {
                 ref={this.widgetRefs[id]}
                 initialData={initialData}
                 canvasRef={this.canvasContainerRef}
+
+                canvasMetaData={{
+                    zoom: this.state.zoom,
+                    pan: this.state.currentTranslate
+                }}
+
                 onWidgetUpdate={this.onActiveWidgetUpdate}
                 onAddChildWidget={this.handleAddWidgetChild}
                 onCreateWidgetRequest={this.createWidget} // create widget when dropped from sidebar

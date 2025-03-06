@@ -12,7 +12,7 @@ import WidgetContainer from "../constants/containers"
 import { DragContext } from "../../components/draggable/draggableContext"
 import { isNumeric, removeKeyFromObject } from "../../utils/common"
 import { info } from "autoprefixer"
-import { message } from "antd"
+import { Layout, message } from "antd"
 
 
 // TODO: make it possible to apply widgetInnerStyle on load
@@ -41,11 +41,13 @@ class Widget extends React.Component {
     constructor(props) {
         super(props)
 
-        const { id, widgetName, canvasRef } = props
+        const { id, widgetName, canvasRef, canvasMetaData } = props
         // console.log("Id: ", id)
         // this id has to be unique inside the canvas, it will be set automatically and should never be changed
         this.__id = id
         this.canvas = canvasRef?.current || null // canvasContainerRef, because some events work properly only if attached to the container
+
+        this.canvasMetaData = canvasMetaData
 
         // this._selected = false
         this._disableResize = false
@@ -209,10 +211,34 @@ class Widget extends React.Component {
             this.setWidgetInnerStyle('backgroundColor', this.state.attrs.styling?.backgroundColor.value || "#fff")
 
         this.load(this.props.initialData || {}) // load the initial data
-
     }
 
+
     componentWillUnmount() {
+    }
+
+    __fixWidgetPosition = () => {
+        
+        if (this.state.parentLayout?.layout === Layouts.FLEX || this.state.parentLayout?.layout === Layouts.GRID ){
+            const elementRect = this.elementRef.current.getBoundingClientRect()
+            const {pan: canvasPan, zoom: canvasZoom} = this.canvasMetaData
+            console.log("elemnt rect: ", elementRect)
+        
+
+            const pos = {  // if the layout is flex or grid the position should be the where it stays
+                // x: ((elementRect?.x || 0) - canvasPan.x) / canvasZoom,
+                // y: ((elementRect?.y || 0) - canvasPan.y) / canvasZoom,
+
+                x: elementRect?.x,
+                y: elementRect?.y,
+            }
+
+            this.setState({
+                ...this.state,
+                pos: pos
+            })
+        }
+
     }
 
     updateState = (newState, callback) => {
@@ -547,12 +573,13 @@ class Widget extends React.Component {
         }
 
         if (layout === Layouts.FLEX || layout === Layouts.GRID){
-
+           
+      
             updates = {
                 ...updates,
-                positionType: PosType.NONE
+                positionType: PosType.NONE,
             }
-
+            
         }else if (layout === Layouts.PLACE){
             updates = {
                 ...updates,
@@ -750,9 +777,13 @@ class Widget extends React.Component {
 
         if (parentLayout?.layout === Layouts.FLEX || parentLayout?.layout === Layouts.GRID){
 
+            const elementRect = this.elementRef.current.getBoundingClientRect()
+            const {pan: canvasPan, zoom: canvasZoom} = this.canvasMetaData
+            console.log("elemnt rect2: ", elementRect)
+
             layoutUpdates = {
                 ...layoutUpdates,
-                positionType: PosType.NONE
+                positionType: PosType.NONE,
             }
 
         }else if (parentLayout?.layout === Layouts.PLACE){
@@ -1121,7 +1152,7 @@ class Widget extends React.Component {
         
             const posMetaData = {
                 dragStartCursorPos: {x: clientX, y: clientY},
-                initialPos: this.getPos()
+                initialPos: {...this.state.pos}
             }
     
             setPosMetaData(posMetaData)
@@ -1131,6 +1162,8 @@ class Widget extends React.Component {
 
         // const boundingRect = this.getBoundingRect
 
+        const {zoom: canvasPan, pan: canvasZoom} = this.canvasMetaData
+
         // FIXME: if the parent container has tw-overflow-none, then the resizable indicator are also hidden
         return (
 
@@ -1138,7 +1171,10 @@ class Widget extends React.Component {
                 {
                     ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement, setPosMetaData }) => {
 
-                        
+                        const canvasRect = this.canvas.getBoundingClientRect()
+
+                        const elementRect = this.getBoundingRect()
+
                         return ( 
                             <div data-widget-id={this.__id}
                                 ref={this.elementRef}
@@ -1203,15 +1239,24 @@ class Widget extends React.Component {
                                         </div>
                                     }
                                     {/* FIXME: the resize handles get clipped in parent container */}
-                                    <div className={`tw-absolute tw-z-[-1] tw-bg-transparent tw-top-[-10px] tw-left-[-10px] tw-opacity-100 
-                                                    tw-w-full tw-h-full 
+                                
+                                    <div className={`tw-fixed tw-pointer-events-none tw-bg-transparent tw-opacity-100 tw-border-t-green-400
                                                     ${this.state.selected ? 'tw-border-2 tw-border-solid tw-border-blue-500' : 'tw-hidden'}`}
                                         style={{
-                                            width: "calc(100% + 20px)",
-                                            height: "calc(100% + 20px)",
-                                            zIndex: -1,
+                                            // left: (this.state.pos.x - 10 - canvasPan.x) / canvasZoom,
+                                            // top: (this.state.pos.y - 10 - canvasPan.y) / canvasZoom,
+                                            // left: (this.state.pos.x - 10),
+                                            // top: (this.state.pos.y - 10),  
+                                            // left: ((elementRect?.x || 0) - 10),
+                                            // top: ((elementRect?.y || 0) - 10),
+                                            // FIXME: from here
+                                            left: ((elementRect?.left || 0) - 20 - canvasPan.x) ,
+                                            top: ((elementRect?.top || 0) - 20 - canvasPan.y) ,
+                                            width: this.state.size.width + 20,
+                                            height: this.state.size.height + 20,
+                                            zIndex: 1,
                                         }}
-                                    >
+                                        >
 
                                         <div className={`"tw-relative tw-w-full  tw-h-full"`}> {/* ${this.state.isDragging ? "tw-pointer-events-none" : "tw-pointer-events-auto"} */}
                                             <EditableDiv value={this.state.widgetName} onChange={this.setWidgetName}
@@ -1222,7 +1267,7 @@ class Widget extends React.Component {
                                             />
 
                                             <div
-                                                className="tw-w-2 tw-h-2 tw-absolute  tw--left-1 tw--top-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--left-1 tw--top-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.NW_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()
@@ -1233,7 +1278,7 @@ class Widget extends React.Component {
                                                 onMouseUp={() => this.setState({ dragEnabled: true })}
                                             />
                                             <div
-                                                className="tw-w-2 tw-h-2 tw-absolute tw--right-1 tw--top-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--right-1 tw--top-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.SW_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()
@@ -1244,7 +1289,7 @@ class Widget extends React.Component {
                                                 onMouseUp={() => this.setState({ dragEnabled: true })}
                                             />
                                             <div
-                                                className="tw-w-2 tw-h-2 tw-absolute tw--left-1 tw--bottom-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--left-1 tw--bottom-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.SW_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()
@@ -1255,7 +1300,7 @@ class Widget extends React.Component {
                                                 onMouseUp={() => this.setState({ dragEnabled: true })}
                                             />
                                             <div
-                                                className="tw-w-2 tw-h-2 tw-absolute tw--right-1 tw--bottom-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--right-1 tw--bottom-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.SE_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()

@@ -344,6 +344,8 @@ export class TkinterBase extends Widget {
      */
     load(data, callback=null){
 
+        // TODO: call the base widget
+
         if (Object.keys(data).length === 0) return // no data to load
 
         data = {...data} // create a shallow copy
@@ -410,6 +412,7 @@ export class TkinterBase extends Widget {
             this.updateState({ attrs: newAttrs }, callback)
 
         })  
+
 
 
     }
