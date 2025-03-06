@@ -408,7 +408,6 @@ export class TkinterBase extends Widget {
             }
             
             this.updateState({ attrs: newAttrs }, callback)
-
         })  
 
 

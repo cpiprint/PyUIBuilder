@@ -4,13 +4,13 @@ import { CSS } from "@dnd-kit/utilities"
 import { useDragContext } from "../draggableContext"
 
 
-function Draggable({dragElementType, dragWidgetClass = null, elementMetaData, ...props}) {
+function Draggable({dragElementType, draggableType, dragWidgetClass = null, elementMetaData, ...props}) {
 
 	const draggableRef = useRef(null);
 
 	const { ref, draggable } = useDraggable({
 		id: dragElementType,
-		feedback: props.draggableType || "default",
+		feedback: draggableType || "default",
 		type: dragElementType
 		// data: { title: props.children }
 	})

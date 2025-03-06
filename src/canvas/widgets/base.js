@@ -72,7 +72,7 @@ class Widget extends React.Component {
 
 
         this.state = {
-            zIndex: 0,
+            zIndex: 1,
             selected: false,
             widgetName: widgetName || 'widget', // this will later be converted to variable name
             enableRename: false, // will open the widgets editable div for renaming
@@ -209,8 +209,7 @@ class Widget extends React.Component {
         if (this.state.attrs.styling.backgroundColor)
             this.setWidgetInnerStyle('backgroundColor', this.state.attrs.styling?.backgroundColor.value || "#fff")
 
-        this.load(this.props.initialData || {}) // load the initial data
-
+        this.load(this.props.initialData || {}, console.log("loaded")) // load the initial data
     }
 
     componentWillUnmount() {
@@ -797,7 +796,6 @@ class Widget extends React.Component {
             }
 
             this.updateState({ attrs: newAttrs }, callback)
-
         })
 
     }
@@ -812,7 +810,6 @@ class Widget extends React.Component {
 
     handleDragEnter = (e, draggedElement) => {
 
-        console.log("Drahg engerted")
 
         if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
@@ -851,18 +848,6 @@ class Widget extends React.Component {
     }
 
     handleDragOver = (e, draggedElement) => {
-
-        if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
-            // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
-            return
-        }
-
-        if (draggedElement === this.elementRef.current) {
-            // prevent drop on itself, since the widget is invisible when dragging, if dropped on itself, it may consume itself
-            return
-        }
-
-        // console.log("Drag over: ", e.dataTransfer.getData("text/plain"), e.dataTransfer)
 
     }
 
@@ -1062,6 +1047,8 @@ class Widget extends React.Component {
             opacity: this.state.isDragging ? 0.6 : 1,
         }
 
+        console.log("state conatainer: ", this.state.widgetContainer, this.state.widgetName)
+
         const isSortable = this.getParentLayout() === Layouts.FLEX || this.getParentLayout() === Layouts.GRID
         // const boundingRect = this.getBoundingRect
         // FIXME: if the parent container has tw-overflow-none, then the resizable indicator are also hidden
@@ -1078,10 +1065,13 @@ class Widget extends React.Component {
 
                             <WidgetDnd widgetId={this.__id}
                                 disabled={false && this.state.dragEnabled}
+                                
                                 data-draggable-type={this.getWidgetType()} // helps with droppable 
+                                data-container={this.state.widgetContainer}
+
                                 dragElementType={this.getWidgetType()}
                                 droppableTags={this.droppableTags}
-                                className="tw-shadow-xl tw-w-fit tw-h-fit"
+                                className="tw-shadow-xl tw-w-full tw-h-full"
                                 currentPos={{ ...this.state.pos }}
                                 onDragStart={this.handleDragStart}
                                 onDragOver={(e) => {this.handleDragOver(e, draggedElement)}}

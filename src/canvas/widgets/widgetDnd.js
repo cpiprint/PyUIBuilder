@@ -3,16 +3,20 @@ import { useDragDropManager, useDroppable, useDraggable } from '@dnd-kit/react'
 import { useDragContext } from '../../components/draggable/draggableContext'
 import WidgetContainer from '../constants/containers'
 import { useSortable } from '@dnd-kit/react/sortable'
+import {
+    pointerIntersection,
+    closestCenter,
+    shapeIntersection
+  } from '@dnd-kit/collision'
 
 
 function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onDrop, onDragStart, 
-                        onDragEnd, onDragEnter, onDragOver, currentPos={x: 0, y: 0},
-                        isSortable=false, sortableIndex=0,
+                        onDragEnd, onDragEnter, onDragOver, currentPos={x: 0, y: 0}, 
+                        dragElementType, isSortable=false, sortableIndex=0,
                             ...props}) {
 
     const dndRef = useRef(null)
 
-    const {dragElementType} = props
 
     const { draggedElement, setOverElement, widgetClass, setPosMetaData } = useDragContext()
 
@@ -21,6 +25,7 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
     const { ref: dropRef, droppable} = useDroppable({
         id: widgetId,
         disabled: isDropDisabled,
+        collisionDetector: pointerIntersection,
         // accept: (draggable) => {
             
         //     const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
@@ -32,21 +37,23 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
         // }
     })
 
+
     const { ref: dragRef, draggable } = useDraggable({
 		id: widgetId,
 		feedback: "move",
 		type: dragElementType,
         disabled: props.disabled,
-
+        
 		// data: { title: props.children }
 	})
 
 
-    const {ref: sortableRef} = useSortable({
-        id: widgetId,
-        index: sortableIndex,
-        disabled: isSortable
-    })
+    // const {ref: sortableRef} = useSortable({
+    //     id: widgetId,
+    //     index: sortableIndex,
+    //     disabled: false && isSortable,
+    //     feedback: 'move'
+    // })
  
     const manager = useDragDropManager()
 
@@ -92,7 +99,7 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
         widgetRef.current = node
 		dropRef(node)
 		dragRef(node)
-        sortableRef(node)
+        // sortableRef(node)
 	}
 
     const handleInitialPosOffset = (e) => {
@@ -108,7 +115,6 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
 
         const canvasBoundingRect = canvas.getBoundingClientRect()
 
-        // FIXME: initial offset is off
         const posMetaData = {
             dragStartCursorPos: {x: clientX, y: clientY},
             initialPos: currentPos
@@ -212,17 +218,24 @@ function WidgetDnd({widgetId, canvas, widgetRef, droppableTags,onMousePress, onD
         
     }
 
-
+    
     return (
         <div ref={handleRef} data-drag-start-within 
                 {...props}
                 data-widget-id={widgetId}
-                data-container={WidgetContainer.CANVAS} 
                 data-draggable-type={dragElementType}
-                className={`${props.className || ''} ${draggable.isDragging && "tw-pointer-events-none"} tw-relative tw-h-max tw-w-max tw-outline-none`}  
+                className={`${props.className || ''} ${draggable.isDragging && "tw-pointer-events-none"} tw-outline
+                            tw-border-2 tw-border-solid tw-border-red-400
+                            tw-relative tw-outline-none`}  
                 >
 
             {props.children}
+            
+            {/* <div className={`${allowDrop ? "tw-bg-[#82ff1c55]" : "tw-bg-[#eb5d3662]"} 
+                                    tw-absolute tw-top-0 tw-left-[${rect.}] tw-w-full tw-h-full tw-z-[3]
+                                    tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
+                                    `}>
+                </div> */}
 
             {
                 (droppable.isDropTarget && !draggable.isDragSource) &&

@@ -1,7 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useDragDropManager, useDroppable } from '@dnd-kit/react'
 import { useDragContext } from '../draggableContext'
-
+import {
+    pointerIntersection,
+    closestCenter,
+    shapeIntersection
+  } from '@dnd-kit/collision'
+  
 
 function Droppable(props) {
 
@@ -12,15 +17,16 @@ function Droppable(props) {
 
     const { ref, isDropTarget, droppable} = useDroppable({
         id: props.id,
-        accept: (draggable) => {
+        collisionDetector: pointerIntersection,
+        // accept: (draggable) => {
             
-            const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
-                (droppableTags.include?.length > 0 && droppableTags.include?.includes(draggable.type)) ||
-                (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(draggable.type))
-            ))
+        //     const allowDrop = (droppableTags && droppableTags !== null && (Object.keys(droppableTags).length === 0 ||
+        //         (droppableTags.include?.length > 0 && droppableTags.include?.includes(draggable.type)) ||
+        //         (droppableTags.exclude?.length > 0 && !droppableTags.exclude?.includes(draggable.type))
+        //     ))
         
-            return allowDrop
-        }
+        //     return allowDrop
+        // }
     })
 
 
@@ -53,7 +59,7 @@ function Droppable(props) {
 
         const {target, source} = e.operation
         
-        if (target && target?.id !== props?.id){
+        if (!droppable.isDropTarget){
             return
         }
 
@@ -81,7 +87,7 @@ function Droppable(props) {
 
         const {target} = e.operation
         
-        if (target && target?.id !== props?.id){
+        if (!droppable.isDropTarget){
             return
         }
         // console.log("Over sir1: ", draggedElement)
@@ -113,9 +119,11 @@ function Droppable(props) {
 
         const {target} = e.operation
         
-        if (target && target?.id !== props?.id){
+        if (!droppable.isDropTarget){
             return
         }
+
+        console.log("dropping")
 
         if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")) {
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
@@ -135,6 +143,7 @@ function Droppable(props) {
         console.log("initial POs: ", posMetaData)
         if (onDrop && dropAllowed) {
             onDrop(e, draggedElement, widgetClass, posMetaData)
+            console.log("Dropped")
         }
 
         setTimeout(() => setAllowDrop({allow: true, show: false}), 10)
@@ -156,7 +165,7 @@ function Droppable(props) {
     }
 
     return (
-        <div ref={handleRef} className={props.className || ''}>
+        <div ref={handleRef} className={`${props.className}` || ''}>
 
             {props.children}
 

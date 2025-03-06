@@ -737,6 +737,8 @@ class Canvas extends React.Component {
 
             } else if (container === WidgetContainer.WIDGET) {
 
+                console.log("removing")
+
                 // if the widget was inside another widget move it outside 
                 let childWidgetObj = this.findWidgetFromListById(widgetObj.current.getId())
                 let parentWidgetObj = this.findWidgetFromListById(childWidgetObj.parent)
