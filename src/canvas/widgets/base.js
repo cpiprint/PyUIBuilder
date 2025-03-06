@@ -821,11 +821,13 @@ class Widget extends React.Component {
         // const offsetY = e.clientY - rect.top
 
         // snap to middle
-        const offsetX = rect.width / 2
-        const offsetY = rect.height / 2
+        // const offsetX = rect.width / 2
+        // const offsetY = rect.height / 2
 
-        // Set the custom drag image with correct offset to avoid snapping to the top-left corner
-        e.dataTransfer.setDragImage(dragImage, offsetX, offsetY)
+        const offsetX = e.clientX - rect.left;
+        const offsetY = e.clientY - rect.top;
+    
+        e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
 
 
         // Remove the custom drag image after some time to avoid leaving it in the DOM
@@ -1113,6 +1115,20 @@ class Widget extends React.Component {
             opacity: this.state.isDragging ? 0.3 : 1,
         }
 
+        const handleSetInitialPosition = (e, setPosMetaData) => {
+            const {clientX, clientY} = e
+
+        
+            const posMetaData = {
+                dragStartCursorPos: {x: clientX, y: clientY},
+                initialPos: this.getPos()
+            }
+    
+            setPosMetaData(posMetaData)
+
+            console.log("handle initial data: ", posMetaData)
+        }
+
         // const boundingRect = this.getBoundingRect
 
         // FIXME: if the parent container has tw-overflow-none, then the resizable indicator are also hidden
@@ -1120,7 +1136,7 @@ class Widget extends React.Component {
 
             <DragContext.Consumer>
                 {
-                    ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement }) => {
+                    ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement, setPosMetaData }) => {
 
                         
                         return ( 
@@ -1143,6 +1159,9 @@ class Widget extends React.Component {
 
                                 onDragStart={(e) => this.handleDragStart(e, onDragStart)}
                                 onDragEnd={(e) => this.handleDragEnd(onDragEnd)}
+
+                                // onPointerDown={setInitialPos}
+                                onPointerDown={(e) => handleSetInitialPosition(e, setPosMetaData)}         
                             >
                                 {/* FIXME: Swappable when the parent layout is flex/grid and gap is more, this trick won't work, add bg color to check */}
                                 {/* FIXME: Swappable, when the parent layout is gap is 0, it doesn't work well */}

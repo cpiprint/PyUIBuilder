@@ -665,7 +665,7 @@ class Canvas extends React.Component {
      * Handles drop event to canvas from the sidebar and on canvas widget movement
      * @param {DragEvent} e 
      */
-      handleDropEvent = (e, draggedElement, widgetClass = null) => {
+      handleDropEvent = (e, draggedElement, widgetClass = null, posMetaData) => {
 
         e.preventDefault()
         // console.log("Drop event")
@@ -706,9 +706,24 @@ class Canvas extends React.Component {
         } else if ([WidgetContainer.CANVAS, WidgetContainer.WIDGET].includes(container)) {
 
             // snaps to center
+            // finalPosition = {
+            //     x: (clientX - canvasRect.left) / this.state.zoom - (elementWidth / 2) / this.state.zoom,
+            //     y: (clientY - canvasRect.top) / this.state.zoom - (elementHeight / 2) / this.state.zoom,
+            // }
+
+            
+            const {dragStartCursorPos, initialPos} = posMetaData
+            const canvasBoundingRect = this.getCanvasBoundingRect()
+
+            // calculate the initial offset from the div to the cursor grab
+            const initialOffset = {
+                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
+                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
+            }
+
             finalPosition = {
-                x: (clientX - canvasRect.left) / this.state.zoom - (elementWidth / 2) / this.state.zoom,
-                y: (clientY - canvasRect.top) / this.state.zoom - (elementHeight / 2) / this.state.zoom,
+                x: finalPosition.x - initialOffset.x  - this.state.currentTranslate.x,
+                y: finalPosition.y - initialOffset.y  - this.state.currentTranslate.y
             }
 
             let widgetId = draggedElement.getAttribute("data-widget-id")

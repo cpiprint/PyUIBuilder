@@ -11,8 +11,12 @@ export const DragProvider = ({ children }) => {
     const [draggedElement, setDraggedElement] = useState(null)
     const [overElement, setOverElement] = useState(null) // the element the dragged items is over
 
-    const [widgetClass, setWidgetClass] = useState(null) // helper to help pass the widget type from sidebar to canvas
+    const [posMetaData, setPosMetaData] = useState({dragStartCursorPos: {x: 0, y: 0}, 
+                                                        initialPos: {x: 0, y: 0}})
 
+
+    const [widgetClass, setWidgetClass] = useState(null) // helper to help pass the widget type from sidebar to canvas
+        
     const onDragStart = (element, widgetClass=null) => {
         setDraggedElement(element)
 
@@ -29,7 +33,8 @@ export const DragProvider = ({ children }) => {
 
     return (
         <DragContext.Provider value={{ draggedElement, overElement, setOverElement, 
-                                            widgetClass, onDragStart, onDragEnd }}>
+                                            widgetClass, onDragStart, onDragEnd, posMetaData, 
+                                            setPosMetaData }}>
             {children}
         </DragContext.Provider>
     )
