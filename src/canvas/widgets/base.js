@@ -215,7 +215,6 @@ class Widget extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps !== this.props) {
-            console.log("Updated sstare: ", this.state.pos)
             this.canvasMetaData = this.props.canvasMetaData
         }
     }
@@ -1163,14 +1162,12 @@ class Widget extends React.Component {
     
             setPosMetaData(posMetaData)
 
-            console.log("handle initial data: ", posMetaData)
         }
 
         // const boundingRect = this.getBoundingRect
 
         const {zoom: canvasZoom, pan: canvasPan} = this.canvasMetaData
 
-        console.log("Zooming and stuff: ", canvasZoom, canvasPan)
 
         // FIXME: if the parent container has tw-overflow-none, then the resizable indicator are also hidden
         return (
@@ -1180,9 +1177,13 @@ class Widget extends React.Component {
                     ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement, setPosMetaData }) => {
 
                         const canvasRect = this.canvas.getBoundingClientRect()
+                        const canvasRectInner = this.props.canvasInnerContainerRef?.current.getBoundingClientRect()
 
                         const elementRect = this.getBoundingRect()
-                        console.log("Canvas rect: ", canvasRect)
+
+
+                        const left = ((elementRect?.left || 0) - canvasRectInner?.left) / canvasZoom - 10
+                        const top = ((elementRect?.top || 0) - canvasRectInner?.top) / canvasZoom - 10
 
                         return ( 
                             <div data-widget-id={this.__id}
@@ -1247,24 +1248,15 @@ class Widget extends React.Component {
                                         >
                                         </div>
                                     }
-                                    {/* FIXME: the resize handles get clipped in parent container */}
                                 
-                                    <div className={`tw-fixed tw-pointer-events-none tw-bg-transparent tw-opacity-100 tw-border-t-green-400
+                                    <div className={`tw-fixed tw-pointer-events-none tw-bg-transparent tw-opacity-100
                                                     ${this.state.selected ? 'tw-border-2 tw-border-solid tw-border-blue-500' : 'tw-hidden'}`}
                                         style={{
-                                            // left: (this.state.pos.x - 10 - canvasPan.x) / canvasZoom,
-                                            // top: (this.state.pos.y - 10 - canvasPan.y) / canvasZoom,
-                                            // left: (this.state.pos.x - 10),
-                                            // top: (this.state.pos.y - 10),  
-                                            // left: (((elementRect?.left || 0 - canvasRect.left)/canvasZoom)) - 10 - (canvasPan.x),
-                                            // top: (((elementRect?.top || 0 - canvasRect.top)/canvasZoom)) - 10 - (canvasPan.y ),
-                                            // FIXME: from here
-                                            // left:   ((elementRect?.left || 0) - 10 - canvasPan.x) / canvasZoom ,
-                                            // top:   ((elementRect?.top || 0) - 10 - canvasPan.y) / canvasZoom ,
-                                            // left: ,
-                                            // top: ,
-                                            // NOTE: also subtract canvas inner ref thats passed
-                                            position: "fixed",
+                                         
+                                            position: "fixed", // transforms are applied on parent so its going to be relative to parent
+                                            left: left,
+                                            top: top,
+
                                             width: this.state.size.width + 20,
                                             height: this.state.size.height + 20,
                                             zIndex: 1,
@@ -1280,7 +1272,7 @@ class Widget extends React.Component {
                                             />
 
                                             <div
-                                                className="tw-w-2 tw-bg-red-500 tw-h-2 tw-absolute tw-pointer-events-auto tw--left-1 tw--top-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--left-1 tw--top-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.NW_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()

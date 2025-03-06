@@ -120,6 +120,9 @@ class Canvas extends React.Component {
     componentDidMount() {
         this.initEvents()
 
+        // NOTE: adding the transform will make the inner fixed position to be relative
+        // NOTE: this is needed to keep the resize widget poition correct in base widget
+        this.applyTransform()
     }
 
     componentWillUnmount() {
