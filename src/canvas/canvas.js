@@ -1055,7 +1055,6 @@ class Canvas extends React.Component {
             })
         }
 
-
         return (
 
             <ComponentType
@@ -1133,7 +1132,7 @@ class Canvas extends React.Component {
                                 }}
                             />
                             {/* Canvas */}
-                            <div data-canvas className="tw-w-full tw-h-full tw-absolute tw-top-0 tw-select-none"
+                            <div data-canvas className="tw-w-full tw-h-full tw-absolute tw-bg-red-300 tw-top-0 tw-select-none"
                                 ref={this.canvasRef}>
                                 <div className="tw-relative tw-w-full tw-h-full">
                                     {

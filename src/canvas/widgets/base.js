@@ -213,6 +213,12 @@ class Widget extends React.Component {
         this.load(this.props.initialData || {}) // load the initial data
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps !== this.props) {
+            console.log("Updated sstare: ", this.state.pos)
+            this.canvasMetaData = this.props.canvasMetaData
+        }
+    }
 
     componentWillUnmount() {
     }
@@ -1162,7 +1168,9 @@ class Widget extends React.Component {
 
         // const boundingRect = this.getBoundingRect
 
-        const {zoom: canvasPan, pan: canvasZoom} = this.canvasMetaData
+        const {zoom: canvasZoom, pan: canvasPan} = this.canvasMetaData
+
+        console.log("Zooming and stuff: ", canvasZoom, canvasPan)
 
         // FIXME: if the parent container has tw-overflow-none, then the resizable indicator are also hidden
         return (
@@ -1174,6 +1182,7 @@ class Widget extends React.Component {
                         const canvasRect = this.canvas.getBoundingClientRect()
 
                         const elementRect = this.getBoundingRect()
+                        console.log("Canvas rect: ", canvasRect)
 
                         return ( 
                             <div data-widget-id={this.__id}
@@ -1247,11 +1256,14 @@ class Widget extends React.Component {
                                             // top: (this.state.pos.y - 10 - canvasPan.y) / canvasZoom,
                                             // left: (this.state.pos.x - 10),
                                             // top: (this.state.pos.y - 10),  
-                                            // left: ((elementRect?.x || 0) - 10),
-                                            // top: ((elementRect?.y || 0) - 10),
+                                            // left: (((elementRect?.left || 0 - canvasRect.left)/canvasZoom)) - 10 - (canvasPan.x),
+                                            // top: (((elementRect?.top || 0 - canvasRect.top)/canvasZoom)) - 10 - (canvasPan.y ),
                                             // FIXME: from here
-                                            left: ((elementRect?.left || 0) - 20 - canvasPan.x) ,
-                                            top: ((elementRect?.top || 0) - 20 - canvasPan.y) ,
+                                            // left:   ((elementRect?.left || 0) - 10 - canvasPan.x) / canvasZoom ,
+                                            // top:   ((elementRect?.top || 0) - 10 - canvasPan.y) / canvasZoom ,
+                                            left: 1,
+                                            top: 1,
+                                            position: "fixed",
                                             width: this.state.size.width + 20,
                                             height: this.state.size.height + 20,
                                             zIndex: 1,
@@ -1267,7 +1279,7 @@ class Widget extends React.Component {
                                             />
 
                                             <div
-                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--left-1 tw--top-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-bg-red-500 tw-h-2 tw-absolute tw-pointer-events-auto tw--left-1 tw--top-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.NW_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()
