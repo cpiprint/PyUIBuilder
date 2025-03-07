@@ -683,9 +683,9 @@ class Canvas extends React.Component {
         const container = draggedElement.getAttribute("data-container")
         const canvasRect = this.canvasRef.current.getBoundingClientRect()
 
-        const draggedElementRect = draggedElement.getBoundingClientRect()
-        const elementWidth = draggedElementRect.width
-        const elementHeight = draggedElementRect.height
+        // const draggedElementRect = draggedElement.getBoundingClientRect()
+        // const elementWidth = draggedElementRect.width
+        // const elementHeight = draggedElementRect.height
 
         const { clientX, clientY } = e
 
@@ -752,6 +752,7 @@ class Canvas extends React.Component {
                     parent: "",
                     initialData: {
                         ...childData,
+                        parentWidgetRef: null,
                         pos: { x: finalPosition.x, y: finalPosition.y },
                         positionType: PosType.ABSOLUTE, // makes sure that after dropping the position is set to absolute value
                         parentLayout: null,// reset the parent layout when its put on the canvas
@@ -795,7 +796,7 @@ class Canvas extends React.Component {
      * @param {object} dragElement 
      * @param {boolean} create - if create is set to true the widget will be created before adding to the child tree
      */
-    handleAddWidgetChild = ({event, parentWidgetId, dragElementID, swap = false }) => {
+    handleAddWidgetChild = ({event, parentWidgetId, dragElementID, swap = false, posMetaData }) => {
 
         // console.log("event: ", event)
         // widgets data structure { id, widgetType: widgetComponentType, children: [], parent: "" }
@@ -813,13 +814,30 @@ class Canvas extends React.Component {
             const parentWidget = this.widgetRefs[parentWidgetId].current
             const parentRect = parentWidget.getBoundingRect()
             const { clientX, clientY } = event
-    
+            
+            const {dragStartCursorPos, initialPos} = posMetaData
+            
+            console.log("Pos meyta data: ", posMetaData)
 
             let finalPosition = {
                 x: (clientX - parentRect.left) / this.state.zoom,
                 y: (clientY - parentRect.top) / this.state.zoom,
             }
+
+            const canvasBoundingRect = this.getCanvasBoundingRect()
+
             
+            const initialOffset = {
+                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
+                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
+            }
+
+
+            finalPosition = {
+                x: finalPosition.x - initialOffset.x  - this.state.currentTranslate.x,
+                y: finalPosition.y - initialOffset.y  - this.state.currentTranslate.y
+            }
+
             // TODO: fix swapping for grid layouts
             if (swap) {
                 // If swapping, we need to find the common parent
@@ -860,15 +878,18 @@ class Canvas extends React.Component {
                 const updatedDragWidget = {
                     ...dragWidgetObj,
                     parent: dropWidgetObj.id, // Keep the parent reference
+
                     initialData: {
                         ...dragData,
                         positionType: parentLayout === Layouts.PLACE ? PosType.ABSOLUTE : PosType.NONE,
                         parentLayout: parentWidget.getLayout() || null, // pass everything about the parent layout
+                        parentWidgetRef: this.widgetRefs[parentWidgetId],
                         zIndex: 0,
                         pos: {x: finalPosition.x, y: finalPosition.y},
                         widgetContainer: WidgetContainer.WIDGET
                     }
                 }
+                console.log("added parent: ", updatedDragWidget)
 
                 const updatedDropWidget = {
                     ...dropWidgetObj,
@@ -1044,9 +1065,10 @@ class Canvas extends React.Component {
 
     renderWidget = (widget) => {
 
+        // FIXME: initial data parentWidgetRef is empty
         const { id, widgetType: ComponentType, children = [], parent, initialData = {} } = widget
 
-
+        console.log("parent: ", parent)
         const renderChildren = (childrenData) => {
             // recursively render the child elements
             return childrenData.map((child) => {
@@ -1057,6 +1079,7 @@ class Canvas extends React.Component {
                 return null
             })
         }
+        console.log("initial data: ", initialData, initialData.parentWidgetRef)
 
         return (
 
@@ -1065,6 +1088,7 @@ class Canvas extends React.Component {
                 id={id}
                 ref={this.widgetRefs[id]}
                 initialData={initialData}
+                parentWidgetRef={initialData.parentWidgetRef || null}
                 canvasRef={this.canvasContainerRef}
                 canvasInnerContainerRef={this.canvasRef}
                 canvasMetaData={{

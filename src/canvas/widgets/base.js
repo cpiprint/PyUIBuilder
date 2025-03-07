@@ -782,9 +782,6 @@ class Widget extends React.Component {
 
         if (parentLayout?.layout === Layouts.FLEX || parentLayout?.layout === Layouts.GRID){
 
-            const elementRect = this.elementRef.current.getBoundingClientRect()
-            const {pan: canvasPan, zoom: canvasZoom} = this.canvasMetaData
-            console.log("elemnt rect2: ", elementRect)
 
             layoutUpdates = {
                 ...layoutUpdates,
@@ -845,31 +842,30 @@ class Widget extends React.Component {
         // this.props.onWidgetDragStart(this.elementRef?.current)
 
         // Create custom drag image with full opacity, this will ensure the image isn't taken from part of the canvas
-        const dragImage = this.elementRef?.current.cloneNode(true)
-        dragImage.style.opacity = '1' // Ensure full opacity
-        dragImage.style.position = 'absolute'
-        dragImage.style.top = '-9999px' // Move it out of view
+        // const dragImage = this.elementRef?.current.cloneNode(true)
+        // dragImage.style.opacity = '1' // Ensure full opacity
+        // dragImage.style.position = 'absolute'
+        // dragImage.style.top = '-9999px' // Move it out of view
 
-        document.body.appendChild(dragImage)
-        const rect = this.elementRef?.current.getBoundingClientRect()
+        // document.body.appendChild(dragImage)
+        // const elementRect = this.elementRef.current.getBoundingClientRect()
+
+        // const canvasRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
         // snap to mouse pos
-        // const offsetX = e.clientX - rect.left
-        // const offsetY = e.clientY - rect.top
+        // const offsetX = e.clientX - elementRect.left
+        // const offsetY = e.clientY - elementRect.top
 
+        // console.log("element rect: ", elementRect, e.clientX, e.clientY, "offset: ", offsetX, offsetY)
         // snap to middle
         // const offsetX = rect.width / 2
         // const offsetY = rect.height / 2
-
-        const offsetX = e.clientX - rect.left;
-        const offsetY = e.clientY - rect.top;
-    
-        e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+        // e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
 
 
         // Remove the custom drag image after some time to avoid leaving it in the DOM
-        setTimeout(() => {
-            document.body.removeChild(dragImage)
-        }, 0)
+        // setTimeout(() => {
+        //     document.body.removeChild(dragImage)
+        // }, 0)
 
         // NOTE: this line will prevent problem's such as self-drop or dropping inside its own children
         setTimeout(this.disablePointerEvents, 1)
@@ -951,7 +947,7 @@ class Widget extends React.Component {
 
     }
 
-    handleDropEvent = (e, draggedElement, widgetClass = null) => {
+    handleDropEvent = (e, draggedElement, widgetClass = null, posMetaData) => {
 
         if (!draggedElement || !draggedElement.getAttribute("data-drag-start-within")){
             // if the drag is starting from outside (eg: file drop) or if drag doesn't exist
@@ -1004,6 +1000,8 @@ class Widget extends React.Component {
             return  
         }
         // TODO: check if the drop is allowed
+
+        console.log("Meta data: ", posMetaData)
         if ([WidgetContainer.CANVAS, WidgetContainer.WIDGET].includes(container)) {
             // console.log("Dropped on meee: ", swapArea, this.swappableAreaRef.current.contains(e.target), thisContainer)
 
@@ -1011,7 +1009,8 @@ class Widget extends React.Component {
                 event: e,
                 parentWidgetId: this.__id,
                 dragElementID: draggedElement.getAttribute("data-widget-id"),
-                swap: swapArea || false
+                swap: swapArea || false,
+                posMetaData
             })
 
         } else if (container === WidgetContainer.SIDEBAR) {
@@ -1021,7 +1020,8 @@ class Widget extends React.Component {
                 this.props.onAddChildWidget({
                                             event: e, 
                                             parentWidgetId: this.__id, 
-                                            dragElementID: id 
+                                            dragElementID: id,
+                                            posMetaData
                                         }) //  if dragged from the sidebar create the widget first
             })
 
@@ -1152,14 +1152,47 @@ class Widget extends React.Component {
         }
 
         const handleSetInitialPosition = (e, setPosMetaData) => {
+
+            e.stopPropagation() // prevent this event from bubbling up to parents
+
             const {clientX, clientY} = e
 
-        
+            const elementRect = this.elementRef.current.getBoundingClientRect() 
+            const canvasInnerRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
+
+            const {zoom, pan} = this.props.canvasMetaData
+
+            console.log("Loss: ", this.props.parentWidgetRef)
+
+            // TODO: if parent exist also subtract it
+            
+            let initialPos = {
+                x: elementRect.left - canvasInnerRect.left,
+                y: elementRect.top - canvasInnerRect.top
+            }
+
+            let parent = this.props.parentWidgetRef?.current;
+
+            console.log("parent1111: ", this.__id, parent, this.props)
+
+            while (parent) {
+                // accounting for nested parents
+                const parentRect = parent.getBoundingRect()
+                console.log("parent: ", parentRect)
+                initialPos.x -= parentRect.left - canvasInnerRect.left
+                initialPos.y -= parentRect.top - canvasInnerRect.top
+
+                // Move up to the next parent (if any)
+                parent = parent.parentWidgetRef?.current
+            }
+
             const posMetaData = {
                 dragStartCursorPos: {x: clientX, y: clientY},
-                initialPos: {...this.state.pos}
+                initialPos: {...initialPos}
             }
-    
+
+            console.log("initial pos: ", posMetaData)
+
             setPosMetaData(posMetaData)
 
         }
@@ -1174,7 +1207,7 @@ class Widget extends React.Component {
 
             <DragContext.Consumer>
                 {
-                    ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement, setPosMetaData }) => {
+                    ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement, posMetaData, setPosMetaData }) => {
 
                         const canvasRect = this.canvas.getBoundingClientRect()
                         const canvasRectInner = this.props.canvasInnerContainerRef?.current.getBoundingClientRect()
@@ -1198,7 +1231,7 @@ class Widget extends React.Component {
                                 draggable={this.state.dragEnabled}
 
                                 onDragOver={(e) => this.handleDragOver(e, draggedElement)}
-                                onDrop={(e) => {this.handleDropEvent(e, draggedElement, widgetClass); onDragEnd()}}
+                                onDrop={(e) => {this.handleDropEvent(e, draggedElement, widgetClass, posMetaData); onDragEnd()}}
 
                                 onDragEnter={(e) => this.handleDragEnter(e, draggedElement, setOverElement)}
                                 onDragLeave={(e) => this.handleDragLeave(e, draggedElement, overElement)}
