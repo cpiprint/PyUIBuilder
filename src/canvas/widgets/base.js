@@ -1160,11 +1160,8 @@ class Widget extends React.Component {
             const elementRect = this.elementRef.current.getBoundingClientRect() 
             const canvasInnerRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
 
-            const {zoom, pan} = this.props.canvasMetaData
+            // const {zoom, pan} = this.props.canvasMetaData
 
-            console.log("Loss: ", this.props.parentWidgetRef)
-
-            // TODO: if parent exist also subtract it
             
             let initialPos = {
                 x: elementRect.left - canvasInnerRect.left,
@@ -1173,12 +1170,10 @@ class Widget extends React.Component {
 
             let parent = this.props.parentWidgetRef?.current;
 
-            console.log("parent1111: ", this.__id, parent, this.props)
 
             while (parent) {
                 // accounting for nested parents
                 const parentRect = parent.getBoundingRect()
-                console.log("parent: ", parentRect)
                 initialPos.x -= parentRect.left - canvasInnerRect.left
                 initialPos.y -= parentRect.top - canvasInnerRect.top
 
@@ -1191,8 +1186,6 @@ class Widget extends React.Component {
                 initialPos: {...initialPos}
             }
 
-            console.log("initial pos: ", posMetaData)
-
             setPosMetaData(posMetaData)
 
         }
@@ -1202,7 +1195,6 @@ class Widget extends React.Component {
         const {zoom: canvasZoom, pan: canvasPan} = this.canvasMetaData
 
 
-        // FIXME: if the parent container has tw-overflow-none, then the resizable indicator are also hidden
         return (
 
             <DragContext.Consumer>

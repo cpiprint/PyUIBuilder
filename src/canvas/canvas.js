@@ -39,6 +39,8 @@ const CanvasModes = {
 }
 
 
+const IS_PRODUCTION = process.env.NODE_ENV === "production"
+
 class Canvas extends React.Component {
 
     // static contextType = ActiveWidgetContext
@@ -790,6 +792,15 @@ class Canvas extends React.Component {
     }
 
     /**
+     * Checks if the child fell in the swappable area 
+     *     
+     */
+    __checkClosestSwappableElement = ({event, parentWidgetId, dragWidgetId}) => {
+
+    }
+
+
+    /**
      * Adds the child into the children attribute inside the this.widgets list of objects
      *  //  widgets data structure { id, widgetType: widgetComponentType, children: [], parent: "" }
      * @param {string} parentWidgetId 
@@ -817,8 +828,6 @@ class Canvas extends React.Component {
             
             const {dragStartCursorPos, initialPos} = posMetaData
             
-            console.log("Pos meyta data: ", posMetaData)
-
             let finalPosition = {
                 x: (clientX - parentRect.left) / this.state.zoom,
                 y: (clientY - parentRect.top) / this.state.zoom,
@@ -889,7 +898,6 @@ class Canvas extends React.Component {
                         widgetContainer: WidgetContainer.WIDGET
                     }
                 }
-                console.log("added parent: ", updatedDragWidget)
 
                 const updatedDropWidget = {
                     ...dropWidgetObj,
@@ -1068,7 +1076,6 @@ class Canvas extends React.Component {
         // FIXME: initial data parentWidgetRef is empty
         const { id, widgetType: ComponentType, children = [], parent, initialData = {} } = widget
 
-        console.log("parent: ", parent)
         const renderChildren = (childrenData) => {
             // recursively render the child elements
             return childrenData.map((child) => {
@@ -1079,7 +1086,6 @@ class Canvas extends React.Component {
                 return null
             })
         }
-        console.log("initial data: ", initialData, initialData.parentWidgetRef)
 
         return (
 
@@ -1159,7 +1165,7 @@ class Canvas extends React.Component {
                                 }}
                             />
                             {/* Canvas */}
-                            <div data-canvas className="tw-w-full tw-h-full tw-absolute tw-bg-red-300 tw-top-0 tw-select-none"
+                            <div data-canvas className={`tw-w-full tw-h-full tw-absolute ${!IS_PRODUCTION ? "tw-bg-red-300" : "tw-bg-transparent"} tw-top-0 tw-select-none`}
                                 ref={this.canvasRef}>
                                 <div className="tw-relative tw-w-full tw-h-full">
                                     {
