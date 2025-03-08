@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef } from "react"
 import Draggable from "./utils/draggableDnd"
 
+import { Button } from "antd"
 import { GithubOutlined, GitlabOutlined, LinkOutlined,
             AudioOutlined, FileTextOutlined,
             DeleteFilled,
             DeleteOutlined,
-            GlobalOutlined} from "@ant-design/icons"
+            GlobalOutlined, 
+            EyeOutlined} from "@ant-design/icons"
+
 import DraggableWrapper from "./draggable/draggable"
-import { Button } from "antd"
 
 
 export function SidebarWidgetCard({ name, img, url, license, widgetClass, innerRef}){
@@ -148,4 +150,22 @@ export function DraggableAssetCard({file, onDelete}){
         </div>
     )
 
+}
+
+
+export function TreeViewCard({widgetId, onDelete, title}){
+
+    return (
+        <div className="tw-flex tw-place-items-center tw-px-2 tw-p-1 tw-place-content-between 
+                            tw-gap-4 tw-w-full" style={{width: "100%"}}>
+            <div className="tw-text-sm">
+                {title}
+            </div>
+
+            <div className="tw-ml-auto tw-flex tw-gap-1">
+                <Button color="danger" size="small" variant="text" danger icon={<DeleteOutlined />}></Button>
+                <Button variant="text" size="small" icon={<EyeOutlined />}></Button>
+            </div>
+        </div>
+    )
 }

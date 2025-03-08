@@ -798,32 +798,32 @@ class Canvas extends React.Component {
     __checkClosestShiftElement = ({ event, parentWidgetId, dragElementID }) => {
         
         // NOTE: work on this more maybe even check all four corners
-        const parentWidget = this.findWidgetFromListById(parentWidgetId);
-        if (!parentWidget) return;
+        const parentWidget = this.findWidgetFromListById(parentWidgetId)
+        if (!parentWidget) return
 
-        const dropX = event.clientX;
-        const dropY = event.clientY;
+        const dropX = event.clientX
+        const dropY = event.clientY
 
-        let closestChild = null;
-        let closestIndex = parentWidget.children.length;
-        let minDistance = Infinity;
+        let closestChild = null
+        let closestIndex = parentWidget.children.length
+        let minDistance = Infinity
 
         // Only check the first level of children
         parentWidget.children.forEach((child, index) => {
             if (child.id !== dragElementID) {
                 const childElement = this.widgetRefs[child.id]
 
-                if (!childElement) return;
+                if (!childElement) return
 
                 const rect = childElement.current.getBoundingRect()
                 const childTopRightX = rect.right
                 const childTopRightY = rect.top
 
                 // Compute Euclidean distance from drop position
-                const distance = Math.hypot(childTopRightX - dropX, childTopRightY - dropY);
+                const distance = Math.hypot(childTopRightX - dropX, childTopRightY - dropY)
                 if (distance < minDistance) {
-                    minDistance = distance;
-                    closestChild = child;
+                    minDistance = distance
+                    closestChild = child
                     closestIndex = index + 1
                 }
             }
@@ -836,7 +836,7 @@ class Canvas extends React.Component {
             const rect = childElement.current.getBoundingRect()
 
             // Closest is first child, check if dropped before or after
-            closestIndex = dropX < rect.left ? 0 : 1;
+            closestIndex = dropX < rect.left ? 0 : 1
         } 
 
         return {closestChild, closestIndex}

@@ -4,7 +4,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 
-import { LayoutFilled, ProductFilled, CloudUploadOutlined, DatabaseFilled } from "@ant-design/icons"
+import { LayoutFilled, ProductFilled, CloudUploadOutlined, DatabaseFilled, AlignLeftOutlined } from "@ant-design/icons"
 // import { DndContext, useSensors, useSensor, PointerSensor, closestCorners, DragOverlay, rectIntersection } from '@dnd-kit/core'
 // import { snapCenterToCursor } from '@dnd-kit/modifiers'
 
@@ -31,6 +31,8 @@ import generateTkinterCode from './frameworks/tkinter/engine/code'
 
 import TkMainWindow from './frameworks/tkinter/widgets/mainWindow' 
 import CTkMainWindow from './frameworks/customtk/widgets/mainWindow' 
+import TreeviewContainer from './sidebar/treeviewContainer'
+import { WidgetContextProvider } from './canvas/context/widgetContext'
 
 
 function App() {
@@ -63,6 +65,11 @@ function App() {
 			name: "Plugins",
 			icon: <ProductFilled />,
 			content: <PluginsContainer sidebarContent={sidebarPlugins}/>
+		},
+		{
+			name: "Tree view",
+			icon: <AlignLeftOutlined />,
+			content: <TreeviewContainer />
 		},
 		{
 			name: "Uploads",
@@ -162,6 +169,7 @@ function App() {
 
 	const handleWidgetAddedToCanvas = (widgets) => {
 		setCanvasWidgets(widgets)
+		console.log("widget added: ", widgets)
 	}
 
 	const handleCodeGen = () => {
@@ -208,16 +216,19 @@ function App() {
                 <p>Are you sure you want to change the framework? This will clear the canvas.</p>
             </Modal> */}
 
-				<DragProvider>
-					<div className="tw-w-full tw-h-[94vh] tw-flex">
-						<Sidebar tabs={sidebarTabs}/>
-						
-						{/* <ActiveWidgetProvider> */}
-						<Canvas ref={canvasRef} widgets={canvasWidgets} onWidgetAdded={handleWidgetAddedToCanvas}/>
-						{/* </ActiveWidgetProvider> */}
-					</div>
-					{/* dragOverlay (dnd-kit) helps move items from one container to another */}
-				</DragProvider>
+				<WidgetContextProvider>
+					<DragProvider>
+						<div className="tw-w-full tw-h-[94vh] tw-flex">
+							<Sidebar tabs={sidebarTabs}/>
+							
+							{/* <ActiveWidgetProvider> */}
+							<Canvas ref={canvasRef} widgets={canvasWidgets} 
+									onWidgetAdded={handleWidgetAddedToCanvas}/>
+							{/* </ActiveWidgetProvider> */}
+						</div>
+						{/* dragOverlay (dnd-kit) helps move items from one container to another */}
+					</DragProvider>
+				</WidgetContextProvider>
 		</div>
 	)
 }

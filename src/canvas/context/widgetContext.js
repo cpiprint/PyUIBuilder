@@ -1,35 +1,19 @@
-import React, { createContext, Component } from 'react'
+import React, { createContext, useContext, useState } from 'react';
 
-const WidgetContext = createContext()
+const widgetContext = createContext()
 
-// NOTE: Don't use this context provider
+export const useSelectedWidgetContext = () => useContext(widgetContext)
 
-class WidgetProvider extends Component {
-    state = {
-        activeWidget: null,  // Keeps track of the active widget's data
-        widgetMethods: null,  // Function to update active widget's state
-    }
 
-    setActiveWidget = (widgetData, widgetMethods) => {
-        this.setState({
-            activeWidget: widgetData,
-            widgetMethods: widgetMethods,  // Store the update function of the active widget
-        })
-    }
+export const WidgetContextProvider = ({ children }) => {
+    const [widgets, setWidgets] = useState(null)
 
-    render() {
-        return (
-            <WidgetContext.Provider
-                value={{
-                    activeWidget: this.state.activeWidget,
-                    setActiveWidget: this.setActiveWidget,
-                    widgetMethods: this.state.widgetMethods,  // Expose the update function
-                }}
-            >
-                {this.props.children}
-            </WidgetContext.Provider>
-        )
-    }
+    const [widgetRef, setWidgetRef] = useState({})
+    // const []
+
+    return (
+        <widgetContext.Provider value={{ widgets, setWidgets, widgetRef, setWidgetRef }}>
+            {children}
+        </widgetContext.Provider>
+    )
 }
-
-export { WidgetContext, WidgetProvider }
