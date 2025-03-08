@@ -160,7 +160,7 @@ class Canvas extends React.Component {
         this.canvasRef.current.style.transform = `translate(${currentTranslate.x}px, ${currentTranslate.y}px) scale(${zoom})`
     }
 
-    closeToolBar(){
+    closeToolBar() {
         this.setState({
             toolbarAttrs: null,
             toolbarOpen: false
@@ -418,8 +418,8 @@ class Canvas extends React.Component {
 
         if (!widget) return
 
-        if (widget.state.fitContent?.width && widget.state.fitContent?.height){
-            this.setState({widgetResizing: ""}) // Disable resizing if this is true, since the user will have to uncheck fit width and height
+        if (widget.state.fitContent?.width && widget.state.fitContent?.height) {
+            this.setState({ widgetResizing: "" }) // Disable resizing if this is true, since the user will have to uncheck fit width and height
             message.warning("both width and height are set to fit-content, unset it to start resizing")
             return
         }
@@ -666,11 +666,11 @@ class Canvas extends React.Component {
         })
     }
 
-      /**
-     * Handles drop event to canvas from the sidebar and on canvas widget movement
-     * @param {DragEvent} e 
-     */
-      handleDropEvent = (e, draggedElement, widgetClass = null, posMetaData) => {
+    /**
+   * Handles drop event to canvas from the sidebar and on canvas widget movement
+   * @param {DragEvent} e 
+   */
+    handleDropEvent = (e, draggedElement, widgetClass = null, posMetaData) => {
 
         e.preventDefault()
         // console.log("Drop event")
@@ -716,8 +716,8 @@ class Canvas extends React.Component {
             //     y: (clientY - canvasRect.top) / this.state.zoom - (elementHeight / 2) / this.state.zoom,
             // }
 
-            
-            const {dragStartCursorPos, initialPos} = posMetaData
+
+            const { dragStartCursorPos, initialPos } = posMetaData
             const canvasBoundingRect = this.getCanvasBoundingRect()
 
             // calculate the initial offset from the div to the cursor grab
@@ -727,8 +727,8 @@ class Canvas extends React.Component {
             }
 
             finalPosition = {
-                x: finalPosition.x - initialOffset.x  - this.state.currentTranslate.x,
-                y: finalPosition.y - initialOffset.y  - this.state.currentTranslate.y
+                x: finalPosition.x - initialOffset.x - this.state.currentTranslate.x,
+                y: finalPosition.y - initialOffset.y - this.state.currentTranslate.y
             }
 
             let widgetId = draggedElement.getAttribute("data-widget-id")
@@ -762,7 +762,7 @@ class Canvas extends React.Component {
                         widgetContainer: WidgetContainer.CANVAS
                     }
                 }
-            
+
                 let updatedWidgets = this.removeWidgetFromCurrentList(widgetObj.current.getId())
 
 
@@ -795,8 +795,70 @@ class Canvas extends React.Component {
      * Checks if the child fell in the swappable area 
      *     
      */
-    __checkClosestSwappableElement = ({event, parentWidgetId, dragWidgetId}) => {
+    __checkClosestShiftElement = ({ event, parentWidgetId, dragElementID }) => {
+        
+        // NOTE: work on this more maybe even check all four corners
+        const parentWidget = this.findWidgetFromListById(parentWidgetId);
+        if (!parentWidget) return;
 
+        const dropX = event.clientX;
+        const dropY = event.clientY;
+
+        let closestChild = null;
+        let closestIndex = parentWidget.children.length;
+        let minDistance = Infinity;
+
+        // Only check the first level of children
+        parentWidget.children.forEach((child, index) => {
+            if (child.id !== dragElementID) {
+                const childElement = this.widgetRefs[child.id]
+
+                if (!childElement) return;
+
+                const rect = childElement.current.getBoundingRect()
+                const childTopRightX = rect.right
+                const childTopRightY = rect.top
+
+                // Compute Euclidean distance from drop position
+                const distance = Math.hypot(childTopRightX - dropX, childTopRightY - dropY);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestChild = child;
+                    closestIndex = index + 1
+                }
+            }
+        });
+
+       
+        if (closestChild && closestIndex === 1) {
+            // by default the new index of the closest first element will be one and it will be zero if rect.left > dropX
+            const childElement = this.widgetRefs[closestChild.id]
+            const rect = childElement.current.getBoundingRect()
+
+            // Closest is first child, check if dropped before or after
+            closestIndex = dropX < rect.left ? 0 : 1;
+        } 
+
+        return {closestChild, closestIndex}
+    }
+
+    shiftWidgetPosition = (parentWidgetId, dragElementID, targetIndex) => {
+
+        const parentWidget = this.findWidgetFromListById(parentWidgetId);
+
+        let childrenCopy = [...parentWidget.children];
+        const dragIndex = childrenCopy.findIndex(child => child.id === dragElementID)
+        
+
+        if (dragIndex !== -1 && dragIndex !== targetIndex) {
+            const [draggedItem] = childrenCopy.splice(dragIndex, 1) // Remove dragged item
+            childrenCopy.splice(targetIndex, 0, draggedItem) // Insert at the target index
+    
+            const updatedParent = { ...parentWidget, children: childrenCopy }
+            this.setState(prevState => ({
+                widgets: this.updateWidgetRecursively(prevState.widgets, updatedParent, {})
+            }))
+        }
     }
 
 
@@ -807,7 +869,7 @@ class Canvas extends React.Component {
      * @param {object} dragElement 
      * @param {boolean} create - if create is set to true the widget will be created before adding to the child tree
      */
-    handleAddWidgetChild = ({event, parentWidgetId, dragElementID, swap = false, posMetaData }) => {
+    handleAddWidgetChild = ({ event, parentWidgetId, dragElementID, posMetaData }) => {
 
         // console.log("event: ", event)
         // widgets data structure { id, widgetType: widgetComponentType, children: [], parent: "" }
@@ -825,94 +887,93 @@ class Canvas extends React.Component {
             const parentWidget = this.widgetRefs[parentWidgetId].current
             const parentRect = parentWidget.getBoundingRect()
             const { clientX, clientY } = event
-            
-            const {dragStartCursorPos, initialPos} = posMetaData
-            
+
+            // const childRect = dragWidget.current.getBoundingRect()
+            // con
+
+            const { dragStartCursorPos, initialPos } = posMetaData
+            const canvasBoundingRect = this.getCanvasBoundingRect()
+
+            // TODO: the final position isn't adjusted for cursorpos
+
             let finalPosition = {
                 x: (clientX - parentRect.left) / this.state.zoom,
                 y: (clientY - parentRect.top) / this.state.zoom,
             }
 
-            const canvasBoundingRect = this.getCanvasBoundingRect()
+            // finalPosition = {
+            //     x: finalPosition.x - parentRect.left  - this.state.currentTranslate.x,
+            //     y: finalPosition.y - parentRect.right  - this.state.currentTranslate.y
+            // }
 
-            
+            // const initialOffset = {
+            //     x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
+            //     y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
+            // } 
+
+            // TODO: add offset to get the cursor to the correct div 
             const initialOffset = {
                 x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
                 y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
             }
 
 
-            finalPosition = {
-                x: finalPosition.x - initialOffset.x  - this.state.currentTranslate.x,
-                y: finalPosition.y - initialOffset.y  - this.state.currentTranslate.y
-            }
+            // finalPosition = {
+            //     x: finalPosition.x - initialOffset.x  - this.state.currentTranslate.x,
+            //     y: finalPosition.y - initialOffset.y  - this.state.currentTranslate.y
+            // }
 
-            // TODO: fix swapping for grid layouts
-            if (swap) {
-                // If swapping, we need to find the common parent
-                const grandParentWidgetObj = this.findWidgetFromListById(dropWidgetObj.parent)
-                // console.log("parent widget: ", grandParentWidgetObj, dropWidgetObj, this.state.widgets)
-                if (grandParentWidgetObj) {
-                    // Find the indices of the dragged and drop widgets in the grandparent's children array
-                    const dragIndex = grandParentWidgetObj.children.findIndex(child => child.id === dragElementID)
-                    const dropIndex = grandParentWidgetObj.children.findIndex(child => child.id === parentWidgetId)
-
-                    if (dragIndex !== -1 && dropIndex !== -1) {
-                        // Swap their positions
-                        let childrenCopy = [...grandParentWidgetObj.children]
-                        const temp = childrenCopy[dragIndex]
-                        childrenCopy[dragIndex] = childrenCopy[dropIndex]
-                        childrenCopy[dropIndex] = temp
-
-                        // Update the grandparent with the swapped children
-                        const updatedGrandParentWidget = {
-                            ...grandParentWidgetObj,
-                            children: childrenCopy
-                        }
-
-                        // Update the state with the new widget hierarchy
-                        this.setState((prevState) => ({
-                            widgets: this.updateWidgetRecursively(prevState.widgets, updatedGrandParentWidget, dragWidgetObj)
-                        }))
-                    }
-                }
-            } else {
-                // Non-swap mode: Add the dragged widget as a child of the drop widget
-                let updatedWidgets = this.removeWidgetFromCurrentList(dragElementID)
-
-                const parentLayout = parentWidget.getLayout()?.layout || null
-                // FIXME: if the layout is flex or grid the position should be different
+            // finalPosition = {
+            //     x: (finalPosition.x - parentRect.left) / this.state.zoom,
+            //     y: (finalPosition.y - parentRect.top) / this.state.zoom
+            // };
+            
+            let updatedWidgets = this.removeWidgetFromCurrentList(dragElementID)
                 
-                dragWidget.current.setPos(finalPosition.x, finalPosition.y)
-                const updatedDragWidget = {
-                    ...dragWidgetObj,
-                    parent: dropWidgetObj.id, // Keep the parent reference
+            const parentLayout = parentWidget.getLayout()?.layout || null
+            // FIXME: if the layout is flex or grid the position should be different
 
-                    initialData: {
-                        ...dragData,
-                        positionType: parentLayout === Layouts.PLACE ? PosType.ABSOLUTE : PosType.NONE,
-                        parentLayout: parentWidget.getLayout() || null, // pass everything about the parent layout
-                        parentWidgetRef: this.widgetRefs[parentWidgetId],
-                        zIndex: 0,
-                        pos: {x: finalPosition.x, y: finalPosition.y},
-                        widgetContainer: WidgetContainer.WIDGET
+            dragWidget.current.setPos(finalPosition.x, finalPosition.y)
+               
+            const updatedDragWidget = {
+                ...dragWidgetObj,
+                parent: dropWidgetObj.id, // Keep the parent reference
+
+                initialData: {
+                    ...dragData,
+                    positionType: parentLayout === Layouts.PLACE ? PosType.ABSOLUTE : PosType.NONE,
+                    parentLayout: parentWidget.getLayout() || null, // pass everything about the parent layout
+                    parentWidgetRef: this.widgetRefs[parentWidgetId],
+                    zIndex: 0,
+                    pos: { x: finalPosition.x, y: finalPosition.y },
+                    widgetContainer: WidgetContainer.WIDGET
+                }
+            }
+
+            const updatedDropWidget = {
+                ...dropWidgetObj,
+                children: [...dropWidgetObj.children, updatedDragWidget]
+            }
+
+
+            // Recursively update the widget structure
+            updatedWidgets = this.updateWidgetRecursively(updatedWidgets, updatedDropWidget, updatedDragWidget)
+
+            // Update the state with the new widget hierarchy
+            this.setState({
+                widgets: updatedWidgets
+            }, () => {
+
+                if (parentLayout !== Layouts.PLACE){
+                    // swap only for grid and flex placements
+                    const swapClosest = this.__checkClosestShiftElement({ event, parentWidgetId, dragElementID })
+        
+                    if (swapClosest.closestChild){
+                        this.shiftWidgetPosition(parentWidgetId, dragElementID, swapClosest.closestIndex)
                     }
                 }
-
-                const updatedDropWidget = {
-                    ...dropWidgetObj,
-                    children: [...dropWidgetObj.children, updatedDragWidget]
-                }
-
-
-                // Recursively update the widget structure
-                updatedWidgets = this.updateWidgetRecursively(updatedWidgets, updatedDropWidget, updatedDragWidget)
-
-                // Update the state with the new widget hierarchy
-                this.setState({
-                    widgets: updatedWidgets
-                })
-            }
+            })
+        
         }
 
     }
@@ -984,7 +1045,7 @@ class Canvas extends React.Component {
         for (let widgetId of widgetIds) {
             this.removeWidget(widgetId)
         }
-        
+
     }
 
     /**
@@ -1058,13 +1119,13 @@ class Canvas extends React.Component {
     /**
      * informs the child about the parent layout
      */
-    updateChildLayouts = ({parentId, parentLayout}) => {
-       
+    updateChildLayouts = ({ parentId, parentLayout }) => {
+
         const parent = this.getWidgetByIdFromWidgetList(parentId)
 
         if (!parent) return
 
-        for (let child of parent.children){
+        for (let child of parent.children) {
             this.widgetRefs[child.id].current.setParentLayout(parentLayout)
         }
 

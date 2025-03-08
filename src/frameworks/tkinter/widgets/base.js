@@ -118,8 +118,33 @@ export class TkinterBase extends Widget {
 
         if (parentLayout === Layouts.FLEX || parentLayout === Layouts.GRID) {
 
+            // const elementRect = this.elementRef.current.getBoundingClientRect() 
+            // const canvasInnerRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
+            // const {zoom, pan} = this.props.canvasMetaData
+            // console.log("pan: ", pan, zoom)
+            // let pos = {
+            //     x: ((elementRect.left - canvasInnerRect.left) - pan.x) / zoom ,
+            //     y: ((elementRect.top - canvasInnerRect.top) - pan.y)  / zoom
+            // }
+
+            // let parent = this.props.parentWidgetRef?.current;
+
+            // while (parent) {
+            //     // accounting for nested parents
+            //     const parentRect = parent.getBoundingRect()
+            //     pos.x -= ((parentRect.left - canvasInnerRect.left) - pan.x) / zoom 
+            //     pos.y -= ((parentRect.top - canvasInnerRect.top) - pan.y) / zoom 
+
+            //     // Move up to the next parent (if any)
+            //     parent = parent.parentWidgetRef?.current
+            // }
+
+            // // this.setPos(pos.x, pos.y)
+            // console.log("setting pos: ", pos, elementRect, canvasInnerRect)
+
             updates = {
                 ...updates,
+                // pos: pos,
                 positionType: PosType.NONE,
             }
             // Allow optional absolute positioning if the parent layout is flex or grid

@@ -584,6 +584,17 @@ class Widget extends React.Component {
                 ...updates,
                 positionType: PosType.NONE,
             }
+
+            // const elementRect = this.elementRef.current.getBoundingClientRect() 
+            // const canvasInnerRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
+
+            // let pos = {
+            //     x: elementRect.left - canvasInnerRect.left,
+            //     y: elementRect.top - canvasInnerRect.top
+            // }
+
+            // this.setPos(pos.x, pos.y)
+            // console.log("setting pos: ", pos)
             
         }else if (layout === Layouts.PLACE){
             updates = {
@@ -986,7 +997,7 @@ class Widget extends React.Component {
         const thisContainer = this.elementRef.current.getAttribute("data-container")
         // console.log("Dropped as swappable: ", e.target, this.swappableAreaRef.current.contains(e.target))
         // If swaparea is true, then it swaps instead of adding it as a child, also make sure that the parent widget(this widget) is on the widget and not on the canvas
-        const swapArea = (this.swappableAreaRef.current.contains(e.target) && !this.innerAreaRef.current.contains(e.target) && thisContainer === WidgetContainer.WIDGET)
+        const swapArea = false // (this.swappableAreaRef.current.contains(e.target) && !this.innerAreaRef.current.contains(e.target) && thisContainer === WidgetContainer.WIDGET)
 
         const dragEleType = draggedElement.getAttribute("data-draggable-type")
 
@@ -1001,7 +1012,7 @@ class Widget extends React.Component {
         }
         // TODO: check if the drop is allowed
 
-        console.log("Meta data: ", posMetaData)
+        // console.log("Meta data: ", posMetaData)
         if ([WidgetContainer.CANVAS, WidgetContainer.WIDGET].includes(container)) {
             // console.log("Dropped on meee: ", swapArea, this.swappableAreaRef.current.contains(e.target), thisContainer)
 
@@ -1009,7 +1020,6 @@ class Widget extends React.Component {
                 event: e,
                 parentWidgetId: this.__id,
                 dragElementID: draggedElement.getAttribute("data-widget-id"),
-                swap: swapArea || false,
                 posMetaData
             })
 
@@ -1170,7 +1180,6 @@ class Widget extends React.Component {
 
             let parent = this.props.parentWidgetRef?.current;
 
-
             while (parent) {
                 // accounting for nested parents
                 const parentRect = parent.getBoundingRect()
@@ -1240,19 +1249,18 @@ class Widget extends React.Component {
                                         
                                     >
                                     
-                                    <div className={`tw-absolute tw-top-[-5px] tw-left-[-5px] 
+                                    {/* <div className={`tw-absolute tw-top-[-5px] tw-left-[-5px] 
                                                         tw-border-1 tw-opacity-0 tw-border-solid tw-border-black
-                                                        tw-w-full tw-h-full tw-bg-red-400
-                                                        tw-scale-[1.1] tw-opacity-1 tw-z-[-1] `}
+                                                        tw-w-full tw-h-full 
+                                                        tw-scale-[1.1] !tw-opacity-1 tw-z-[-1] `}
                                         style={{
                                             width: "calc(100% + 10px)",
                                             height: "calc(100% + 10px)",
                                         }}
                                         ref={this.swappableAreaRef}
-                                        // swapable area
-                                    >
+                                        > */}
                                         {/* helps with swappable: if the mouse is in this area while hovering/dropping, then swap */}
-                                    </div>
+                                    {/* </div> */}
 
                                     <div className="tw-relative tw-top-0 tw-left-0 tw-w-full tw-h-full" ref={this.innerAreaRef}
                                         >
