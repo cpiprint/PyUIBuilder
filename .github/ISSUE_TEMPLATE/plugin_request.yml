@@ -1,28 +1,27 @@
 name: Plugin Request
-description: Request a 3rd party library support
-title: "[Plugin request]: "
+description: Request support for a third-party library
+title: "[Plugin Request]: "
 labels: ["plugin"]
-assignees: 
+assignees:
   - PaulleDemon
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to request for new plugin
-
+        Thanks for taking the time to request a new plugin.
 
   - type: input
     id: plugin
     attributes:
       label: Name of the plugin
-      placeholder: plugin name
+      placeholder: Enter the plugin name
     validations:
-        required: true
+      required: true
 
   - type: input
     id: plugin-link
     attributes:
-      label: Link to plugin
-      placeholder: plugin link
+      label: Link to the plugin
+      placeholder: Enter the plugin link
     validations:
-        required: true
+      required: true
