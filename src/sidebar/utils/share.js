@@ -45,6 +45,10 @@ function Share({children, className=""}){
                     footer={null}
                     open={shareModalOpen}>
                 
+                <div className="tw-text-lg">
+                    Share and help speed up development
+                </div>
+
                 <div className="tw-mt-5 tw-flex tw-place-content-center tw-w-full tw-place-items-center">
                     <a onClick={onCopy}
                         className="hover:!tw-bg-gray-100 hover:!tw-color-black !tw-text-4xl" 

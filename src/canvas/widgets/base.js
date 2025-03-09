@@ -1200,17 +1200,17 @@ class Widget extends React.Component {
                 y: elementRect.top - canvasInnerRect.top
             }
 
-            let parent = this.props.parentWidgetRef?.current;
+            // let parent = this.props.parentWidgetRef?.current;
 
-            while (parent) {
-                // accounting for nested parents
-                const parentRect = parent.getBoundingRect()
-                initialPos.x -= parentRect.left - canvasInnerRect.left
-                initialPos.y -= parentRect.top - canvasInnerRect.top
+            // while (parent) {
+            //     // accounting for nested parents
+            //     const parentRect = parent.getBoundingRect()
+            //     initialPos.x -= parentRect.left - canvasInnerRect.left
+            //     initialPos.y -= parentRect.top - canvasInnerRect.top
 
-                // Move up to the next parent (if any)
-                parent = parent.parentWidgetRef?.current
-            }
+            //     // Move up to the next parent (if any)
+            //     parent = parent.parentWidgetRef?.current
+            // }
 
             const posMetaData = {
                 dragStartCursorPos: {x: clientX, y: clientY},
@@ -1232,7 +1232,7 @@ class Widget extends React.Component {
                     ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement, posMetaData, setPosMetaData }) => {
 
                         // const canvasRect = this.canvas.getBoundingClientRect()
-                        const canvasRectInner = this.props.canvasInnerContainerRef?.current.getBoundingClientRect()
+                        const canvasRectInner = this.props.canvasInnerContainerRef?.current?.getBoundingClientRect()
 
                         const elementRect = this.getBoundingRect()
 

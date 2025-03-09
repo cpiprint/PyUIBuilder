@@ -183,7 +183,7 @@ export const TreeViewCard = memo(({widgetRef, title, isTopLevel}) => {
             <div className="tw-ml-auto tw-flex tw-gap-1">
                 <Button color="danger" title="delete" onClick={onDelete} size="small" variant="text" danger 
                 icon={<DeleteOutlined />}></Button>
-                <Button variant="text" title="hide" onClick={toggleHideShowWidget} size="small" 
+                <Button variant="text" type="text" title="hide" onClick={toggleHideShowWidget} size="small" 
                 icon={widgetVisible ? <EyeInvisibleOutlined/> : <EyeOutlined />}></Button>
             </div>
         </div>

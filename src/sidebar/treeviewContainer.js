@@ -18,7 +18,7 @@ function transformWidgets(widgets, widgetRefs, isTopLevel=true) {
       isTopLevel: isTopLevel,
       widgetRef: widgetRefs.current[widget.id],
       children: widget.children.length > 0 ? transformWidgets(widget.children, widgetRefs, false) : []
-    }));
+    }))
   }
   
 
@@ -61,6 +61,13 @@ function TreeviewContainer() {
                         >
                   
                 </Tree>
+
+                {
+                    Object.keys(transformedContent || {}).length === 0 && 
+                    <div className="tw-text-sm tw-place-content-center">
+                        Start adding widgets to view it in tree view
+                    </div>
+                }
 
             </div>
         </div>

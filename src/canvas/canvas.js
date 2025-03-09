@@ -734,15 +734,27 @@ class Canvas extends React.Component {
             const canvasBoundingRect = this.getCanvasBoundingRect()
 
             // calculate the initial offset from the div to the cursor grab
+            // const initialOffset = {
+            //     x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
+            //     y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
+            // }
+
             const initialOffset = {
-                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
-                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
+                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom) - (initialPos.x/this.state.zoom),
+                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom) - (initialPos.y/this.state.zoom)
             }
+
+            console.log("initial offset:")
 
             // finalPosition = {
             //     x: finalPosition.x - initialOffset.x - this.state.currentTranslate.x,
             //     y: finalPosition.y - initialOffset.y - this.state.currentTranslate.y
             // }
+
+            finalPosition = {
+                x: finalPosition.x - initialOffset.x,
+                y: finalPosition.y - initialOffset.y
+            }
 
             let widgetId = draggedElement.getAttribute("data-widget-id")
 
@@ -927,9 +939,14 @@ class Canvas extends React.Component {
             // } 
 
             // TODO: add offset to get the cursor to the correct div 
+            // const initialOffset = {
+            //     x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
+            //     y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
+            // }
+
             const initialOffset = {
-                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
-                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
+                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom) - (initialPos.x/this.state.zoom),
+                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom) - (initialPos.y/this.state.zoom)
             }
 
 
@@ -943,6 +960,12 @@ class Canvas extends React.Component {
             //     y: (finalPosition.y - parentRect.top) / this.state.zoom
             // };
             
+
+            finalPosition = {
+                x: finalPosition.x - initialOffset.x,
+                y: finalPosition.y - initialOffset.y 
+            }
+
             let updatedWidgets = this.removeWidgetFromCurrentList(dragElementID)
                 
             const parentLayout = parentWidget.getLayout()?.layout || null
@@ -1081,7 +1104,7 @@ class Canvas extends React.Component {
 
         let activeWidgets = removeDuplicateObjects([...widgets, this.selectedWidget], "__id")
 
-        this.selectedWidget(null)
+        this.setSelectedWidget(null)
 
         this.setState({
             toolbarAttrs: null,

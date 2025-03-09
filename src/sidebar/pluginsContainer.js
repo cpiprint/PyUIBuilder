@@ -78,7 +78,7 @@ function PluginsContainer({sidebarContent, onWidgetsUpdate}){
                     target="_blank" rel="noopener noreferrer"
                     className="tw-flex tw-mt-6 btn"
                     >
-                Request new plugin support
+                Request new plugin
             </Button>
         </div>
     )
