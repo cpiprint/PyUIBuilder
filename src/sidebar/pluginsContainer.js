@@ -9,6 +9,7 @@ import ButtonWidget from "../assets/widgets/button.png"
 import { filterObjectListStartingWith } from "../utils/filter"
 import Widget from "../canvas/widgets/base"
 import { SearchComponent } from "../components/inputs"
+import { Button } from "antd"
 
 
 /**
@@ -72,6 +73,13 @@ function PluginsContainer({sidebarContent, onWidgetsUpdate}){
                     })
                 }
             </div>
+
+            <Button href="https://github.com/PaulleDemon/PyUIBuilder/issues" 
+                    target="_blank" rel="noopener noreferrer"
+                    className="tw-flex tw-mt-6 btn"
+                    >
+                Request new plugin support
+            </Button>
         </div>
     )
 

@@ -33,11 +33,16 @@ function Premium({ children, className = "" }) {
                 open={premiumModalOpen}
             >
                 <div className="tw-mt-5 tw-text-lg tw-max-w-[850px]  tw-w-full ">
-                    I am Paul, a indie open-source dev.
+                    
+                    I am Paul, an indie open-source dev.
                     If you find this tool useful and want to fund and support it's development, consider buying a <b>one time license</b>.
                     <br />
                     <br />
-                    By buying pre-order license, you get advance features, priority support, early access, upcoming features, and &nbsp;
+                    I am working on PYUI builder full time to help you easily build GUI's in python. However as a solo-dev, its super hard 
+                    to keep working on it without enough funding. 
+                    <br />
+                    <br />
+                    By buying pre-order license, I get to complete this faster and you get discounted price, advance features, priority support, early access, upcoming features, and &nbsp;
                     <a
                         href="https://github.com/PaulleDemon/tab=readme-ov-file"
                         target="_blank"
@@ -45,12 +50,16 @@ function Premium({ children, className = "" }) {
                         className="!tw-text-blue-500"
                     >
                         more.
-                    </a>
+                    </a> 
+                    <div className="tw-text-sm tw-mt-2">
+                    Or you could support development by sharing this tool on your socials and you'll be eligible for a 
+                    &nbsp;<a href="https://tally.so/r/mJM22X" target="_blank" rel="noreferrer noopener">free license</a>.
+                    </div>
                 </div>
 
                 <section className="tw-mt-1 tw-flex tw-w-full tw-flex-col tw-place-items-center tw-p-[2%] max-lg:tw-p-2" id="pricing">
                     <h3 className="tw-text-2xl tw-font-medium max-md:tw-text-2xl">Choose your plan</h3>
-                    <div className="tw-mt-10 tw-flex tw-place-content-center tw-gap-8 max-lg:tw-flex-col">
+                    <div className="tw-mt-6 tw-flex tw-place-content-center tw-gap-8 max-lg:tw-flex-col">
                         {/* Free Plan */}
                         <div className="tw-flex tw-w-[380px] tw-border-[1px] tw-border-gray-500 tw-border-solid tw-flex-col tw-place-items-center tw-gap-2 tw-rounded-lg tw-p-8 tw-shadow-xl max-lg:tw-w-[340px]">
                             <h3>
@@ -113,7 +122,7 @@ function Premium({ children, className = "" }) {
                         <div className="tw-flex tw-w-[380px] tw-flex-col tw-place-items-center tw-gap-2 tw-rounded-lg tw-border-2 tw-border-solid
                                          tw-border-blue-500 tw-p-8 tw-shadow-xl max-lg:tw-w-[340px]">
                             <div className="tw-text-white tw-p-1 tw-px-3 tw-bg-blue-500 tw-rounded-full">
-                                Limited time offer
+                                Pre-order time offer
                             </div>
                             <div className="tw-text-white tw-font-medium tw-p-1 tw-px-3 tw-bg-green-700 tw-rounded-full">
                                 Hobby
@@ -192,7 +201,7 @@ function Premium({ children, className = "" }) {
                         <div className="tw-flex tw-w-[380px] tw-flex-col tw-place-items-center tw-gap-2 tw-rounded-lg tw-border-3 tw-border-solid
                                          tw-border-green-600 tw-p-8 tw-shadow-xl max-lg:tw-w-[340px]">
                             <div className="tw-text-white tw-p-1 tw-px-3 tw-bg-blue-500 tw-rounded-full">
-                                Limited time offer
+                                Pre-order time offer
                             </div>
                             <div className="tw-text-white tw-font-medium tw-p-1 tw-px-3 tw-bg-green-700 tw-rounded-full">
                                 Commercial
