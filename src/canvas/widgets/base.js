@@ -75,6 +75,8 @@ class Widget extends React.Component {
         this.state = {
             zIndex: 0,
             selected: false,
+            isWidgetVisible: true,
+
             widgetName: widgetName || 'widget', // this will later be converted to variable name
             enableRename: false, // will open the widgets editable div for renaming
 
@@ -177,6 +179,7 @@ class Widget extends React.Component {
 
         // this.openRenaming = this.openRenaming.bind(this)
 
+        // this.isWidgetVisible = true // widget is visible in viewport
         this.isSelected = this.isSelected.bind(this)
 
         this.setPos = this.setPos.bind(this)
@@ -332,6 +335,26 @@ class Widget extends React.Component {
     // TODO: add context menu items such as delete, add etc
     contextMenu() {
 
+    }
+
+    deleteWidget = () => {
+        this.props.onWidgetDeleteRequest(this.__id)
+    }
+
+    isWidgetVisible = () => {
+        return this.state.isWidgetVisible
+    }
+
+    hideFromViewport = () => {
+        this.setState({
+            isWidgetVisible: false
+        })
+    }
+
+    unHideFromViewport = () => {
+        this.setState({
+            isWidgetVisible: true
+        })
     }
 
     getVariableName() {
@@ -997,7 +1020,6 @@ class Widget extends React.Component {
         const thisContainer = this.elementRef.current.getAttribute("data-container")
         // console.log("Dropped as swappable: ", e.target, this.swappableAreaRef.current.contains(e.target))
         // If swaparea is true, then it swaps instead of adding it as a child, also make sure that the parent widget(this widget) is on the widget and not on the canvas
-        const swapArea = false // (this.swappableAreaRef.current.contains(e.target) && !this.innerAreaRef.current.contains(e.target) && thisContainer === WidgetContainer.WIDGET)
 
         const dragEleType = draggedElement.getAttribute("data-draggable-type")
 
@@ -1006,8 +1028,8 @@ class Widget extends React.Component {
             (this.droppableTags.exclude?.length > 0 && !this.droppableTags.exclude?.includes(dragEleType))
         ))
 
-        if (!allowDrop && !swapArea) {
-            // only if both swap and drop is not allowed return, if swap is allowed continue
+        if (!allowDrop) {
+            // only if drop is not allowed return, if swap is allowed continue
             return  
         }
         // TODO: check if the drop is allowed
@@ -1203,14 +1225,13 @@ class Widget extends React.Component {
 
         const {zoom: canvasZoom, pan: canvasPan} = this.canvasMetaData
 
-
         return (
 
             <DragContext.Consumer>
                 {
                     ({ draggedElement, widgetClass, onDragStart, onDragEnd, overElement, setOverElement, posMetaData, setPosMetaData }) => {
 
-                        const canvasRect = this.canvas.getBoundingClientRect()
+                        // const canvasRect = this.canvas.getBoundingClientRect()
                         const canvasRectInner = this.props.canvasInnerContainerRef?.current.getBoundingClientRect()
 
                         const elementRect = this.getBoundingRect()
@@ -1222,7 +1243,7 @@ class Widget extends React.Component {
                         return ( 
                             <div data-widget-id={this.__id}
                                 ref={this.elementRef}
-                                className="tw-shadow-xl tw-w-fit tw-h-fit"
+                                className={`tw-shadow-xl tw-w-fit tw-h-fit ${!this.state.isWidgetVisible ? "tw-hidden" : ""}`}
                                 style={outerStyle}
                                 data-draggable-type={this.getWidgetType()} // helps with droppable 
                                 data-container={this.state.widgetContainer} // indicates how the canvas should handle dragging, one is sidebar other is canvas
@@ -1243,8 +1264,6 @@ class Widget extends React.Component {
                                 // onPointerDown={setInitialPos}
                                 onPointerDown={(e) => handleSetInitialPosition(e, setPosMetaData)}         
                             >
-                                {/* FIXME: Swappable when the parent layout is flex/grid and gap is more, this trick won't work, add bg color to check */}
-                                {/* FIXME: Swappable, when the parent layout is gap is 0, it doesn't work well */}
                                 <div className="tw-relative tw-w-full  tw-h-full tw-top-0 tw-left-0"
                                         
                                     >

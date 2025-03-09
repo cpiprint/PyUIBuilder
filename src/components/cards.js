@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react"
+import { memo, useEffect, useMemo, useRef, useState } from "react"
 import Draggable from "./utils/draggableDnd"
 
 import { Button } from "antd"
@@ -7,7 +7,8 @@ import { GithubOutlined, GitlabOutlined, LinkOutlined,
             DeleteFilled,
             DeleteOutlined,
             GlobalOutlined, 
-            EyeOutlined} from "@ant-design/icons"
+            EyeOutlined,
+            EyeInvisibleOutlined} from "@ant-design/icons"
 
 import DraggableWrapper from "./draggable/draggable"
 
@@ -153,19 +154,38 @@ export function DraggableAssetCard({file, onDelete}){
 }
 
 
-export function TreeViewCard({widgetId, onDelete, title}){
+export const TreeViewCard = memo(({widgetRef, title, isTopLevel}) => {
+
+    const [widgetVisible, setWidgetVisible] = useState(widgetRef.current.isWidgetVisible)
+
+    const onDelete = () => {
+        widgetRef.current.deleteWidget()
+    }
+
+    const toggleHideShowWidget = () => {
+        
+        setWidgetVisible(!widgetRef.current.isWidgetVisible())
+
+        if (widgetRef.current.isWidgetVisible())
+            widgetRef.current.hideFromViewport()
+        else{
+            widgetRef.current.unHideFromViewport()
+        }
+    }
 
     return (
         <div className="tw-flex tw-place-items-center tw-px-2 tw-p-1 tw-place-content-between 
                             tw-gap-4 tw-w-full" style={{width: "100%"}}>
-            <div className="tw-text-sm">
+            <div className={`tw-text-sm ${isTopLevel ? "tw-font-medium" : ""}`}>
                 {title}
             </div>
 
             <div className="tw-ml-auto tw-flex tw-gap-1">
-                <Button color="danger" size="small" variant="text" danger icon={<DeleteOutlined />}></Button>
-                <Button variant="text" size="small" icon={<EyeOutlined />}></Button>
+                <Button color="danger" title="delete" onClick={onDelete} size="small" variant="text" danger 
+                icon={<DeleteOutlined />}></Button>
+                <Button variant="text" title="hide" onClick={toggleHideShowWidget} size="small" 
+                icon={widgetVisible ? <EyeInvisibleOutlined/> : <EyeOutlined />}></Button>
             </div>
         </div>
     )
-}
+})

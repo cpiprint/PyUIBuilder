@@ -4,65 +4,44 @@ import { CloseCircleFilled, SearchOutlined } from "@ant-design/icons"
 
 import { SidebarWidgetCard, TreeViewCard } from "../components/cards"
 
-import ButtonWidget from "../assets/widgets/button.png"
 
-import { filterObjectListStartingWith } from "../utils/filter"
-import Widget from "../canvas/widgets/base"
-import { SearchComponent } from "../components/inputs"
 import { Tree } from "antd"
-import { TreeNode } from "antd/es/tree-select"
+import { useWidgetContext } from "../canvas/context/widgetContext"
 
+
+
+function transformWidgets(widgets, widgetRefs, isTopLevel=true) {
+    // console.log("Wdiegts refs: ", widgetRefs)
+    return widgets.map(widget => ({
+      title: widget.widgetType.name, // Assuming widgetType is a class
+      key: widget.id,
+      isTopLevel: isTopLevel,
+      widgetRef: widgetRefs.current[widget.id],
+      children: widget.children.length > 0 ? transformWidgets(widget.children, widgetRefs, false) : []
+    }));
+  }
+  
 
 /**
  * 
  * @param {function} onWidgetsUpdate - this is a callback that will be called once the sidebar is populated with widgets
  * @returns 
  */
-function TreeviewContainer({ sidebarContent, onWidgetsUpdate }) {
+function TreeviewContainer() {
 
 
-    const [searchValue, setSearchValue] = useState("")
-    const [widgetData, setWidgetData] = useState(sidebarContent)
+    const {widgets, widgetRefs} = useWidgetContext()
 
+    const transformedContent = useMemo(() => {
+        return (transformWidgets(widgets, widgetRefs))
+    }, [widgets, widgetRefs])
 
-    const treeData = [
-        {
-            title: 'Parent',
-            key: '0-0',
-            children: [
-                { title: 'Child 1', key: '0-0-1' },
-                { title: 'Child 2', key: '0-0-2' },
-            ],
-        },
-    ];
+    const topLevelKeys = transformedContent.filter(cont => cont.isTopLevel).map(cont => cont.key)
 
-    useEffect(() => {
-
-        setWidgetData(sidebarContent)
-        // if (onWidgetsUpdate){
-        //     onWidgetsUpdate(widgets)
-        // }
-
-    }, [sidebarContent])
-
-
-
-    // useEffect(() => {
-
-    //     if (searchValue.length > 0) {
-    //         const searchData = filterObjectListStartingWith(sidebarContent, "name", searchValue)
-    //         setWidgetData(searchData)
-    //     } else {
-    //         setWidgetData(sidebarContent)
-    //     }
-
-    // }, [searchValue])
-
-    function onSearch(event) {
-
-        setSearchValue(event.target.value)
-
+    const onDeleteRequest = (widgetId) => {
+        widgetRefs.current[widgetId].current?.deleteWidget()
     }
+
 
     return (
         <div className="tw-w-full tw-p-2 tw-gap-4 tw-flex tw-flex-col tw-overflow-x-hidden">
@@ -71,10 +50,14 @@ function TreeviewContainer({ sidebarContent, onWidgetsUpdate }) {
                 onClear={() => setSearchValue("")} /> */}
             <div className="tw-flex tw-flex-col tw-gap-2 tw-w-full tw-h-full tw-p-1">
 
-                <Tree treeData={treeData}
+                <Tree treeData={transformedContent}
                         titleRender={(nodeData) => 
-                            <TreeViewCard title={nodeData.title}/>
+                            
+                            <TreeViewCard widgetId={nodeData.id} title={nodeData.title} 
+                                            widgetRef={nodeData.widgetRef}
+                                            isTopLevel={nodeData.isTopLevel}/>
                         }
+                        defaultExpandedKeys={topLevelKeys}
                         >
                   
                 </Tree>

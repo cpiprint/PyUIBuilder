@@ -28,6 +28,7 @@ import WidgetContainer from "./constants/containers"
 import { isSubClassOfWidget } from "../utils/widget"
 import { ButtonModal } from "../components/modals"
 import ResizeWidgetContainer from "./resizeContainer"
+import { WidgetContext, WidgetContextProvider } from "./context/widgetContext"
 
 // const DotsBackground = require("../assets/background/dots.svg")
 
@@ -38,6 +39,7 @@ const CanvasModes = {
     MOVE_WIDGET: 2 // when the mode is move widget
 }
 
+// TODO: replace this.widgetRefs with this.widgetRefs.current
 
 const IS_PRODUCTION = process.env.NODE_ENV === "production"
 
@@ -64,20 +66,25 @@ class Canvas extends React.Component {
             y: 0
         }
 
+        this.setWidgets = null // a helper variable to help update widgets from widgetProviderContext
+        this.widgetRefs = {} // a helper variable to store the widgetRef from widgetProviderContext (doesn't store a copy but just a reference pointer )
+        this.widgets = [] // a helper variable to store the widgets from widgetProviderContext (doesn't store a copy but just a reference pointer )
+
+        this.selectedWidget = null // a helper variable that stores the reference to the selected widget fro widgetProvider
+        this.setSelectedWidget = null // a helper variable that stores reference to setSelected fro widgetProvider context
         // this._contextMenuItems = []
-        this.widgetRefs = {} // stores the actual refs to the widgets inside the canvas {id: ref, id2, ref2...}
 
         this.state = {
             isWidgetDragging: false,
             widgetResizing: "", // set this to "nw", "sw" etc based on the side when widgets resizing handles are selected
-            widgets: [], // stores the mapping to widgetRefs, stores id and WidgetType, later used for rendering [{id: , widgetType: WidgetClass, children: [], parent: "", initialData: {}}]
+            // widgets: [], // stores the mapping to widgetRefs, stores id and WidgetType, later used for rendering [{id: , widgetType: WidgetClass, children: [], parent: "", initialData: {}}]
             zoom: 1,
             isPanning: false,
             currentTranslate: { x: 0, y: 0 },
             canvasSize: { width: 500, height: 500 },
 
             contextMenuItems: [],
-            selectedWidget: null,
+            // selectedWidget: null,
 
             toolbarOpen: false,
             toolbarAttrs: null
@@ -106,7 +113,7 @@ class Canvas extends React.Component {
         this.getCanvasContainerBoundingRect = this.getCanvasContainerBoundingRect.bind(this)
         this.getCanvasBoundingRect = this.getCanvasBoundingRect.bind(this)
 
-        this.setSelectedWidget = this.setSelectedWidget.bind(this)
+        // this.setSelectedWidget = this.setSelectedWidget.bind(this)
         this.deleteSelectedWidgets = this.deleteSelectedWidgets.bind(this)
         this.removeWidget = this.removeWidget.bind(this)
         this.clearSelections = this.clearSelections.bind(this)
@@ -128,6 +135,7 @@ class Canvas extends React.Component {
     }
 
     componentWillUnmount() {
+        console.log("unmounted")
 
         this.canvasContainerRef.current.removeEventListener("mousedown", this.mouseDownEvent)
         this.canvasContainerRef.current.removeEventListener("mouseup", this.mouseUpEvent)
@@ -173,7 +181,8 @@ class Canvas extends React.Component {
     */
     getWidgets() {
 
-        return this.state.widgets
+        // return this.widgets
+        return this.widgets
     }
 
     /**
@@ -181,7 +190,7 @@ class Canvas extends React.Component {
      * @returns Widget[]
      */
     getActiveObjects() {
-        return Object.values(this.widgetRefs).filter((widgetRef) => {
+        return Object.values(this.widgetRefs.current).filter((widgetRef) => {
             return widgetRef.current?.isSelected()
         })
     }
@@ -193,10 +202,10 @@ class Canvas extends React.Component {
      * @returns {Widget}
      */
     getWidgetFromTarget(target) {
-        // TODO: improve search, currently O(n), but can be improved via this.state.widgets or something
+        // TODO: improve search, currently O(n), but can be improved via this.widgets or something
 
         let innerWidget = null
-        for (let [key, ref] of Object.entries(this.widgetRefs)) {
+        for (let [key, ref] of Object.entries(this.widgetRefs.current)) {
 
             if (ref.current === target) {
                 innerWidget = ref.current
@@ -249,16 +258,18 @@ class Canvas extends React.Component {
                 if (!selectedWidget._disableSelection) {
                     // console.log("selected widget2: ", selectedWidget.getId(), this.state.selectedWidget?.getId())
 
-                    this.state.selectedWidget?.deSelect() // deselect the previous widget before adding the new one
-                    this.state.selectedWidget?.setZIndex(0)
+                    this.selectedWidget?.deSelect() // deselect the previous widget before adding the new one
+                    this.selectedWidget?.setZIndex(0)
                     selectedWidget.setZIndex(1000)
                     selectedWidget.select()
                     // console.log("selected widget", selectedWidget.getToolbarAttrs(), selectedWidget, this.state.selectedWidget)
                     this.setState({
-                        selectedWidget: selectedWidget,
+                        // selectedWidget: selectedWidget,
                         toolbarAttrs: selectedWidget.getToolbarAttrs(),
                         toolbarOpen: true
                     })
+
+                    this.setSelectedWidget(selectedWidget)
 
 
                     // if (!this.state.selectedWidget || (selectedWidget.getId() !== this.state.selectedWidget?.getId())) {
@@ -296,14 +307,14 @@ class Canvas extends React.Component {
         } else if (event.button === 2) {
             //right click
 
-            if (this.state.selectedWidget && this.state.selectedWidget.__id !== selectedWidget.__id) {
+            if (this.selectedWidget && this.selectedWidget.__id !== selectedWidget.__id) {
                 this.clearSelections()
             }
 
             if (selectedWidget) {
-
+                this.setSelectedWidget(selectedWidget)
                 this.setState({
-                    selectedWidget: selectedWidget,
+                    // selectedWidget: selectedWidget,
                     contextMenuItems: [
                         {
                             key: "rename",
@@ -356,7 +367,7 @@ class Canvas extends React.Component {
             const deltaX = event.clientX - this.mousePos.x
             const deltaY = event.clientY - this.mousePos.y
 
-            if (!this.state.selectedWidget) {
+            if (!this.selectedWidget) {
                 // if there aren't any selected widgets, then pan the canvas
                 this.setState(prevState => ({
                     currentTranslate: {
@@ -392,7 +403,7 @@ class Canvas extends React.Component {
             this.setState({ widgetResizing: "" })
         }
 
-        for (let [key, widget] of Object.entries(this.widgetRefs)) {
+        for (let [key, widget] of Object.entries(this.widgetRefs.current)) {
             // since the mouseUp event is not triggered inside the widget once its outside, 
             // we'll need a global mouse up event to re-enable drag
             widget.current?.enableDrag()
@@ -414,7 +425,7 @@ class Canvas extends React.Component {
     handleResize = (event) => {
         if (this.state.resizing === "") return
 
-        const widget = this.state.selectedWidget
+        const widget = this.selectedWidget
 
         if (!widget) return
 
@@ -543,13 +554,13 @@ class Canvas extends React.Component {
         }, this.applyTransform)
     }
 
-    setSelectedWidget(selectedWidget) {
-        this.setState({ selectedWidget: [selectedWidget] })
-    }
+    // setSelectedWidget(selectedWidget) {
+    //     this.setState({ selectedWidget: [selectedWidget] })
+    // }
 
     clearSelections() {
 
-        if (!this.state.selectedWidget)
+        if (!this.selectedWidget)
             return
 
         this.getActiveObjects().forEach(widget => {
@@ -560,10 +571,12 @@ class Canvas extends React.Component {
         // this.context.updateToolAttrs({})
 
         this.setState({
-            selectedWidget: null,
+            // selectedWidget: null,
             toolbarAttrs: null,
             toolbarOpen: false
         })
+
+        this.setSelectedWidget(null)
 
     }
 
@@ -579,7 +592,7 @@ class Canvas extends React.Component {
         let right = Number.NEGATIVE_INFINITY
         let bottom = Number.NEGATIVE_INFINITY
 
-        for (let widget of Object.values(this.widgetRefs)) {
+        for (let widget of Object.values(this.widgetRefs.current)) {
             const rect = widget.current.getBoundingRect()
             // Update the top, left, right, and bottom coordinates
             if (rect.top < top) top = rect.top
@@ -593,7 +606,7 @@ class Canvas extends React.Component {
 
 
     /**
-     * finds widgets from the list of this.state.widgets, also checks the children to find the widgets
+     * finds widgets from the list of this.widgets, also checks the children to find the widgets
      * @param {string} widgetId 
      * @returns 
      */
@@ -616,7 +629,7 @@ class Canvas extends React.Component {
             return null // Widget not found
         }
 
-        return searchWidgetById(this.state.widgets, widgetId)
+        return searchWidgetById(this.widgets, widgetId)
     }
 
     /**
@@ -643,7 +656,7 @@ class Canvas extends React.Component {
         }
 
         // Start the recursive removal from the top level
-        return recursiveRemove(this.state.widgets)
+        return recursiveRemove(this.widgets)
 
     }
 
@@ -726,10 +739,10 @@ class Canvas extends React.Component {
                 y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
             }
 
-            finalPosition = {
-                x: finalPosition.x - initialOffset.x - this.state.currentTranslate.x,
-                y: finalPosition.y - initialOffset.y - this.state.currentTranslate.y
-            }
+            // finalPosition = {
+            //     x: finalPosition.x - initialOffset.x - this.state.currentTranslate.x,
+            //     y: finalPosition.y - initialOffset.y - this.state.currentTranslate.y
+            // }
 
             let widgetId = draggedElement.getAttribute("data-widget-id")
 
@@ -781,10 +794,10 @@ class Canvas extends React.Component {
                     }
                 })
 
-
-                this.setState({
-                    widgets: [...updatedWidgets, updatedChildWidget]
-                })
+                this.setWidgets([...updatedWidgets, updatedChildWidget])
+                // this.setState({
+                //     widgets: [...updatedWidgets, updatedChildWidget]
+                // })
 
             }
         }
@@ -811,7 +824,7 @@ class Canvas extends React.Component {
         // Only check the first level of children
         parentWidget.children.forEach((child, index) => {
             if (child.id !== dragElementID) {
-                const childElement = this.widgetRefs[child.id]
+                const childElement = this.widgetRefs.current[child.id]
 
                 if (!childElement) return
 
@@ -832,7 +845,7 @@ class Canvas extends React.Component {
        
         if (closestChild && closestIndex === 1) {
             // by default the new index of the closest first element will be one and it will be zero if rect.left > dropX
-            const childElement = this.widgetRefs[closestChild.id]
+            const childElement = this.widgetRefs.current[closestChild.id]
             const rect = childElement.current.getBoundingRect()
 
             // Closest is first child, check if dropped before or after
@@ -855,9 +868,11 @@ class Canvas extends React.Component {
             childrenCopy.splice(targetIndex, 0, draggedItem) // Insert at the target index
     
             const updatedParent = { ...parentWidget, children: childrenCopy }
-            this.setState(prevState => ({
-                widgets: this.updateWidgetRecursively(prevState.widgets, updatedParent, {})
-            }))
+            // this.setState(prevState => ({
+            //     widgets: this.updateWidgetRecursively(prevState.widgets, updatedParent, {})
+            // }))
+
+            this.setWidgets(this.updateWidgetRecursively(this.widgets, updatedParent, {}))
         }
     }
 
@@ -880,11 +895,11 @@ class Canvas extends React.Component {
         // console.log("Drag widget obj: ", dragWidgetObj, dropWidgetObj)
 
         if (dropWidgetObj && dragWidgetObj) {
-            const dragWidget = this.widgetRefs[dragWidgetObj.id]
+            const dragWidget = this.widgetRefs.current[dragWidgetObj.id]
             const dragData = dragWidget.current.serialize()
 
 
-            const parentWidget = this.widgetRefs[parentWidgetId].current
+            const parentWidget = this.widgetRefs.current[parentWidgetId].current
             const parentRect = parentWidget.getBoundingRect()
             const { clientX, clientY } = event
 
@@ -943,7 +958,7 @@ class Canvas extends React.Component {
                     ...dragData,
                     positionType: parentLayout === Layouts.PLACE ? PosType.ABSOLUTE : PosType.NONE,
                     parentLayout: parentWidget.getLayout() || null, // pass everything about the parent layout
-                    parentWidgetRef: this.widgetRefs[parentWidgetId],
+                    parentWidgetRef: this.widgetRefs.current[parentWidgetId],
                     zIndex: 0,
                     pos: { x: finalPosition.x, y: finalPosition.y },
                     widgetContainer: WidgetContainer.WIDGET
@@ -959,20 +974,37 @@ class Canvas extends React.Component {
             // Recursively update the widget structure
             updatedWidgets = this.updateWidgetRecursively(updatedWidgets, updatedDropWidget, updatedDragWidget)
 
-            // Update the state with the new widget hierarchy
-            this.setState({
-                widgets: updatedWidgets
-            }, () => {
-
-                if (parentLayout !== Layouts.PLACE){
+            this.setWidgets(updatedWidgets)
+            
+            setTimeout(() => {
+                if (parentLayout !== Layouts.PLACE) {
                     // swap only for grid and flex placements
-                    const swapClosest = this.__checkClosestShiftElement({ event, parentWidgetId, dragElementID })
-        
-                    if (swapClosest.closestChild){
+                    const swapClosest = this.__checkClosestShiftElement({
+                        event,
+                        parentWidgetId,
+                        dragElementID,
+                    })
+            
+                    if (swapClosest.closestChild) {
                         this.shiftWidgetPosition(parentWidgetId, dragElementID, swapClosest.closestIndex)
                     }
                 }
-            })
+            }, 1)
+
+            // Update the state with the new widget hierarchy
+            // this.setState({
+            //     widgets: updatedWidgets
+            // }, () => {
+
+            //     if (parentLayout !== Layouts.PLACE){
+            //         // swap only for grid and flex placements
+            //         const swapClosest = this.__checkClosestShiftElement({ event, parentWidgetId, dragElementID })
+        
+            //         if (swapClosest.closestChild){
+            //             this.shiftWidgetPosition(parentWidgetId, dragElementID, swapClosest.closestIndex)
+            //         }
+            //     }
+            // })
         
         }
 
@@ -995,7 +1027,11 @@ class Canvas extends React.Component {
         const id = `${widgetComponentType.widgetType}_${UID()}`
 
         // Store the ref in the instance variable
-        this.widgetRefs[id] = widgetRef
+        this.widgetRefs.current[id] = widgetRef
+
+        console.log("widget ref: ", widgetRef)
+
+        // this.setWidgetRefs({...this.widgetRefs.current, [id]: widgetRef})
 
         const newWidget = {
             id,
@@ -1005,25 +1041,36 @@ class Canvas extends React.Component {
             initialData: {} //  useful for serializing and deserializing (aka, saving and loading)
         }
 
-        const widgets = [...this.state.widgets, newWidget] // don't add the widget refs in the state
+        const widgets = [...this.widgets, newWidget] // don't add the widget refs in the state
+        
+        this.setWidgets(widgets)
 
-        // Update the state to include the new widget's type and ID
-        this.setState({
-            widgets: widgets
-        }, () => {
+        setTimeout(() => {
             if (callback)
                 callback({ id, widgetRef })
 
             if (this._onWidgetListUpdated)
                 this._onWidgetListUpdated(widgets) // inform the parent container
-        })
+        }, 1)
+
+        // Update the state to include the new widget's type and ID
+        // this.setState({
+        //     widgets: widgets
+        // }, () => {
+        //     if (callback)
+        //         callback({ id, widgetRef })
+
+        //     if (this._onWidgetListUpdated)
+        //         this._onWidgetListUpdated(widgets) // inform the parent container
+        // })
 
         return { id, widgetRef }
     }
 
     getWidgetById(id) {
+        console.log("ID: ", id, this.widgetRefs.current)
 
-        return this.widgetRefs[id]
+        return this.widgetRefs.current[id]
     }
 
     /**
@@ -1032,12 +1079,14 @@ class Canvas extends React.Component {
      */
     deleteSelectedWidgets(widgets = []) {
 
-        let activeWidgets = removeDuplicateObjects([...widgets, this.state.selectedWidget], "__id")
+        let activeWidgets = removeDuplicateObjects([...widgets, this.selectedWidget], "__id")
+
+        this.selectedWidget(null)
 
         this.setState({
             toolbarAttrs: null,
             toolbarOpen: false,
-            selectedWidget: null
+            // selectedWidget: null
         })
 
         const widgetIds = activeWidgets.map(widget => widget.__id)
@@ -1055,10 +1104,12 @@ class Canvas extends React.Component {
 
         // NOTE: Don't remove from it using remove() function since, it already removed from the DOM tree when its removed from widgets
 
-        this.widgetRefs = {}
-        this.setState({
-            widgets: []
-        })
+        this.widgetRefs.current = {}
+        this.setWidgets([])
+
+        // this.setState({
+        //     widgets: []
+        // })
 
         if (this._onWidgetListUpdated)
             this._onWidgetListUpdated([])
@@ -1083,18 +1134,19 @@ class Canvas extends React.Component {
             return null // Return null if not found
         }
 
-        return recursiveFind(this.state.widgets)
+        return recursiveFind(this.widgets)
     }
 
     removeWidget(widgetId) {
 
 
-        delete this.widgetRefs[widgetId]
+        delete this.widgetRefs.current[widgetId]
 
         const widgets = this.removeWidgetFromCurrentList(widgetId)
-        this.setState({
-            widgets: widgets
-        })
+        // this.setState({
+        //     widgets: widgets
+        // })
+        this.setWidgets(widgets)
 
         if (this._onWidgetListUpdated)
             this._onWidgetListUpdated(widgets)
@@ -1102,7 +1154,7 @@ class Canvas extends React.Component {
 
     onActiveWidgetUpdate(widgetId) {
 
-        if (!this.state.selectedWidget || widgetId !== this.state.selectedWidget.__id)
+        if (!this.selectedWidget || widgetId !== this.selectedWidget.__id)
             return
 
         // console.log("updating...", this.state.toolbarAttrs, this.state.selectedWidget.getToolbarAttrs())
@@ -1110,7 +1162,7 @@ class Canvas extends React.Component {
         // console.log("attrs: ", this.state.selectedWidgets.at(0).getToolbarAttrs())
 
         this.setState({
-            toolbarAttrs: this.state.selectedWidget.getToolbarAttrs()
+            toolbarAttrs: this.selectedWidget.getToolbarAttrs()
         })
 
     }
@@ -1126,7 +1178,7 @@ class Canvas extends React.Component {
         if (!parent) return
 
         for (let child of parent.children) {
-            this.widgetRefs[child.id].current.setParentLayout(parentLayout)
+            this.widgetRefs.current[child.id].current.setParentLayout(parentLayout)
         }
 
     }
@@ -1134,7 +1186,6 @@ class Canvas extends React.Component {
 
     renderWidget = (widget) => {
 
-        // FIXME: initial data parentWidgetRef is empty
         const { id, widgetType: ComponentType, children = [], parent, initialData = {} } = widget
 
         const renderChildren = (childrenData) => {
@@ -1153,7 +1204,7 @@ class Canvas extends React.Component {
             <ComponentType
                 key={id}
                 id={id}
-                ref={this.widgetRefs[id]}
+                ref={this.widgetRefs.current[id]}
                 initialData={initialData}
                 parentWidgetRef={initialData.parentWidgetRef || null}
                 canvasRef={this.canvasContainerRef}
@@ -1162,6 +1213,8 @@ class Canvas extends React.Component {
                     zoom: this.state.zoom,
                     pan: this.state.currentTranslate
                 }}
+                
+                onWidgetDeleteRequest={this.removeWidget}
 
                 onWidgetUpdate={this.onActiveWidgetUpdate}
                 onAddChildWidget={this.handleAddWidgetChild}
@@ -1180,76 +1233,86 @@ class Canvas extends React.Component {
     render() {
 
         return (
-            <div className="tw-relative tw-overflow-hidden tw-flex tw-w-full tw-h-full tw-max-h-[100vh]">
+            <WidgetContext.Consumer>
+                {
+                    ({ widgets, setWidgets, widgetRefs, activeWidget, setActiveWidget }) => {
 
-                <div className="tw-absolute tw-p-2 tw-bg-white tw-z-10 tw-min-w-[100px] tw-h-[50px] tw-gap-2 
-                                    tw-top-4 tw-place-items-center tw-right-4 tw-shadow-md tw-rounded-md tw-flex">
+                        this.widgets = widgets
+                        this.setWidgets = setWidgets
+                        // this.setWidgetRefs = setWidgetRefs
+                        this.widgetRefs = widgetRefs
+                        this.selectedWidget = activeWidget
+                        this.setSelectedWidget = setActiveWidget
 
-                    <Tooltip title="Reset viewport">
-                        <Button icon={<ReloadOutlined />} onClick={this.resetTransforms} />
-                    </Tooltip>
-                    <ButtonModal
-                        message={"Are you sure you want to clear the canvas? This cannot be undone."}
-                        title={"Clear canvas"}
-                        onOk={this.clearCanvas}
-                        okText="Yes"
-                        okButtonType="danger"
-                    >
-                        <Tooltip title="Clear canvas">
-                            <Button danger icon={<DeleteOutlined />} />
-                        </Tooltip>
-                    </ButtonModal>
-                </div>
+                        return (<div className="tw-relative tw-overflow-hidden tw-flex tw-w-full tw-h-full tw-max-h-[100vh]">
 
-                {/* <ActiveWidgetProvider> */}
-                <DroppableWrapper id="canvas-droppable"
-                    droppableTags={{ exclude: ["image", "video"] }}
-                    className="tw-w-full tw-h-full"
-                    onDrop={this.handleDropEvent}>
-                    {/* <DragWidgetProvider> */}
-                    <Dropdown trigger={['contextMenu']} mouseLeaveDelay={0} menu={{ items: this.state.contextMenuItems, }}>
-                        <div className="tw-w-full tw-h-full tw-outline-none tw-flex tw-relative tw-bg-[#f2f2f2] tw-overflow-hidden"
-                            ref={this.canvasContainerRef}
-                            style={{
-                                transition: " transform 0.3s ease-in-out",
-                                backgroundImage: `url(${DotsBackground})`,
-                                backgroundSize: 'cover', // Ensure proper sizing if needed
-                                backgroundRepeat: 'no-repeat',
-                            }}
-                            tabIndex={0} // allow focus
-                        >
-                            <DotsBackground
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    backgroundSize: 'cover'
-                                }}
-                            />
-                            {/* Canvas */}
-                            <div data-canvas className={`tw-w-full tw-h-full tw-absolute ${!IS_PRODUCTION ? "tw-bg-red-300" : "tw-bg-transparent"} tw-top-0 tw-select-none`}
-                                ref={this.canvasRef}>
-                                <div className="tw-relative tw-w-full tw-h-full">
-                                    {
-                                        this.state.widgets.map(this.renderWidget)
-                                    }
+                                    <div className="tw-absolute tw-p-2 tw-bg-white tw-z-10 tw-min-w-[100px] tw-h-[50px] tw-gap-2 
+                                                        tw-top-4 tw-place-items-center tw-right-4 tw-shadow-md tw-rounded-md tw-flex">
 
+                                        <Tooltip title="Reset viewport">
+                                            <Button icon={<ReloadOutlined />} onClick={this.resetTransforms} />
+                                        </Tooltip>
+                                        <ButtonModal
+                                            message={"Are you sure you want to clear the canvas? This cannot be undone."}
+                                            title={"Clear canvas"}
+                                            onOk={this.clearCanvas}
+                                            okText="Yes"
+                                            okButtonType="danger"
+                                        >
+                                            <Tooltip title="Clear canvas">
+                                                <Button danger icon={<DeleteOutlined />} />
+                                            </Tooltip>
+                                        </ButtonModal>
+                                    </div>
 
-                                    {/* { this.state.selectedWidget &&
-                                        <ResizeWidgetContainer selectedWidget={this.state.selectedWidget}/>
-                                    } */}
+                                    {/* <ActiveWidgetProvider> */}
+                                    <DroppableWrapper id="canvas-droppable"
+                                        droppableTags={{ exclude: ["image", "video"] }}
+                                        className="tw-w-full tw-h-full"
+                                        onDrop={this.handleDropEvent}>
+                                        {/* <DragWidgetProvider> */}
+                                        <Dropdown trigger={['contextMenu']} mouseLeaveDelay={0} menu={{ items: this.state.contextMenuItems, }}>
+                                            <div className="tw-w-full tw-h-full tw-outline-none tw-flex tw-relative tw-bg-[#f2f2f2] tw-overflow-hidden"
+                                                ref={this.canvasContainerRef}
+                                                style={{
+                                                    transition: " transform 0.3s ease-in-out",
+                                                    backgroundImage: `url(${DotsBackground})`,
+                                                    backgroundSize: 'cover', // Ensure proper sizing if needed
+                                                    backgroundRepeat: 'no-repeat',
+                                                }}
+                                                tabIndex={0} // allow focus
+                                            >
+                                                <DotsBackground
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        backgroundSize: 'cover'
+                                                    }}
+                                                />
+                                                {/* Canvas */}
+                                                <div data-canvas className={`tw-w-full tw-h-full tw-absolute ${!IS_PRODUCTION ? "tw-bg-red-300" : "tw-bg-transparent"} tw-top-0 tw-select-none`}
+                                                    ref={this.canvasRef}>
+                                                    <div className="tw-relative tw-w-full tw-h-full">
+                                                        {
+                                                            this.widgets.map(this.renderWidget)
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Dropdown>
+                                        {/* </DragWidgetProvider> */}
+                                    </DroppableWrapper>
+
+                                    <CanvasToolBar isOpen={this.state.toolbarOpen}
+                                        widgetType={this.selectedWidget?.getWidgetType() || ""}
+                                        attrs={this.state.toolbarAttrs}
+                                    />
+                                    {/* </ActiveWidgetProvider> */}
                                 </div>
-                            </div>
-                        </div>
-                    </Dropdown>
-                    {/* </DragWidgetProvider> */}
-                </DroppableWrapper>
-
-                <CanvasToolBar isOpen={this.state.toolbarOpen}
-                    widgetType={this.state.selectedWidget?.getWidgetType() || ""}
-                    attrs={this.state.toolbarAttrs}
-                />
-                {/* </ActiveWidgetProvider> */}
-            </div>
+                            )
+                        }
+                    }
+            </WidgetContext.Consumer>
         )
     }
 }

@@ -1,19 +1,23 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 
-const widgetContext = createContext()
+export const WidgetContext = createContext()
 
-export const useSelectedWidgetContext = () => useContext(widgetContext)
+export const useWidgetContext = () => useContext(WidgetContext)
 
 
 export const WidgetContextProvider = ({ children }) => {
-    const [widgets, setWidgets] = useState(null)
+    
+    const [activeWidget, setActiveWidget] = useState(null)
+    const [widgets, setWidgets] = useState([]) // stores the mapping to widgetRefs, stores id and WidgetType, later used for rendering [{id: , widgetType: WidgetClass, children: [], parent: "", initialData: {}}]
 
-    const [widgetRef, setWidgetRef] = useState({})
-    // const []
+    // don't useState here because the refs are changing often
+    const widgetRefs = useRef({}) // stores the actual refs to the widgets inside the canvas {id: ref, id2, ref2...}
+
 
     return (
-        <widgetContext.Provider value={{ widgets, setWidgets, widgetRef, setWidgetRef }}>
+        <WidgetContext.Provider value={{ widgets, setWidgets, widgetRefs, 
+                                            activeWidget, setActiveWidget }}>
             {children}
-        </widgetContext.Provider>
+        </WidgetContext.Provider>
     )
 }
