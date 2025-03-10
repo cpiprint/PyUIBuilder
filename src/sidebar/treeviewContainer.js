@@ -38,10 +38,6 @@ function TreeviewContainer() {
 
     const topLevelKeys = transformedContent.filter(cont => cont.isTopLevel).map(cont => cont.key)
 
-    const onDeleteRequest = (widgetId) => {
-        widgetRefs.current[widgetId].current?.deleteWidget()
-    }
-
 
     return (
         <div className="tw-w-full tw-p-2 tw-gap-4 tw-flex tw-flex-col tw-overflow-x-hidden">

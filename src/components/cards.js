@@ -11,6 +11,7 @@ import { GithubOutlined, GitlabOutlined, LinkOutlined,
             EyeInvisibleOutlined} from "@ant-design/icons"
 
 import DraggableWrapper from "./draggable/draggable"
+import { useWidgetContext } from "../canvas/context/widgetContext"
 
 
 export function SidebarWidgetCard({ name, img, url, license, widgetClass, innerRef}){
@@ -157,6 +158,7 @@ export function DraggableAssetCard({file, onDelete}){
 export const TreeViewCard = memo(({widgetRef, title, isTopLevel}) => {
 
     const [widgetVisible, setWidgetVisible] = useState(widgetRef.current.isWidgetVisible)
+    const {activeWidget} = useWidgetContext()
 
     const onDelete = () => {
         widgetRef.current.deleteWidget()
@@ -173,9 +175,17 @@ export const TreeViewCard = memo(({widgetRef, title, isTopLevel}) => {
         }
     }
 
+    const handleSingleClick = () => {
+        activeWidget?.deSelect()
+        widgetRef.current.select()
+    }
+
     return (
         <div className="tw-flex tw-place-items-center tw-px-2 tw-p-1 tw-place-content-between 
-                            tw-gap-4 tw-w-full" style={{width: "100%"}}>
+                            tw-gap-4 tw-w-full" style={{width: "100%"}} 
+                            onClick={handleSingleClick}
+                            onDoubleClick={() => widgetRef?.current.panToWidget()}
+                            >
             <div className={`tw-text-sm ${isTopLevel ? "tw-font-medium" : ""}`}>
                 {title}
             </div>

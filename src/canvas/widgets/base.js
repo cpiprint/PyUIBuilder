@@ -225,29 +225,29 @@ class Widget extends React.Component {
     componentWillUnmount() {
     }
 
-    __fixWidgetPosition = () => {
+    // __fixWidgetPosition = () => {
         
-        if (this.state.parentLayout?.layout === Layouts.FLEX || this.state.parentLayout?.layout === Layouts.GRID ){
-            const elementRect = this.elementRef.current.getBoundingClientRect()
-            const {pan: canvasPan, zoom: canvasZoom} = this.canvasMetaData
-            console.log("elemnt rect: ", elementRect)
+    //     if (this.state.parentLayout?.layout === Layouts.FLEX || this.state.parentLayout?.layout === Layouts.GRID ){
+    //         const elementRect = this.elementRef.current.getBoundingClientRect()
+    //         const {pan: canvasPan, zoom: canvasZoom} = this.canvasMetaData
+    //         console.log("elemnt rect: ", elementRect)
         
 
-            const pos = {  // if the layout is flex or grid the position should be the where it stays
-                // x: ((elementRect?.x || 0) - canvasPan.x) / canvasZoom,
-                // y: ((elementRect?.y || 0) - canvasPan.y) / canvasZoom,
+    //         const pos = {  // if the layout is flex or grid the position should be the where it stays
+    //             // x: ((elementRect?.x || 0) - canvasPan.x) / canvasZoom,
+    //             // y: ((elementRect?.y || 0) - canvasPan.y) / canvasZoom,
 
-                x: elementRect?.x,
-                y: elementRect?.y,
-            }
+    //             x: elementRect?.x,
+    //             y: elementRect?.y,
+    //         }
 
-            this.setState({
-                ...this.state,
-                pos: pos
-            })
-        }
+    //         this.setState({
+    //             ...this.state,
+    //             pos: pos
+    //         })
+    //     }
 
-    }
+    // }
 
     updateState = (newState, callback) => {
 
@@ -393,6 +393,8 @@ class Widget extends React.Component {
         this.setState({
             selected: true
         })
+
+        this.props.onSelect(this.__id)
 
     }
 
@@ -867,6 +869,9 @@ class Widget extends React.Component {
 
     }
 
+    panToWidget = () => {
+        this.props.onPanToWidget(this.__id)
+    }
 
     handleDragStart = (e, callback) => {
         e.stopPropagation()

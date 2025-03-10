@@ -554,6 +554,39 @@ class Canvas extends React.Component {
         }, this.applyTransform)
     }
 
+    setPan = (x, y) => {
+        this.setState({
+            currentTranslate: {x, y}
+        })
+    }
+
+    panToWidget = (widgetId) => {
+
+        const widget = this.getWidgetById(widgetId).current
+
+        const canvasBoundingRect = this.getCanvasBoundingRect(); // Get the canvas dimensions
+
+        // Get widget position
+        const widgetRect = widget.getBoundingRect(); // Get widget's bounding box
+    
+        // Calculate widget center position in canvas space
+        const widgetCenter = {
+            x: (widgetRect.left - canvasBoundingRect.left + widgetRect.width / 2) / this.state.zoom,
+            y: (widgetRect.top - canvasBoundingRect.top + widgetRect.height / 2) / this.state.zoom
+        }
+
+        // Calculate new translation to center the widget in the viewport
+        const newTranslate = {
+            x: (canvasBoundingRect.width / 2) / this.state.zoom - widgetCenter.x,
+            y: (canvasBoundingRect.height / 2) / this.state.zoom - widgetCenter.y
+        }  
+
+        this.setState({
+            currentTranslate: newTranslate
+        })
+
+    }
+
     // setSelectedWidget(selectedWidget) {
     //     this.setState({ selectedWidget: [selectedWidget] })
     // }
@@ -1053,8 +1086,6 @@ class Canvas extends React.Component {
     }
 
     getWidgetById(id) {
-        console.log("ID: ", id, this.widgetRefs.current)
-
         return this.widgetRefs.current[id]
     }
 
@@ -1198,8 +1229,12 @@ class Canvas extends React.Component {
                     zoom: this.state.zoom,
                     pan: this.state.currentTranslate
                 }}
+
+                onSelect={(widgetId) => this.setSelectedWidget(this.getWidgetById(widgetId)?.current)}
                 
                 onWidgetDeleteRequest={this.removeWidget}
+
+                onPanToWidget={this.panToWidget}
 
                 onWidgetUpdate={this.onActiveWidgetUpdate}
                 onAddChildWidget={this.handleAddWidgetChild}
@@ -1275,7 +1310,14 @@ class Canvas extends React.Component {
                                                     }}
                                                 />
                                                 {/* Canvas */}
-                                                <div data-canvas className={`tw-w-full tw-h-full tw-absolute ${!IS_PRODUCTION ? "tw-bg-red-300" : "tw-bg-transparent"} tw-top-0 tw-select-none`}
+                                                {/* TODO: add translation in class instead of applyTransform function */}
+                                                <div data-canvas className={`tw-w-full tw-h-full tw-absolute ${!IS_PRODUCTION ? "tw-bg-red-300" : "tw-bg-transparent"} 
+                                                                            tw-top-0 tw-select-none
+                                                                            `}
+
+                                                        style={{
+                                                            transform: `translate(${this.state.currentTranslate.x}px, ${this.state.currentTranslate.y}px) scale(${this.state.zoom})`
+                                                        }}
                                                     ref={this.canvasRef}>
                                                     <div className="tw-relative tw-w-full tw-h-full">
                                                         {
