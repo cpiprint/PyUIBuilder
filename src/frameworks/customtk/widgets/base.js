@@ -104,6 +104,8 @@ export class CustomTkBase extends Widget {
             return {}
         } 
 
+        super.setParentLayout(layout)
+
         const {layout: parentLayout, direction, gap} = layout
 
         // show attributes related to the layout manager

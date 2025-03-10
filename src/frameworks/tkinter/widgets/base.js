@@ -101,6 +101,7 @@ export class TkinterBase extends Widget {
         if (!layout){
             return {}
         } 
+        super.setParentLayout(layout)
 
         const {layout: parentLayout, direction, gap} = layout
 

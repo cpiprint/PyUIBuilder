@@ -461,14 +461,14 @@ class Widget extends React.Component {
     }
 
     hideDroppableIndicator(){
-        console.log("hide drop indicator")
+        // console.log("hide drop indicator")
         this.setState({
             showDroppableStyle: {
                 allow: false, 
                 show: false
             }
         }, () => {
-            console.log("hidden the drop indicator")
+            // console.log("hidden the drop indicator")
         })
     }
 
@@ -603,22 +603,23 @@ class Widget extends React.Component {
         }
 
         if (layout === Layouts.FLEX || layout === Layouts.GRID){
-           
       
             updates = {
                 ...updates,
                 positionType: PosType.NONE,
             }
 
-            // const elementRect = this.elementRef.current.getBoundingClientRect() 
-            // const canvasInnerRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
+            const elementRect = this.elementRef.current.getBoundingClientRect() 
+            // console.log("winner: ", this.props.parentWidgetRef.current.getBoundingRect())
+            const parentRect = this.props.parentWidgetRef.current.getBoundingRect()
 
-            // let pos = {
-            //     x: elementRect.left - canvasInnerRect.left,
-            //     y: elementRect.top - canvasInnerRect.top
-            // }
+            // FIXME: (low priority) once the place is moved and back to flex the position the updated position is not reflected
+            let pos = {
+                x: (elementRect.left - parentRect.left) / this.canvasMetaData.zoom,
+                y: (elementRect.top - parentRect.top) / this.canvasMetaData.zoom
+            }
 
-            // this.setPos(pos.x, pos.y)
+            this.setPos(pos.x, pos.y)
             // console.log("setting pos: ", pos)
             
         }else if (layout === Layouts.PLACE){
@@ -629,6 +630,8 @@ class Widget extends React.Component {
         }
 
         this.setState(updates)
+
+        return updates
     }
 
     getParentLayout(){
@@ -1052,13 +1055,27 @@ class Widget extends React.Component {
 
         } else if (container === WidgetContainer.SIDEBAR) {
 
+            // const { initialPos } = posMetaData
+
+            // const canvasInnerRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
+          
+            // const newInitialPos = {
+            //     x: (initialPos.x - canvasInnerRect.left),
+            //     y: (initialPos.y - canvasInnerRect.top)
+            // }
+
+            // posMetaData = {
+            //     ...posMetaData,
+            //     initialPos: newInitialPos,
+            // }
             // console.log("Dropped on Sidebar: ", this.__id)
             this.props.onCreateWidgetRequest(widgetClass, ({ id, widgetRef }) => {
                 this.props.onAddChildWidget({
                                             event: e, 
                                             parentWidgetId: this.__id, 
                                             dragElementID: id,
-                                            posMetaData
+                                            posMetaData,
+                                            adjustInitialOffset: false, // don't adjust for initial offset
                                         }) //  if dragged from the sidebar create the widget first
             })
 
@@ -1205,18 +1222,6 @@ class Widget extends React.Component {
                 y: elementRect.top - canvasInnerRect.top
             }
 
-            // let parent = this.props.parentWidgetRef?.current;
-
-            // while (parent) {
-            //     // accounting for nested parents
-            //     const parentRect = parent.getBoundingRect()
-            //     initialPos.x -= parentRect.left - canvasInnerRect.left
-            //     initialPos.y -= parentRect.top - canvasInnerRect.top
-
-            //     // Move up to the next parent (if any)
-            //     parent = parent.parentWidgetRef?.current
-            // }
-
             const posMetaData = {
                 dragStartCursorPos: {x: clientX, y: clientY},
                 initialPos: {...initialPos}
@@ -1329,7 +1334,7 @@ class Widget extends React.Component {
                                             />
 
                                             <div
-                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--left-1 tw--top-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--left-1 tw--top-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.NW_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()
@@ -1340,7 +1345,7 @@ class Widget extends React.Component {
                                                 onMouseUp={() => this.setState({ dragEnabled: true })}
                                             />
                                             <div
-                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--right-1 tw--top-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--right-1 tw--top-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.SW_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()
@@ -1351,7 +1356,7 @@ class Widget extends React.Component {
                                                 onMouseUp={() => this.setState({ dragEnabled: true })}
                                             />
                                             <div
-                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--left-1 tw--bottom-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--left-1 tw--bottom-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.SW_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()
@@ -1362,7 +1367,7 @@ class Widget extends React.Component {
                                                 onMouseUp={() => this.setState({ dragEnabled: true })}
                                             />
                                             <div
-                                                className="tw-w-2 tw-h-2 tw-absolute tw-pointer-events-auto tw--right-1 tw--bottom-1 tw-bg-blue-500"
+                                                className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--right-1 tw--bottom-1 tw-bg-blue-500"
                                                 style={{ cursor: Cursor.SE_RESIZE }}
                                                 onMouseDown={(e) => {
                                                     e.stopPropagation()

@@ -713,7 +713,7 @@ class Canvas extends React.Component {
     }
 
     /**
-   * Handles drop event to canvas from the sidebar and on canvas widget movement
+   * Handles drop event to canvas from the sidebar and on canvas widget movement (not the drop on child widget)
    * @param {DragEvent} e 
    */
     handleDropEvent = (e, draggedElement, widgetClass = null, posMetaData) => {
@@ -916,10 +916,11 @@ class Canvas extends React.Component {
      * Adds the child into the children attribute inside the this.widgets list of objects
      *  //  widgets data structure { id, widgetType: widgetComponentType, children: [], parent: "" }
      * @param {string} parentWidgetId 
-     * @param {object} dragElement 
-     * @param {boolean} create - if create is set to true the widget will be created before adding to the child tree
+     * @param {object} dragElementId, 
+     * @param {object} posMetaData, - meta data about the initial cursor and widget position 
+     * @param {boolean} adjustInitialOffset - if set to false, it won't adjust based on initial position, so you'll have the widget drop at top right corner (useful when dropping from sidebar)
      */
-    handleAddWidgetChild = ({ event, parentWidgetId, dragElementID, posMetaData }) => {
+    handleAddWidgetChild = ({ event, parentWidgetId, dragElementID, posMetaData, adjustInitialOffset=true }) => {
 
         // console.log("event: ", event)
         // widgets data structure { id, widgetType: widgetComponentType, children: [], parent: "" }
@@ -950,24 +951,24 @@ class Canvas extends React.Component {
                 y: (clientY - parentRect.top) / this.state.zoom,
             }
 
-            // FIXME: if the drag is from sidebar in layout absolute the position is wrong
-
-            const initialOffset = {
-                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom) - (initialPos.x / this.state.zoom),
-                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom) - (initialPos.y / this.state.zoom)
-            }
 
 
-            finalPosition = {
-                x: finalPosition.x - initialOffset.x,
-                y: finalPosition.y - initialOffset.y 
+            if (adjustInitialOffset){
+                const initialOffset = {
+                    x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom) - (initialPos.x / this.state.zoom),
+                    y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom) - (initialPos.y / this.state.zoom)
+                }
+
+                
+                finalPosition = {
+                    x: finalPosition.x - initialOffset.x,
+                    y: finalPosition.y - initialOffset.y 
+                }
             }
 
             let updatedWidgets = this.removeWidgetFromCurrentList(dragElementID)
                 
             const parentLayout = parentWidget.getLayout()?.layout || null
-            // FIXME: if the layout is flex or grid the position should be different
-
             dragWidget.current.setPos(finalPosition.x, finalPosition.y)
                
             const updatedDragWidget = {
@@ -1311,7 +1312,7 @@ class Canvas extends React.Component {
                                                 />
                                                 {/* Canvas */}
                                                 {/* TODO: add translation in class instead of applyTransform function */}
-                                                <div data-canvas className={`tw-w-full tw-h-full tw-absolute ${!IS_PRODUCTION ? "tw-bg-red-300" : "tw-bg-transparent"} 
+                                                <div data-canvas className={`tw-w-full tw-h-full tw-absolute ${!IS_PRODUCTION ? "tw-bg-red-300" : "tw-bg-transparent"} tw-bg-transparent
                                                                             tw-top-0 tw-select-none
                                                                             `}
 

@@ -20,7 +20,7 @@ const DraggableWrapper = memo(({dragElementType, dragWidgetClass=null, currentPo
 
         const posMetaData = {
             dragStartCursorPos: {x: clientX, y: clientY},
-            initialPos: {x: draggableRect.x, y: draggableRect.y}
+            initialPos: {x: draggableRect.left, y: draggableRect.top}
         }
 
         setPosMetaData(posMetaData)
