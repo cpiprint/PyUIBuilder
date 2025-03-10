@@ -708,6 +708,7 @@ class Canvas extends React.Component {
             x: (clientX - canvasRect.left) / this.state.zoom,
             y: (clientY - canvasRect.top) / this.state.zoom,
         }
+        // console.log("Final position1: ", finalPosition, container)
 
 
         if (container === WidgetContainer.SIDEBAR) {
@@ -734,22 +735,11 @@ class Canvas extends React.Component {
             const canvasBoundingRect = this.getCanvasBoundingRect()
 
             // calculate the initial offset from the div to the cursor grab
-            // const initialOffset = {
-            //     x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
-            //     y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
-            // }
 
             const initialOffset = {
-                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom) - (initialPos.x/this.state.zoom),
-                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom) - (initialPos.y/this.state.zoom)
+                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom) - (initialPos.x / this.state.zoom),
+                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom) - (initialPos.y / this.state.zoom)
             }
-
-            console.log("initial offset:")
-
-            // finalPosition = {
-            //     x: finalPosition.x - initialOffset.x - this.state.currentTranslate.x,
-            //     y: finalPosition.y - initialOffset.y - this.state.currentTranslate.y
-            // }
 
             finalPosition = {
                 x: finalPosition.x - initialOffset.x,
@@ -921,45 +911,19 @@ class Canvas extends React.Component {
             const { dragStartCursorPos, initialPos } = posMetaData
             const canvasBoundingRect = this.getCanvasBoundingRect()
 
-            // TODO: the final position isn't adjusted for cursorpos
 
             let finalPosition = {
                 x: (clientX - parentRect.left) / this.state.zoom,
                 y: (clientY - parentRect.top) / this.state.zoom,
             }
 
-            // finalPosition = {
-            //     x: finalPosition.x - parentRect.left  - this.state.currentTranslate.x,
-            //     y: finalPosition.y - parentRect.right  - this.state.currentTranslate.y
-            // }
-
-            // const initialOffset = {
-            //     x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
-            //     y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
-            // } 
-
-            // TODO: add offset to get the cursor to the correct div 
-            // const initialOffset = {
-            //     x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom - this.state.currentTranslate.x) - initialPos.x,
-            //     y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom - this.state.currentTranslate.y) - initialPos.y
-            // }
+            // FIXME: if the drag is from sidebar in layout absolute the position is wrong
 
             const initialOffset = {
-                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom) - (initialPos.x/this.state.zoom),
-                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom) - (initialPos.y/this.state.zoom)
+                x: ((dragStartCursorPos.x - canvasBoundingRect.left) / this.state.zoom) - (initialPos.x / this.state.zoom),
+                y: ((dragStartCursorPos.y - canvasBoundingRect.top) / this.state.zoom) - (initialPos.y / this.state.zoom)
             }
 
-
-            // finalPosition = {
-            //     x: finalPosition.x - initialOffset.x  - this.state.currentTranslate.x,
-            //     y: finalPosition.y - initialOffset.y  - this.state.currentTranslate.y
-            // }
-
-            // finalPosition = {
-            //     x: (finalPosition.x - parentRect.left) / this.state.zoom,
-            //     y: (finalPosition.y - parentRect.top) / this.state.zoom
-            // };
-            
 
             finalPosition = {
                 x: finalPosition.x - initialOffset.x,
@@ -1051,8 +1015,6 @@ class Canvas extends React.Component {
 
         // Store the ref in the instance variable
         this.widgetRefs.current[id] = widgetRef
-
-        console.log("widget ref: ", widgetRef)
 
         // this.setWidgetRefs({...this.widgetRefs.current, [id]: widgetRef})
 

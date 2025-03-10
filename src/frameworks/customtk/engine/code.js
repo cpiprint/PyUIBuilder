@@ -111,7 +111,7 @@ async function generateCustomTkCode(projectName, widgetList=[], widgetRefs=[], a
 
     // widget - {id, widgetType: widgetComponentType, children: [], parent: "", initialData: {}}
     
-    const generatedObject = generateCustomTkCodeList(filteredWidgetList, widgetRefs, "", "")
+    const generatedObject = generateCustomTkCodeList(filteredWidgetList, widgetRefs.current, "", "")
 
     const {code: codeLines, imports, requirements, mainVariable} = generatedObject
 

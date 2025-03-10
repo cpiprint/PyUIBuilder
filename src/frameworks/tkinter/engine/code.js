@@ -111,7 +111,7 @@ async function generateTkinterCode(projectName, widgetList=[], widgetRefs=[], as
 
     // widget - {id, widgetType: widgetComponentType, children: [], parent: "", initialData: {}}
     
-    const generatedObject = generateTkinterCodeList(filteredWidgetList, widgetRefs, "", "")
+    const generatedObject = generateTkinterCodeList(filteredWidgetList, widgetRefs.current, "", "")
 
     const {code: codeLines, imports, requirements, mainVariable} = generatedObject
 

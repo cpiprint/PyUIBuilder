@@ -184,7 +184,7 @@ export const TreeViewCard = memo(({widgetRef, title, isTopLevel}) => {
                 <Button color="danger" title="delete" onClick={onDelete} size="small" variant="text" danger 
                 icon={<DeleteOutlined />}></Button>
                 <Button variant="text" type="text" title="hide" onClick={toggleHideShowWidget} size="small" 
-                icon={widgetVisible ? <EyeInvisibleOutlined/> : <EyeOutlined />}></Button>
+                icon={widgetVisible ? <EyeOutlined /> : <EyeInvisibleOutlined/>}></Button>
             </div>
         </div>
     )

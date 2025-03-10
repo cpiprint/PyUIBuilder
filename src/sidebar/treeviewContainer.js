@@ -50,7 +50,8 @@ function TreeviewContainer() {
                 onClear={() => setSearchValue("")} /> */}
             <div className="tw-flex tw-flex-col tw-gap-2 tw-w-full tw-h-full tw-p-1">
 
-                <Tree treeData={transformedContent}
+                <Tree  showLine
+                        treeData={transformedContent}
                         titleRender={(nodeData) => 
                             
                             <TreeViewCard widgetId={nodeData.id} title={nodeData.title} 

@@ -28,12 +28,12 @@ export class TkinterBase extends Widget {
         if (parentLayout === Layouts.PLACE || absolutePositioning){
 
             const config = {
-                x: this.state.pos.x,
-                y: this.state.pos.y,
+                x: Math.trunc(this.state.pos.x),
+                y: Math.trunc(this.state.pos.y),
             }
 
-            config["width"] = this.state.size.width
-            config["height"] = this.state.size.height
+            config["width"] = Math.trunc(this.state.size.width)
+            config["height"] = Math.trunc(this.state.size.height)
 
             // if (!this.state.fitContent.width){
             //     config["width"] = this.state.size.width
