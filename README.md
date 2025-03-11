@@ -1,4 +1,6 @@
-# PyUIBuilder - Build python GUIs like Webflow
+# PyUIBuilder - Python GUI Builder
+Build python GUIs like Webflow
+
 <sub>Not affiliated to Webflow</sub>
 
 <p align="center">
