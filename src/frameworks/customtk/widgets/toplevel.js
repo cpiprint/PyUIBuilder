@@ -5,6 +5,7 @@ import Tools from "../../../canvas/constants/tools"
 class TopLevel extends Widget{
 
     static widgetType = "toplevel"
+    static displayName = "Top Level"
 
     constructor(props) {
         super(props)

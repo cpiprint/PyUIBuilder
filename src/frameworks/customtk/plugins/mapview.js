@@ -13,6 +13,8 @@ import { CustomTkBase } from "../widgets/base"
 class MapView extends CustomTkBase{
 
     static widgetType = "map_view"
+    static displayName = "Map View"
+
 
     static requiredImports = [
         ...CustomTkBase.requiredImports, 

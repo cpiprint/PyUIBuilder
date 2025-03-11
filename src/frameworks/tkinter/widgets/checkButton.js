@@ -8,6 +8,8 @@ import { TkinterWidgetBase } from "./base"
 export class CheckBox extends TkinterWidgetBase{
 
     static widgetType = "check_button"
+    static displayName = "Check Box"
+
     constructor(props) {
         super(props)
 

@@ -32,6 +32,7 @@ const ATTRS_KEYS = ['value', 'label', 'tool', 'onChange', 'options', 'toolProps'
 class Widget extends React.Component {
 
     static widgetType = "widget"
+    static displayName = "Widget"
 
     static requirements = [] // requirements for the widgets (libraries) eg: tkvideoplayer, tktimepicker
     static requiredImports = [] // import statements
@@ -345,6 +346,10 @@ class Widget extends React.Component {
 
     getWidgetType() {
         return this.constructor.widgetType
+    }
+
+    getDisplayName(){
+        return this.constructor.displayName
     }
 
     getRequirements(){

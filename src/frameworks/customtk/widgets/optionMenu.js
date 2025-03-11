@@ -7,6 +7,7 @@ import { convertObjectToKeyValueString, removeKeyFromObject } from "../../../uti
 class OptionMenu extends CustomTkWidgetBase{
 
     static widgetType = "option_menu"
+    static displayName = "Option Menu"
 
     constructor(props) {
         super(props)

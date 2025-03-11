@@ -6,6 +6,7 @@ import { TkinterBase } from "./base"
 class MainWindow extends TkinterBase{
 
     static widgetType = "main_window"
+    static displayName = "Main Window"
 
     constructor(props) {
         super(props)

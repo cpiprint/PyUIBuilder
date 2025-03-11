@@ -20,6 +20,7 @@ const Themes = {
 class AnalogTimePicker extends CustomTkBase{
 
     static widgetType = "analog_timepicker"
+    static displayName = "Analog Timepicker"
 
     static requiredImports = [
                                 ...CustomTkBase.requiredImports, 

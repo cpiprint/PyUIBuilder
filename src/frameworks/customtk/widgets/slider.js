@@ -7,6 +7,8 @@ import { CustomTkWidgetBase } from "./base"
 class Slider extends CustomTkWidgetBase{
 
     static widgetType = "scale"
+    static displayName = "Scale"
+
     // FIXME: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use 
     constructor(props) {
         super(props)

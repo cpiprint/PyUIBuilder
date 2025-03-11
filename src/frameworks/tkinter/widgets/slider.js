@@ -7,6 +7,8 @@ import {TkinterBase, TkinterWidgetBase} from "./base"
 class Slider extends TkinterWidgetBase{
 
     static widgetType = "scale"
+    static displayName = "Scale"
+
     // FIXME: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use 
     constructor(props) {
         super(props)

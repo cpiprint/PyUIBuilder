@@ -5,6 +5,7 @@ import {TkinterBase} from "./base"
 class Frame extends TkinterBase{
 
     static widgetType = "frame"
+    static displayName = "Frame"
 
     constructor(props) {
         super(props)

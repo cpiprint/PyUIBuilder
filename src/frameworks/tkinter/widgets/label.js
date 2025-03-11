@@ -7,6 +7,7 @@ import { TkinterWidgetBase } from "./base"
 class Label extends TkinterWidgetBase{
 
     static widgetType = "label"
+    static displayName = "Label"
 
 
     constructor(props) {

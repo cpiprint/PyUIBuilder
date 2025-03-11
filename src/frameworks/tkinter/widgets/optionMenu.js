@@ -7,6 +7,7 @@ import { convertObjectToKeyValueString } from "../../../utils/common"
 class OptionMenu extends TkinterWidgetBase{
 
     static widgetType = "option_menu"
+    static displayName = "Option Menu"
 
     constructor(props) {
         super(props)

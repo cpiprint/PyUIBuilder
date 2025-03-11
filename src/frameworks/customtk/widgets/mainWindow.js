@@ -6,6 +6,7 @@ import { CustomTkBase } from "./base"
 class MainWindow extends CustomTkBase{
 
     static widgetType = "main_window"
+    static displayName = "Main Window"
 
     constructor(props) {
         super(props)

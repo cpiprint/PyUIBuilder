@@ -7,7 +7,7 @@ import { CustomTkWidgetBase } from "./base"
 class Label extends CustomTkWidgetBase{
 
     static widgetType = "label"
-
+    static displayName = "Label"
 
     constructor(props) {
         super(props)

@@ -5,6 +5,7 @@ import { CustomTkBase } from "./base"
 class Frame extends CustomTkBase{
 
     static widgetType = "frame"
+    static displayName = "Frame"
 
     constructor(props) {
         super(props)

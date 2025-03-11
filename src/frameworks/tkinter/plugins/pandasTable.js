@@ -70,6 +70,7 @@ const ResizableTable = ({minRows=5, minCols=5}) => {
 class PandasTable extends TkinterBase{
 
     static widgetType = "pandas_table"
+    static displayName = "Pandas Table"
 
     static requiredImports = [
         ...TkinterBase.requiredImports, 

@@ -13,6 +13,7 @@ import { TkinterBase } from "../widgets/base"
 class MapView extends TkinterBase{
 
     static widgetType = "map_view"
+    static displayName = "Map View"
 
     static requiredImports = [
         ...TkinterBase.requiredImports, 

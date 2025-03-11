@@ -8,6 +8,7 @@ import {TkinterBase, TkinterWidgetBase} from "./base"
 class SpinBox extends TkinterWidgetBase{
 
     static widgetType = "spin_box"
+    static displayName = "Spin Box"
 
     constructor(props) {
         super(props)

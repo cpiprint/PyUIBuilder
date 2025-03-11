@@ -13,7 +13,7 @@ import { useWidgetContext } from "../canvas/context/widgetContext"
 function transformWidgets(widgets, widgetRefs, isTopLevel=true) {
     // console.log("Wdiegts refs: ", widgetRefs)
     return widgets.map(widget => ({
-      title: widget.widgetType.name, // Assuming widgetType is a class
+      title: widgetRefs.current[widget.id].current.getDisplayName(), // Assuming widgetType is a class
       key: widget.id,
       isTopLevel: isTopLevel,
       widgetRef: widgetRefs.current[widget.id],

@@ -7,7 +7,7 @@ import Label from "./widgets/label"
 import Button from "./widgets/button"
 import OptionMenu from "./widgets/optionMenu"
 import Slider from "./widgets/slider"
-import { CheckBox, RadioButton } from "./widgets/ checkButton"
+import { CheckBox, RadioButton } from "./widgets/checkButton"
 import { Input, Text } from "./widgets/input"
 import SpinBox from "./widgets/spinBox"
 

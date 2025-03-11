@@ -12,6 +12,7 @@ import { getPythonAssetPath } from "../../utils/pythonFilePath"
 class VideoPlayer extends CustomTkBase{
 
     static widgetType = "video_player"
+    static displayName = "Video Player"
 
     static requiredImports = [
         ...CustomTkBase.requiredImports, 

@@ -6,6 +6,7 @@ import { CustomTkWidgetBase } from "./base"
 export class Input extends CustomTkWidgetBase{
 
     static widgetType = "entry"
+    static displayName = "Entry"
     
     constructor(props) {
         super(props)

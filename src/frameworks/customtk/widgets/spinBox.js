@@ -8,6 +8,7 @@ import { CustomTkWidgetBase } from "./base"
 class SpinBox extends CustomTkWidgetBase{
 
     static widgetType = "spin_box"
+    static displayName = "Spin Box"
 
     constructor(props) {
         super(props)

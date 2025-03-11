@@ -70,6 +70,7 @@ const ResizableTable = ({minRows=5, minCols=5}) => {
 class PandasTable extends CustomTkBase{
 
     static widgetType = "pandas_table"
+    static displayName = "Pandas Table"
 
     static requiredImports = [
         ...CustomTkBase.requiredImports, 

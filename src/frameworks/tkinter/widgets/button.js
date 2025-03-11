@@ -6,6 +6,7 @@ import { TkinterWidgetBase } from "./base"
 class Button extends TkinterWidgetBase{
 
     static widgetType = "button"
+    static displayName = "Button"
 
     constructor(props) {
         super(props)
