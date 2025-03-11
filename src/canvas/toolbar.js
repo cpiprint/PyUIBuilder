@@ -338,7 +338,7 @@ const CanvasToolBar = memo(({ isOpen, widgetType, attrs = {} }) => {
                 
                 if (isFirstLevel){
                     return (
-                        <Collapse key={keyName} ghost defaultActiveKey={keys}>
+                        <Collapse key={keyName} defaultActiveKey={keys}>
                             <Collapse.Panel header={val.label} key={keyName}>
                                 {renderTool(keyName, val)}
                             </Collapse.Panel>
@@ -367,7 +367,7 @@ const CanvasToolBar = memo(({ isOpen, widgetType, attrs = {} }) => {
 
                 if (isFirstLevel){
                     return (
-                        <Collapse key={keyName} ghost defaultActiveKey={keys}>
+                        <Collapse key={keyName}  defaultActiveKey={keys}>
                             <Collapse.Panel header={val.label} key={keyName}>
                                 <div className={`${containerClass} tw-px-2`}>
                                     {renderToolbar(val, keyName, toolCount+1)}
@@ -398,13 +398,15 @@ const CanvasToolBar = memo(({ isOpen, widgetType, attrs = {} }) => {
                 ${toolbarOpen ? "tw-translate-x-0" : "tw-translate-x-full"} 
                 tw-w-[280px] tw-px-3 tw-p-2 tw-h-[600px] tw-rounded-md tw-z-[1000] tw-shadow-lg 
                 tw-transition-transform tw-duration-[0.3s] tw-overflow-x-hidden
-                tw-flex tw-flex-col tw-gap-2 tw-overflow-y-auto`}
+                tw-flex tw-flex-col tw-gap-2 tw-overflow-y-auto tw-border-[2px] 
+                tw-border-solid tw-border-gray-300`}
 
                 style={{
                     transform: toolbarOpen ? "translateX(0)" : "translateX(calc(100% + 50px))"
                 }}
         >
-            <h3 className="tw-text-lg tw-text-center">
+            <h3 className="tw-text-lg tw-text-center tw-bg-[#FAFAFA] tw-border-[1px] tw-border-solid tw-border-[#D9D9D9]
+                            tw-p-1 tw-px-2 tw-rounded-md tw-font-medium">
                 {capitalize(`${widgetType || ""}`).replace(/_/g, " ")}
             </h3>
 

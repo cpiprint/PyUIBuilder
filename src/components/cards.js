@@ -42,7 +42,7 @@ export function SidebarWidgetCard({ name, img, url, license, widgetClass, innerR
                 <div ref={innerRef} className="tw-select-none  tw-h-[200px] tw-w-[230px] tw-flex tw-flex-col 
                                                 tw-rounded-md tw-overflow-hidden 
                                                 tw-gap-2 tw-text-gray-600 tw-bg-[#ffffff44] tw-border-solid tw-border-[1px]
-                                                tw-border-blue-500 tw-shadow-md">
+                                                tw-border-gray-500 tw-shadow-md">
                     <div className="tw-h-[200px] tw-pointer-events-none tw-w-full tw-overflow-hidden">
                         <img src={img} alt={name} className="tw-object-contain tw-h-full tw-w-full tw-select-none" />
                     </div>

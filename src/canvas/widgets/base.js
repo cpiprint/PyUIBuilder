@@ -1290,6 +1290,7 @@ class Widget extends React.Component {
                                         style={{
                                          
                                             position: "fixed", // transforms are applied on parent so its going to be relative to parent
+                                            // TODO: this Change left and top with elementRect.left
                                             left: left,
                                             top: top,
 

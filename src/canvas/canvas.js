@@ -1332,7 +1332,7 @@ class Canvas extends React.Component {
                                     </DroppableWrapper>
 
                                     <CanvasToolBar isOpen={this.state.toolbarOpen}
-                                        widgetType={this.selectedWidget?.getWidgetType() || ""}
+                                        widgetType={this.selectedWidget?.getDisplayName() || ""}
                                         attrs={this.state.toolbarAttrs}
                                     />
                                     {/* </ActiveWidgetProvider> */}
