@@ -62,7 +62,7 @@ function Sidebar({tabs}){
                 >
             
 
-            <div className="tw-min-w-[80px] tw-w-[80px] tw-h-full tw-flex tw-flex-col tw-gap-4 tw-p-3 tw-place-items-center">
+            <div className="tw-min-w-[80px] tw-w-[80px] tw-bg-gray-100 tw-h-full tw-flex tw-flex-col tw-gap-4 tw-p-3 tw-place-items-center">
                 {
                     sidebarTabs.map((tab, index) => {
                         return (
@@ -113,7 +113,9 @@ function Sidebar({tabs}){
                 </div>
             </div>
 
-            <div className="tw-w-full tw-h-full tw-bg-inherit tw-flex tw-flex-col tw-overflow-x-hidden" ref={sideBarExtraRef}>
+            <div className="tw-w-full tw-h-full tw-bg-inherit tw-rounded-lg
+                            tw-shadow-[rgb(59,130,246)] !tw-shadow-[rgba(179,116,206,0.5)_-3px_0px_10px_] tw-flex tw-flex-col tw-overflow-x-hidden" 
+                ref={sideBarExtraRef}>
                 <div className="tw-w-full tw-h-[50px] tw-flex tw-place-content-end tw-p-1">
                     <button className="tw-outline-none tw-bg-transparent tw-border-none tw-text-gray-600 tw-cursor-pointer tw-text-xl"
                             onClick={closeSidebar}
