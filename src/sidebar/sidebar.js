@@ -114,7 +114,7 @@ function Sidebar({tabs}){
             </div>
 
             <div className="tw-w-full tw-h-full tw-bg-inherit tw-rounded-lg
-                            tw-shadow-[rgb(59,130,246)] !tw-shadow-[rgba(179,116,206,0.5)_-3px_0px_10px_] tw-flex tw-flex-col tw-overflow-x-hidden" 
+                            tw-shadow-[rgb(207,207,207)] tw-shadow-[rgb(207,207,207,0.5)_-3px_0px_10px_] tw-flex tw-flex-col tw-overflow-x-hidden" 
                 ref={sideBarExtraRef}>
                 <div className="tw-w-full tw-h-[50px] tw-flex tw-place-content-end tw-p-1">
                     <button className="tw-outline-none tw-bg-transparent tw-border-none tw-text-gray-600 tw-cursor-pointer tw-text-xl"
