@@ -36,6 +36,13 @@ function Header({projectName, onProjectNameChange, framework, onFrameworkChange,
             />
             
             <div className="tw-ml-auto tw-flex tw-gap-2 tw-place-content-center">
+            <button data-tally-open="mVDY7N" data-tally-layout="modal" data-tally-emoji-text="👋" 
+                    data-tally-emoji-animation="wave" className="tw-p-1 tw-w-full tw-outline-none tw-bg-transparent tw-border-[1px] 
+                                    tw-border-gray-400 tw-rounded-md tw-no-underline tw-border-solid hover:tw-bg-[#9333EA]
+                                    hover:tw-text-white tw-duration-200
+                                    tw-text-black tw-text-center tw-px-4 tw-text-sm tw-cursor-pointer">
+                                        Join Waitlist
+                            </button>
                 <Premium className="tw-text-2xl tw-bg-purple-600 tw-text-center 
                                     tw-w-[40px] tw-min-w-[40px] tw-h-[35px] tw-rounded-md 
                                     tw-cursor-pointer tw-text-white 
