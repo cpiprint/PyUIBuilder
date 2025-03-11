@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 
 import "./styles/tailwind.css";
 import "./styles/index.css";
+
 import { FileUploadProvider } from "./contexts/fileUploadContext";
 
 const originalSetItem = localStorage.setItem;

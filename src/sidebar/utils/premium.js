@@ -44,7 +44,7 @@ function Premium({ children, className = "" }) {
                     <br />
                     By buying pre-order license, I get to complete this faster and you get discounted price, advance features, priority support, early access, upcoming features, and &nbsp;
                     <a
-                        href="https://github.com/PaulleDemon/tab=readme-ov-file"
+                        href="https://github.com/PaulleDemon/PyUIBuilder/blob/main/roadmap.md"
                         target="_blank"
                         rel="noreferrer noopener"
                         className="!tw-text-blue-500"
@@ -122,7 +122,7 @@ function Premium({ children, className = "" }) {
                         <div className="tw-flex tw-w-[380px] tw-flex-col tw-place-items-center tw-gap-2 tw-rounded-lg tw-border-2 tw-border-solid
                                          tw-border-blue-500 tw-p-8 tw-shadow-xl max-lg:tw-w-[340px]">
                             <div className="tw-text-white tw-p-1 tw-px-3 tw-bg-blue-500 tw-rounded-full">
-                                Pre-order time offer
+                                Pre-order offer
                             </div>
                             <div className="tw-text-white tw-font-medium tw-p-1 tw-px-3 tw-bg-green-700 tw-rounded-full">
                                 Hobby
@@ -201,7 +201,7 @@ function Premium({ children, className = "" }) {
                         <div className="tw-flex tw-w-[380px] tw-flex-col tw-place-items-center tw-gap-2 tw-rounded-lg tw-border-3 tw-border-solid
                                          tw-border-green-600 tw-p-8 tw-shadow-xl max-lg:tw-w-[340px]">
                             <div className="tw-text-white tw-p-1 tw-px-3 tw-bg-blue-500 tw-rounded-full">
-                                Pre-order time offer
+                                Pre-order offer
                             </div>
                             <div className="tw-text-white tw-font-medium tw-p-1 tw-px-3 tw-bg-green-700 tw-rounded-full">
                                 Commercial

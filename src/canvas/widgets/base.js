@@ -225,29 +225,7 @@ class Widget extends React.Component {
     componentWillUnmount() {
     }
 
-    // __fixWidgetPosition = () => {
-        
-    //     if (this.state.parentLayout?.layout === Layouts.FLEX || this.state.parentLayout?.layout === Layouts.GRID ){
-    //         const elementRect = this.elementRef.current.getBoundingClientRect()
-    //         const {pan: canvasPan, zoom: canvasZoom} = this.canvasMetaData
-    //         console.log("elemnt rect: ", elementRect)
-        
 
-    //         const pos = {  // if the layout is flex or grid the position should be the where it stays
-    //             // x: ((elementRect?.x || 0) - canvasPan.x) / canvasZoom,
-    //             // y: ((elementRect?.y || 0) - canvasPan.y) / canvasZoom,
-
-    //             x: elementRect?.x,
-    //             y: elementRect?.y,
-    //         }
-
-    //         this.setState({
-    //             ...this.state,
-    //             pos: pos
-    //         })
-    //     }
-
-    // }
 
     updateState = (newState, callback) => {
 
@@ -661,13 +639,13 @@ class Widget extends React.Component {
         }
 
         if (align === "start"){
-            widgetStyle["alignItems"] = "flex-start"
+            widgetStyle["placeContent"] = "flex-start"
         }else if (align === "center"){
-            widgetStyle["alignItems"] = "center"
+            widgetStyle["placeContent"] = "center"
         }else if (align === "end"){
-            widgetStyle["alignItems"] = "flex-end"
+            widgetStyle["placeContent"] = "flex-end"
         }else{
-            widgetStyle["alignItems"] = "unset"
+            widgetStyle["placeContent"] = "unset"
         }
 
         this.updateState({
@@ -1234,6 +1212,8 @@ class Widget extends React.Component {
         // const boundingRect = this.getBoundingRect
 
         const {zoom: canvasZoom, pan: canvasPan} = this.canvasMetaData
+        
+        const elementRect = this.elementRef.current?.getBoundingClientRect()
 
         return (
 
@@ -1246,6 +1226,7 @@ class Widget extends React.Component {
 
                         const elementRect = this.getBoundingRect()
 
+                        const {zoom, pan} = this.props.canvasMetaData
 
                         const left = ((elementRect?.left || 0) - canvasRectInner?.left) / canvasZoom - 10
                         const top = ((elementRect?.top || 0) - canvasRectInner?.top) / canvasZoom - 10
@@ -1278,18 +1259,6 @@ class Widget extends React.Component {
                                         
                                     >
                                     
-                                    {/* <div className={`tw-absolute tw-top-[-5px] tw-left-[-5px] 
-                                                        tw-border-1 tw-opacity-0 tw-border-solid tw-border-black
-                                                        tw-w-full tw-h-full 
-                                                        tw-scale-[1.1] !tw-opacity-1 tw-z-[-1] `}
-                                        style={{
-                                            width: "calc(100% + 10px)",
-                                            height: "calc(100% + 10px)",
-                                        }}
-                                        ref={this.swappableAreaRef}
-                                        > */}
-                                        {/* helps with swappable: if the mouse is in this area while hovering/dropping, then swap */}
-                                    {/* </div> */}
 
                                     <div className="tw-relative tw-top-0 tw-left-0 tw-w-full tw-h-full" ref={this.innerAreaRef}
                                         >
@@ -1319,8 +1288,11 @@ class Widget extends React.Component {
                                             left: left,
                                             top: top,
 
-                                            width: this.state.size.width + 20,
-                                            height: this.state.size.height + 20,
+                                            // width: this.state.size.width + 20,
+                                            // height: this.state.size.height + 20,
+                                            // TODO: this isn't smooth when zooming
+                                            width: (elementRect?.width/zoom || this.state.size.width) + 20,
+                                            height: (elementRect?.height/zoom || this.state.size.height) + 20,
                                             zIndex: 1,
                                         }}
                                         >

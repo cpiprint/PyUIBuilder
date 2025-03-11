@@ -9,11 +9,11 @@ Any feature that has 👑 beside it, is meant only for [premium users](./README.
 ### 1.2.0
 - [ ] UI fixes and enhancement 
 - [ ] Documentation
-- [ ] Tree view for elements on the canvas
+- [X] Tree view for elements on the canvas
 - [ ] Add text editor to support event handlers
 - [ ] Support for Event handlers
 - [ ] Support more pre-built widgets such as ttk.Notebook, multi-page etc.
-- [ ] Rewrite DND for better feedback - (swappy/react-dnd-kit/ GSAP draggable)
+- [ ] Rewrite DND for better feedback - (swappy/react-dnd-kit/ GSAP draggable) - least priority
 - [ ] Duplicate widgets
 
 ### 1.5.0
