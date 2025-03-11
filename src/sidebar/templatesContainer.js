@@ -50,10 +50,13 @@ function TemplatesContainer(){
 
                 <div className="tw-flex tw-flex-col tw-mt-6 tw-gap-2">
                     <div>Want to be notified of the release?</div>
-                    <a href="https://paulfreeman.substack.com/subscribe?utm_source=pyGUIBuilder_web" 
+                    <button data-tally-open="mVDY7N" data-tally-layout="modal" data-tally-emoji-text="👋" 
+                    data-tally-emoji-animation="wave" className="tw-p-2 tw-w-full tw-outline-none tw-bg-blue-500 tw-rounded-md tw-no-underline
+                                    tw-text-white tw-text-center tw-py-3 tw-border-none tw-text-base tw-shadow-md tw-cursor-pointer">Join the waitlist</button>
+                    {/* <a href="https://paulfreeman.substack.com/subscribe?utm_source=pyGUIBuilder_web" 
                         className="tw-p-2 tw-w-full tw-bg-blue-500 tw-rounded-md tw-no-underline
                                     tw-text-white tw-text-center tw-py-3"
-                        target="_blank" rel="noreferrer noopener">Subscribe to newsletter</a>
+                        target="_blank" rel="noreferrer noopener">Join the waitlist</a> */}
                 </div>
                 
             </div>
