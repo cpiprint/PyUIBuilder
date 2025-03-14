@@ -508,7 +508,7 @@ export class TkinterWidgetBase extends TkinterBase{
                     padX: {
                         label: "Pad X",
                         tool: Tools.NUMBER_INPUT,
-                        toolProps: {min: 1, max: 140},
+                        toolProps: {min: 0, max: 140},
                         value: null,
                         onChange: (value) => {
                             // this.setWidgetInnerStyle("paddingLeft", `${value}px`)
@@ -531,7 +531,7 @@ export class TkinterWidgetBase extends TkinterBase{
                     padY: {
                         label: "Pad Y",
                         tool: Tools.NUMBER_INPUT,
-                        toolProps: {min: 1, max: 140},
+                        toolProps: {min: 0, max: 140},
                         value: null,
                         onChange: (value) => {
                             const widgetStyle = {
@@ -544,6 +544,46 @@ export class TkinterWidgetBase extends TkinterBase{
                                 widgetInnerStyling: widgetStyle
                             })
                             this.setAttrValue("padding.padX", value)
+                        }
+                    },
+                },
+                margin: {
+                    label: "Margin",
+                    marginX: {
+                        label: "Margin X",
+                        tool: Tools.NUMBER_INPUT,
+                        toolProps: {min: 0, max: 140},
+                        value: null,
+                        onChange: (value) => {
+
+                            const widgetStyle = {
+                                ...this.state.widgetOuterStyling,
+                                marginLeft: `${value}px`,
+                                marginRight: `${value}px`
+                            }
+
+                            this.updateState({
+                                widgetOuterStyling: widgetStyle,
+                            })
+                            this.setAttrValue("margin.marginX", value)
+                        }
+                    },
+                    marginY: {
+                        label: "Margin Y",
+                        tool: Tools.NUMBER_INPUT,
+                        toolProps: {min: 0, max: 140},
+                        value: null,
+                        onChange: (value) => {
+                            const widgetStyle = {
+                                ...this.state.widgetOuterStyling,
+                                marginTop: `${value}px`,
+                                marginBottom: `${value}px`
+                            }
+
+                            this.updateState({
+                                widgetOuterStyling: widgetStyle,
+                            })
+                            this.setAttrValue("margin.marginY", value)
                         }
                     },
                 },
@@ -608,11 +648,21 @@ export class TkinterWidgetBase extends TkinterBase{
             config["cursor"] = `"${this.getAttrValue("cursor")}"`
 
         if (this.getAttrValue("padding.padX")){
-            config["padx"] = this.getAttrValue("padding.padX")
+            // inner padding
+            config["ipadx"] = this.getAttrValue("padding.padX")
         }
 
         if (this.getAttrValue("padding.padY")){
-            config["pady"] = this.getAttrValue("padding.padY")
+            config["ipady"] = this.getAttrValue("padding.padY")
+        }
+
+
+        if (this.getAttrValue("margin.marginX")){
+            config["padx"] = this.getAttrValue("margin.marginX")
+        }
+
+        if (this.getAttrValue("margin.marginY")){
+            config["pady"] = this.getAttrValue("margin.marginY")
         }
 
         // FIXME: add width and height, the scales may not be correct as the width and height are based on characters in pack and grid not pixels

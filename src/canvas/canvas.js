@@ -50,7 +50,7 @@ class Canvas extends React.Component {
     constructor(props) {
         super(props)
 
-        const { canvasWidgets, onWidgetListUpdated } = props
+        // const { canvasWidgets, onWidgetListUpdated } = props
 
         this.canvasRef = React.createRef()
         this.canvasContainerRef = React.createRef()
@@ -90,7 +90,7 @@ class Canvas extends React.Component {
             toolbarAttrs: null
         }
 
-        this._onWidgetListUpdated = onWidgetListUpdated // a function callback when the widget is added to the canvas
+        // this._onWidgetListUpdated = onWidgetListUpdated // a function callback when the widget is added to the canvas
 
         this.resetTransforms = this.resetTransforms.bind(this)
         this.renderWidget = this.renderWidget.bind(this)
@@ -1068,8 +1068,8 @@ class Canvas extends React.Component {
             if (callback)
                 callback({ id, widgetRef })
 
-            if (this._onWidgetListUpdated)
-                this._onWidgetListUpdated(widgets) // inform the parent container
+            // if (this._onWidgetListUpdated)
+            //     this._onWidgetListUpdated(widgets) // inform the parent container
         }, 1)
 
         // Update the state to include the new widget's type and ID
@@ -1128,8 +1128,8 @@ class Canvas extends React.Component {
         //     widgets: []
         // })
 
-        if (this._onWidgetListUpdated)
-            this._onWidgetListUpdated([])
+        // if (this._onWidgetListUpdated)
+        //     this._onWidgetListUpdated([])
     }
 
     getWidgetByIdFromWidgetList = (widgetId) => {
@@ -1165,8 +1165,8 @@ class Canvas extends React.Component {
         // })
         this.setWidgets(widgets)
 
-        if (this._onWidgetListUpdated)
-            this._onWidgetListUpdated(widgets)
+        // if (this._onWidgetListUpdated)
+        //     this._onWidgetListUpdated(widgets)
     }
 
     onActiveWidgetUpdate(widgetId) {
@@ -1268,7 +1268,7 @@ class Canvas extends React.Component {
                         return (<div className="tw-relative tw-overflow-hidden tw-flex tw-w-full tw-h-full tw-max-h-[100vh]">
 
                                     <div className="tw-absolute tw-p-2 tw-bg-white tw-z-10 tw-min-w-[100px] tw-h-[50px] tw-gap-2 
-                                                        tw-top-4 tw-place-items-center tw-right-4 tw-shadow-md tw-rounded-md tw-flex">
+                                                        tw-top-4 tw-place-items-center tw-left-4 tw-shadow-md tw-rounded-md tw-flex">
 
                                         <Tooltip title="Reset viewport">
                                             <Button icon={<ReloadOutlined />} onClick={this.resetTransforms} />

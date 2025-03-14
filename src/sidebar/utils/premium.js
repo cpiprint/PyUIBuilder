@@ -80,6 +80,14 @@ function Premium({ children, className = "" }) {
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-x-circle-fill tw-text-red-600 tw-text-base"></i>
+                                    <span>Premium widgets</span>
+                                </li>
+                                <li className="tw-flex tw-place-items-center tw-gap-2">
+                                    <i className="bi bi-x-circle-fill tw-text-red-600 tw-text-base"></i>
+                                    <span>Premium Templates</span>
+                                </li>
+                                <li className="tw-flex tw-place-items-center tw-gap-2">
+                                    <i className="bi bi-x-circle-fill tw-text-red-600 tw-text-base"></i>
                                     <span>Downloadable UI builder exe for local development</span>
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
@@ -146,6 +154,14 @@ function Premium({ children, className = "" }) {
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
                                     <span>Downloadable UI builder exe for local development</span>
+                                </li>
+                                <li className="tw-flex tw-place-items-center tw-gap-2">
+                                    <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
+                                    <span>Premium widgets</span>
+                                </li>
+                                <li className="tw-flex tw-place-items-center tw-gap-2">
+                                    <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
+                                    <span>Premium Templates</span>
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
@@ -225,6 +241,14 @@ function Premium({ children, className = "" }) {
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
                                     <span>Downloadable UI builder exe for local development</span>
+                                </li>
+                                <li className="tw-flex tw-place-items-center tw-gap-2">
+                                    <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
+                                    <span>Premium widgets</span>
+                                </li>
+                                <li className="tw-flex tw-place-items-center tw-gap-2">
+                                    <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
+                                    <span>Premium Templates</span>
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>

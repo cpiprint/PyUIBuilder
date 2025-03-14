@@ -85,15 +85,49 @@ function App() {
 
 
 	useEffect(() => {
+
+		if (!canvasRef)
+			return
+
+		const canvasBoundingBox = canvasRef.current.getCanvasContainerBoundingRect()
+		const canvasCenterX = (canvasBoundingBox.width - canvasBoundingBox.left) / 2
+		const canvasCenterY = (canvasBoundingBox.height - canvasBoundingBox.top) / 2
+
 		if (UIFramework === FrameWorks.TKINTER){
-			canvasRef?.current?.createWidget(TkMainWindow)
+			canvasRef?.current?.createWidget(TkMainWindow, ({id, widgetRef}) => {
+				
+				// center the widget when adding to canvas
+				if (!widgetRef.current){
+					return
+				}
+
+				const widgetBoundingBox = widgetRef.current?.getBoundingRect()
+				const widgetCenterX = (widgetBoundingBox.width - widgetBoundingBox.left) / 2
+				const widgetCenterY = (widgetBoundingBox.height - widgetBoundingBox.top) / 2
+
+
+				widgetRef.current?.setPos(canvasCenterX-widgetCenterX, canvasCenterY-widgetCenterY)
+			})
 
 		}else if (UIFramework === FrameWorks.CUSTOMTK){
-			canvasRef?.current?.createWidget(CTkMainWindow)
+			canvasRef?.current?.createWidget(CTkMainWindow, ({id, widgetRef}) => {
+
+				// center the widget when adding to canvas
+				if (!widgetRef.current){
+					return
+				}
+
+				const widgetBoundingBox = widgetRef.current?.getBoundingRect()
+				const widgetCenterX = (widgetBoundingBox.width - widgetBoundingBox.left) / 2
+				const widgetCenterY = (widgetBoundingBox.height - widgetBoundingBox.top) / 2
+
+
+				widgetRef.current?.setPos(canvasCenterX-widgetCenterX, canvasCenterY-widgetCenterY)
+			})
 		}
 
 
-	}, [UIFramework])
+	}, [UIFramework, canvasRef])
 
 	// const handleDragStart = (event) => {
 	// 	console.log("Drag start: ", event)
@@ -169,7 +203,6 @@ function App() {
 
 	const handleWidgetAddedToCanvas = (widgets) => {
 		setCanvasWidgets(widgets)
-		console.log("widget added: ", widgets)
 	}
 
 	const handleCodeGen = () => {
@@ -223,7 +256,7 @@ function App() {
 							
 							{/* <ActiveWidgetProvider> */}
 							<Canvas ref={canvasRef} widgets={canvasWidgets} 
-									onWidgetAdded={handleWidgetAddedToCanvas}/>
+									/>
 							{/* </ActiveWidgetProvider> */}
 						</div>
 						{/* dragOverlay (dnd-kit) helps move items from one container to another */}
