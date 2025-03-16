@@ -9,6 +9,11 @@ class MainWindow extends TkinterBase{
     static widgetType = "main_window"
     static displayName = "Main Window"
 
+    static initialSize = {
+        width: 700,
+        height: 400
+    }
+
     constructor(props) {
         super(props)
 
@@ -20,7 +25,7 @@ class MainWindow extends TkinterBase{
 
         this.state = {
             ...this.state,
-            size: { width: 700, height: 400 },
+            size: { width: MainWindow.initialSize.width, height: MainWindow.initialSize.height },
             widgetName: "main",
             attrs: {
                 ...newAttrs,
@@ -77,7 +82,6 @@ class MainWindow extends TkinterBase{
     }
 
     renderContent(){
-        console.log("inner style: ", this.getInnerRenderStyling())
         return (
             <div className="tw-w-flex tw-flex-col tw-w-full tw-h-full tw-rounded-md tw-overflow-hidden">
                 <div className="tw-flex tw-w-full tw-h-[25px] tw-bg-[#c7c7c7] tw-p-1

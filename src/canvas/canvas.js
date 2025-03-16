@@ -761,8 +761,8 @@ class Canvas extends React.Component {
             }
 
             // if the widget is being dropped from the sidebar, use the info to create the widget first
-            this.createWidget(widgetClass, ({ id, widgetRef }) => {
-                widgetRef.current.setPos(finalPosition.x, finalPosition.y)
+            this.createWidget(widgetClass, {x: finalPosition.x, y: finalPosition.y},({ id, widgetRef }) => {
+                // widgetRef.current.setPos(finalPosition.x, finalPosition.y)
             })
 
         } else if ([WidgetContainer.CANVAS, WidgetContainer.WIDGET].includes(container)) {
@@ -1045,7 +1045,7 @@ class Canvas extends React.Component {
      * 
      * @param {Widget} widgetComponentType - don't pass <Widget /> instead pass Widget object/class
      */
-    createWidget(widgetComponentType, callback) {
+    createWidget(widgetComponentType, initialPos={x: 0, y: 0}, callback,) {
 
         if (!isSubClassOfWidget(widgetComponentType)) {
             throw new Error("widgetComponentType must be a subclass of Widget class")
@@ -1067,7 +1067,7 @@ class Canvas extends React.Component {
             widgetType: widgetComponentType,
             children: [],
             parent: "",
-            initialData: {} //  useful for serializing and deserializing (aka, saving and loading)
+            initialData: {pos: initialPos} //  useful for serializing and deserializing (aka, saving and loading)
         }
 
         const widgets = [...this.widgets, newWidget] // don't add the widget refs in the state
@@ -1180,7 +1180,7 @@ class Canvas extends React.Component {
     }
 
     onActiveWidgetUpdate(widgetId) {
-
+        // TODO: remove this as it may no longer be required also remove toolbarAttrs
         if (!this.selectedWidget || widgetId !== this.selectedWidget.__id)
             return
 

@@ -202,6 +202,8 @@ class Widget extends React.Component {
         this.getRenderSize = this.getRenderSize.bind(this)
         this.getInnerRenderStyling = this.getInnerRenderStyling.bind(this)
 
+        this.stateUpdateCallback = null // allowing other components such as toolbar to subscribe to changes in this widget
+
     }
 
     componentDidMount() {
@@ -227,6 +229,12 @@ class Widget extends React.Component {
     }
 
 
+    stateChangeSubscriberCallback = (callback) => {
+        // NOTE: don't subscribe to multiple callbacks, only the last one will work 
+        // allowing other components such as toolbar to subscribe to changes in this widget
+        this.stateUpdateCallback = callback
+    }
+
     /**
      * This function will notify the canvas of the updates to the widgets
      * 
@@ -234,15 +242,18 @@ class Widget extends React.Component {
      * @param {*} callback - callback to run after setState
      */
     updateState = (newState, callback) => {
-
-        console.log("updatstate called: ", newState, this.state.attrs)
+       
         // FIXME: maximum recursion error when updating size, color etc
         this.setState(newState, () => {
             console.log("updatinhg./..: ", this.state)
             const { onWidgetUpdate } = this.props
-            if (onWidgetUpdate) {
-                onWidgetUpdate(this.__id)
-            }
+
+                
+            if (this.stateUpdateCallback)
+                this.stateUpdateCallback()
+            // if (onWidgetUpdate) {
+            //     onWidgetUpdate(this.__id)
+            // }
 
             // const { activeWidgetId, updateToolAttrs } = this.context
 
@@ -318,7 +329,7 @@ class Widget extends React.Component {
     }
 
     forceRerender = () => {
-        this.forceUpdate(() => console.log("forced"))
+        this.forceUpdate()
     }
 
     // TODO: add context menu items such as delete, add etc
@@ -487,9 +498,9 @@ class Widget extends React.Component {
      * @param {string} path - path to the key, eg: styling.backgroundColor
      * @param {any} value 
      */
-    setAttrValue(path, value) {
+    setAttrValue(path, value, callback) {
 
-        this.setState((prevState) => { // since the  setState is Async only the prevState contains the latest state
+        this.updateState((prevState) => { // since the  setState is Async only the prevState contains the latest state
 
             const keys = path.split('.')
             const lastKey = keys.pop()
@@ -511,9 +522,7 @@ class Widget extends React.Component {
             
             return { attrs: newAttrs }
 
-        }, () => {
-            console.log("new data updated: ", this.state.attrs)
-        })
+        }, callback)
     }
 
     /**
@@ -533,7 +542,6 @@ class Widget extends React.Component {
                 return undefined  // Return undefined if the key doesn't exist
             }
         }
-        console.log("found value: ", nestedObject, path)
         return nestedObject?.value  // Return the value (assuming it has a 'value' field)
     }
 
@@ -822,7 +830,7 @@ class Widget extends React.Component {
 
         data = {...data} // create a shallow copy
 
-        const {attrs, parentLayout, ...restData} = data
+        const {attrs={}, pos={x: 0, y: 0}, parentLayout=null, ...restData} = data
 
 
         let layoutUpdates = {
@@ -846,7 +854,8 @@ class Widget extends React.Component {
 
         const newData = {
             ...restData,
-            ...layoutUpdates
+            ...layoutUpdates,
+            pos
         }
 
         this.setState(newData,  () => {
@@ -1079,7 +1088,17 @@ class Widget extends React.Component {
             //     initialPos: newInitialPos,
             // }
             // console.log("Dropped on Sidebar: ", this.__id)
-            this.props.onCreateWidgetRequest(widgetClass, ({ id, widgetRef }) => {
+
+
+            const parentRect = this.getBoundingRect()
+            const {zoom, pan} = this.props.canvasMetaData
+
+            let initialPos = {
+                x: (e.clientX - parentRect.left) / zoom,
+                y: (e.clientY - parentRect.top) / zoom,
+            }
+
+            this.props.onCreateWidgetRequest(widgetClass, {x: initialPos.x, y: initialPos.y},({ id, widgetRef }) => {
                 this.props.onAddChildWidget({
                                             event: e, 
                                             parentWidgetId: this.__id, 

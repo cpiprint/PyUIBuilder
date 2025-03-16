@@ -93,8 +93,14 @@ function App() {
 		const canvasCenterX = (canvasBoundingBox.width - canvasBoundingBox.left) / 2
 		const canvasCenterY = (canvasBoundingBox.height - canvasBoundingBox.top) / 2
 
+		// console.log("position: ", TkMainWindow.)
 		if (UIFramework === FrameWorks.TKINTER){
-			canvasRef?.current?.createWidget(TkMainWindow, ({id, widgetRef}) => {
+
+			const widgetCenterX = (TkMainWindow.initialSize.width - canvasBoundingBox.left) / 2
+			const widgetCenterY = (TkMainWindow.initialSize.height - canvasBoundingBox.top) / 2
+
+
+			canvasRef?.current?.createWidget(TkMainWindow, {x: canvasCenterX - widgetCenterX, y: canvasCenterY - widgetCenterY}, ({id, widgetRef}) => {
 				
 				// center the widget when adding to canvas
 				if (!widgetRef.current){
@@ -106,7 +112,7 @@ function App() {
 				const widgetCenterY = (widgetBoundingBox.height - widgetBoundingBox.top) / 2
 
 
-				widgetRef.current?.setPos(canvasCenterX-widgetCenterX, canvasCenterY-widgetCenterY)
+				// widgetRef.current?.setPos(canvasCenterX-widgetCenterX, canvasCenterY-widgetCenterY)
 			})
 
 		}else if (UIFramework === FrameWorks.CUSTOMTK){

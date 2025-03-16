@@ -12,6 +12,7 @@ import { Layouts } from "./constants/layouts.js"
 import { DynamicRadioInputList } from "../components/inputs.js"
 import { useFileUploadContext } from "../contexts/fileUploadContext.js"
 import { AudioOutlined, FileImageOutlined, FileTextOutlined, VideoCameraOutlined } from "@ant-design/icons"
+import { useWidgetContext } from "./context/widgetContext.js"
 
 
 // FIXME: Maximum recursion error
@@ -22,15 +23,43 @@ import { AudioOutlined, FileImageOutlined, FileTextOutlined, VideoCameraOutlined
  * @param {string} widgetType 
  * @param {object} attrs - widget attributes 
  */
-const CanvasToolBar = memo(({ isOpen, widgetType, attrs = {} }) => {
+const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
 
     // const { activeWidgetAttrs } = useActiveWidget()
 
+    const {activeWidget} = useWidgetContext()
+
+    console.log("active widget: ", activeWidget)
+
     // console.log("active widget context: ", activeWidgetAttrs)
     const [toolbarOpen, setToolbarOpen] = useState(isOpen)
-    const [toolbarAttrs, setToolbarAttrs] = useState(attrs)
+    const [toolbarAttrs, setToolbarAttrs] = useState({})
 
     const {uploadedAssets} = useFileUploadContext()
+
+    useEffect(() => {
+
+        const stateUpdatedCallback = () => {
+            setToolbarAttrs(activeWidget.getToolbarAttrs())
+        }
+
+        if (activeWidget){
+            activeWidget.stateChangeSubscriberCallback(stateUpdatedCallback)
+            // console.log("sytate update: ", activeWidget.getToolbarAttrs())
+            setToolbarAttrs(activeWidget.getToolbarAttrs())
+        }
+
+    }, [activeWidget]) // , activeWidget?.state
+
+    useEffect(() => {
+        setToolbarOpen(isOpen)
+    }, [isOpen])
+
+    // useEffect(() => {
+   
+    //      setToolbarAttrs(activeWidget.getToolbarAttrs())
+   
+    // }, [])
 
     const uploadItems = useMemo(() => {
 
@@ -80,14 +109,6 @@ const CanvasToolBar = memo(({ isOpen, widgetType, attrs = {} }) => {
         return uploadList
 
     }, [uploadedAssets])
-
-    useEffect(() => {
-        setToolbarOpen(isOpen)
-    }, [isOpen])
-
-    useEffect(() => {
-        setToolbarAttrs(attrs)
-    }, [attrs])
 
 
     const handleChange = (value, callback) => {
@@ -407,7 +428,7 @@ const CanvasToolBar = memo(({ isOpen, widgetType, attrs = {} }) => {
         >
             <h3 className="tw-text-lg tw-text-center tw-bg-[#FAFAFA] tw-border-[1px] tw-border-solid tw-border-[#D9D9D9]
                             tw-p-1 tw-px-2 tw-rounded-md tw-font-medium">
-                {capitalize(`${widgetType || ""}`).replace(/_/g, " ")}
+                {capitalize(`${activeWidget?.getDisplayName() || ""}`).replace(/_/g, " ")}
             </h3>
 
             <div className="tw-flex tw-flex-col tw-gap-2">

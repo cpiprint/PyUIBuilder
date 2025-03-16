@@ -16,6 +16,11 @@ export class TkinterBase extends Widget {
         super(props)
 
         this.getLayoutCode = this.getLayoutCode.bind(this)
+
+        this.state = {
+            ...this.state,
+            flexSide: "left"
+        }
     }
 
     getLayoutCode(){
@@ -99,7 +104,7 @@ export class TkinterBase extends Widget {
     getPackAttrs = () => {
 
         return {
-            side: this.getAttrValue("flexManager.side") ,
+            side: this.state.flexSide,
         }
     }
 
@@ -164,15 +169,13 @@ export class TkinterBase extends Widget {
                                 value: false,
                                 onChange: (value) => {
                                     this.setAttrValue("flexManager.fillX", value)
-                                    const widgetStyle = {
-                                        ...this.state.widgetOuterStyling,
-                                        // flexGrow: value ? 1 : 0,
-                                        width: "100%"
-                                    }
 
-                                    this.updateState({
-                                        widgetOuterStyling: widgetStyle,
-                                    })
+                                    this.updateState((prevState) => ({
+                                        widgetOuterStyling: {
+                                            ...prevState.widgetOuterStyling,
+                                            width: "100%"
+                                        }
+                                    }))
                                     
                                 }
                             },
@@ -183,15 +186,12 @@ export class TkinterBase extends Widget {
                                 onChange: (value) => {
                                     this.setAttrValue("flexManager.fillY", value)
                                     
-                                    const widgetStyle = {
-                                        ...this.state.widgetOuterStyling,
-                                        height: "100%"
-
-                                        // flexGrow: value ? 1 : 0,
-                                    }
-                                    this.updateState({
-                                        widgetOuterStyling: widgetStyle,
-                                    })
+                                    this.updateState((prevState) => ({
+                                        widgetOuterStyling: {
+                                            ...prevState.widgetOuterStyling,
+                                            height: "100%"
+                                        }
+                                    }))
                                 }
                             },
                             expand: {
@@ -215,14 +215,17 @@ export class TkinterBase extends Widget {
                                 label: "Align Side",
                                 tool: Tools.SELECT_DROPDOWN,
                                 options: ["left", "right", "top", "bottom", ""].map(val => ({value: val, label: val})),
-                                value: "",
+                                value: "left",
                                 onChange: (value) => {
 
                                     // FIXME: force parent rerender because, here only child get rerendered, if only parent get rerendered the widget would move
                                     this.setAttrValue("flexManager.side", value)
                                     
+                                    this.setState({flexSide: value}, () => {
+                                        console.log("updated side: ", this.state.attrs)
+                                        setTimeout(this.props.parentWidgetRef.current.forceRerender, 1)
+                                    })
                                     // this.props.parentWidgetRef.current.forceRerender()
-                                    // setTimeout(this.props.parentWidgetRef.current.forceRerender, 1)
                                     // console.log("updateing state: ", value, this.props.parentWidgetRef.current)
                                 }
                             },
@@ -361,7 +364,7 @@ export class TkinterBase extends Widget {
                                 console.log("side: ", packAttrs, item, item.ref?.current?.getPackAttrs())
                                 // const widgetSide = item.ref.current?.getAttrValue("flexManager.side") || "left"
                                 // console.log("widget side: ", item.ref.current?.__id, item.ref.current, item.ref.current.getAttrValue("flexManager.side"))
-                                return ((packAttrs?.side || "right") === pos)
+                                return ((packAttrs?.side ) === pos)
                             })}
                         </div>
                     ))}
@@ -385,12 +388,18 @@ export class TkinterBase extends Widget {
         }
 
         switch (side) {
-            case "top": return { gridColumn: "1 / -1", justifySelf: "center", ...columnStyle };
-            case "bottom": return { gridColumn: "1 / -1", justifySelf: "center", ...columnStyle };
-            case "left": return { gridRow: "2", gridColumn: "1", alignSelf: "center", ...rowStyle };
-            case "right": return { gridRow: "2", gridColumn: "3", alignSelf: "center", ...rowStyle };
-            case "center": return { gridRow: "2", gridColumn: "2", alignSelf: "center", justifySelf: "center" };
-            default: return {}
+            case "top":
+                return { gridColumn: "1 / -1", alignSelf: "stretch", width: "100%", ...columnStyle };
+            case "bottom":
+                return { gridColumn: "1 / -1", alignSelf: "stretch", width: "100%", ...columnStyle };
+            case "left":
+                return { gridRow: "2", gridColumn: "1", justifySelf: "stretch", height: "100%", ...rowStyle };
+            case "right":
+                return { gridRow: "2", gridColumn: "3", justifySelf: "stretch", height: "100%", ...rowStyle };
+            case "center":
+                return { gridRow: "2", gridColumn: "2", alignSelf: "center", justifySelf: "center" };
+            default:
+                return {};
         }
         
     }
@@ -494,6 +503,14 @@ export class TkinterBase extends Widget {
     //     })
     // }
 
+
+    serialize(){
+        return ({
+            ...super.serialize(),
+            flexSide: this.state.flexSide
+        })
+    }
+
     /**
      * loads the data 
      * @param {object} data 
@@ -506,8 +523,7 @@ export class TkinterBase extends Widget {
 
         data = {...data} // create a shallow copy
 
-        const {attrs, parentLayout=null, ...restData} = data
-
+        const {attrs={}, pos={x: 0, y: 0}, parentLayout=null, ...restData} = data
 
         let layoutUpdates = {
             parentLayout: parentLayout
@@ -531,16 +547,18 @@ export class TkinterBase extends Widget {
 
         const newData = {
             ...restData,
-            ...layoutUpdates
+            ...layoutUpdates,
+            pos
         }
         
+        console.log("data: ", newData)
 
         this.setState(newData,  () => {
             let layoutAttrs = this.setParentLayout(parentLayout).attrs || {}
             
             // UPdates attrs
             let newAttrs = { ...this.state.attrs, ...layoutAttrs }
-
+            console.log("new attrs: ", newAttrs, attrs)
             // Iterate over each path in the updates object
             Object.entries(attrs).forEach(([path, value]) => {
                 const keys = path.split('.')
@@ -564,7 +582,7 @@ export class TkinterBase extends Widget {
                 // TODO: find a better way to apply innerStyles
                 this.setWidgetInnerStyle("backgroundColor", newAttrs.styling.backgroundColor.value)
             }
-            
+            console.log("new arttrs: ", newData)
             this.updateState({ attrs: newAttrs }, callback)
 
         })  
