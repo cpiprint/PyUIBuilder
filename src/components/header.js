@@ -24,7 +24,7 @@ function Header({projectName, onProjectNameChange, framework, onFrameworkChange,
 
 
     return (
-        <div className={`tw-w-full tw-bg-primaryBg tw-p-2 tw-flex tw-place-items-center
+        <div className={`tw-w-full tw-bg-primaryBg tw-gap-2 tw-overflow-x-auto tw-p-2 tw-flex tw-place-items-center
                              ${className||''}`}>
 
             <div className="tw-flex tw-gap-2 tw-place-content-center">

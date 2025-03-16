@@ -244,6 +244,15 @@ class Canvas extends React.Component {
 
     }
 
+    openToolbar = (widget) => {
+        this.setState({
+            // selectedWidget: selectedWidget,
+            toolbarAttrs: widget.getToolbarAttrs(),
+            toolbarOpen: true
+        })
+
+    }
+
     mouseDownEvent(event) {
 
         this.mousePos = { x: event.clientX, y: event.clientY }
@@ -263,11 +272,12 @@ class Canvas extends React.Component {
                     selectedWidget.setZIndex(1000)
                     selectedWidget.select()
                     // console.log("selected widget", selectedWidget.getToolbarAttrs(), selectedWidget, this.state.selectedWidget)
-                    this.setState({
-                        // selectedWidget: selectedWidget,
-                        toolbarAttrs: selectedWidget.getToolbarAttrs(),
-                        toolbarOpen: true
-                    })
+                    // this.setState({
+                    //     // selectedWidget: selectedWidget,
+                    //     toolbarAttrs: selectedWidget.getToolbarAttrs(),
+                    //     toolbarOpen: true
+                    // })
+                    // this.openToolbar(selectedWidget)
 
                     this.setSelectedWidget(selectedWidget)
 
@@ -1216,6 +1226,17 @@ class Canvas extends React.Component {
             })
         }
 
+        const handleWidgetSelect = (widgetId) => {
+            
+            if (this.selectedWidget && this.selectedWidget.getId() !== widgetId){
+                this.selectedWidget?.deSelect() // deselect the previous widget before adding the new one
+            }
+
+            const widget = this.getWidgetById(widgetId)?.current
+            this.setSelectedWidget(widget)
+            this.openToolbar(widget)
+        }
+
         return (
 
             <ComponentType
@@ -1231,7 +1252,7 @@ class Canvas extends React.Component {
                     pan: this.state.currentTranslate
                 }}
 
-                onSelect={(widgetId) => this.setSelectedWidget(this.getWidgetById(widgetId)?.current)}
+                onSelect={handleWidgetSelect}
                 
                 onWidgetDeleteRequest={this.removeWidget}
 

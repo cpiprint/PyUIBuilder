@@ -1,6 +1,7 @@
 import Widget from "../../../canvas/widgets/base"
 import Tools from "../../../canvas/constants/tools"
 import { TkinterBase } from "./base"
+import { removeKeyFromObject } from "../../../utils/common"
 
 
 class MainWindow extends TkinterBase{
@@ -15,12 +16,14 @@ class MainWindow extends TkinterBase{
             exclude: ["image", "video", "media", "main_window", "toplevel"]
         }
 
+        const newAttrs = removeKeyFromObject("margin", this.state.attrs)
+
         this.state = {
             ...this.state,
             size: { width: 700, height: 400 },
             widgetName: "main",
             attrs: {
-                ...this.state.attrs,
+                ...newAttrs,
                 title: {
                     label: "Window Title",
                     tool: Tools.INPUT, // the tool to display, can be either HTML ELement or a constant string
@@ -44,7 +47,7 @@ class MainWindow extends TkinterBase{
     // }
 
     componentDidMount(){
-        this.setAttrValue("styling.backgroundColor", "#E4E2E2")
+        // this.setAttrValue("styling.backgroundColor", "#E4E2E2")
         super.componentDidMount()
     }
 
@@ -74,6 +77,7 @@ class MainWindow extends TkinterBase{
     }
 
     renderContent(){
+        console.log("inner style: ", this.getInnerRenderStyling())
         return (
             <div className="tw-w-flex tw-flex-col tw-w-full tw-h-full tw-rounded-md tw-overflow-hidden">
                 <div className="tw-flex tw-w-full tw-h-[25px] tw-bg-[#c7c7c7] tw-p-1
@@ -90,7 +94,8 @@ class MainWindow extends TkinterBase{
                 </div>
                 <div className="tw-p-2 tw-w-full tw-relative tw-h-full tw-overflow-hidden tw-content-start" 
                         style={{...this.getInnerRenderStyling(), width: "100%", height: "calc(100% - 25px)"}}>
-                    {this.props.children}
+                    {/* {this.props.children} */}
+                    {this.renderTkinterLayout()} {/* This is required for pack layouts, so if your widget accepts child widgets, ensure to add this */}
                 </div>
             </div>
         )

@@ -104,10 +104,10 @@ class Widget extends React.Component {
             widgetInnerStyling: {
                 // use for widget's inner styling
                 backgroundColor: "#fff",
-                display: "flex",
-                flexDirection: "row",
+                // display: "flex",
+                // flexDirection: "row",
                 gap: 10,
-                flexWrap: "wrap"
+                // flexWrap: "wrap" // NOTE: this has been uncommented
             },
 
             attrs: {
@@ -115,7 +115,7 @@ class Widget extends React.Component {
                     backgroundColor: {
                         label: "Background Color",
                         tool: Tools.COLOR_PICKER, // the tool to display, can be either HTML ELement or a constant string
-                        value: "#fff",
+                        value: "#E4E2E2",
                         onChange: (value) => {
                             this.setWidgetInnerStyle("backgroundColor", value)
                             this.setAttrValue("styling.backgroundColor", value)
@@ -206,10 +206,13 @@ class Widget extends React.Component {
 
     componentDidMount() {
 
-        if (this.state.attrs.layout){
-            this.setLayout(this.state.attrs.layout.value)
-            // console.log("prior layout: ", this.state.attrs.layout.value)
-        }
+        console.log("state layout: ")
+        this.setLayout({layout: Layouts.FLEX, gap: 10})
+
+        // if (this.state.attrs.layout){
+        //     this.setLayout(this.state.attrs.layout.value)
+        //     // console.log("prior layout: ", this.state.attrs.layout.value)
+        // }
         
         if (this.state.attrs.styling.backgroundColor)
             this.setWidgetInnerStyle('backgroundColor', this.state.attrs.styling?.backgroundColor.value || "#fff")
@@ -223,16 +226,19 @@ class Widget extends React.Component {
         }
     }
 
-    componentWillUnmount() {
-    }
 
-
-
+    /**
+     * This function will notify the canvas of the updates to the widgets
+     * 
+     * @param {} newState  - this can either be a callback or a new State like (prevState) => ({key: value})
+     * @param {*} callback - callback to run after setState
+     */
     updateState = (newState, callback) => {
 
+        console.log("updatstate called: ", newState, this.state.attrs)
         // FIXME: maximum recursion error when updating size, color etc
         this.setState(newState, () => {
-
+            console.log("updatinhg./..: ", this.state)
             const { onWidgetUpdate } = this.props
             if (onWidgetUpdate) {
                 onWidgetUpdate(this.__id)
@@ -309,6 +315,10 @@ class Widget extends React.Component {
             ...this.state.attrs,
 
         })
+    }
+
+    forceRerender = () => {
+        this.forceUpdate(() => console.log("forced"))
     }
 
     // TODO: add context menu items such as delete, add etc
@@ -478,22 +488,32 @@ class Widget extends React.Component {
      * @param {any} value 
      */
     setAttrValue(path, value) {
-        const keys = path.split('.')
-        const lastKey = keys.pop()
 
-        
-        // Traverse the state and update the nested value immutably
-        let newAttrs = { ...this.state.attrs }
-        let nestedObject = newAttrs
-        
-        keys.forEach(key => {
-            nestedObject[key] = { ...nestedObject[key] } // Ensure immutability
-            nestedObject = nestedObject[key]
+        this.setState((prevState) => { // since the  setState is Async only the prevState contains the latest state
+
+            const keys = path.split('.')
+            const lastKey = keys.pop()
+
+            // Traverse the state and update the nested value immutably
+            let newAttrs = { ...prevState.attrs }
+            let nestedObject = newAttrs
+            
+            keys.forEach(key => {
+                nestedObject[key] = { ...nestedObject[key] } // Ensure immutability
+                nestedObject = nestedObject[key]
+            })
+            
+            if (nestedObject[lastKey]) {
+                nestedObject[lastKey] = { ...nestedObject[lastKey], value }
+            } else {
+                nestedObject[lastKey] = { value }
+            }
+            
+            return { attrs: newAttrs }
+
+        }, () => {
+            console.log("new data updated: ", this.state.attrs)
         })
-        
-        nestedObject[lastKey].value = value
-
-        this.updateState({ attrs: newAttrs })
     }
 
     /**
@@ -506,7 +526,6 @@ class Widget extends React.Component {
 
         // Traverse the state and get the nested value
         let nestedObject = this.state.attrs
-
         for (const key of keys) {
             if (nestedObject[key] !== undefined) {
                 nestedObject = nestedObject[key]
@@ -514,7 +533,7 @@ class Widget extends React.Component {
                 return undefined  // Return undefined if the key doesn't exist
             }
         }
-
+        console.log("found value: ", nestedObject, path)
         return nestedObject?.value  // Return the value (assuming it has a 'value' field)
     }
 
@@ -612,7 +631,7 @@ class Widget extends React.Component {
             }
         }
 
-        this.setState(updates)
+        this.setState((prevState) => ({...prevState, ...updates}))
 
         return updates
     }
@@ -636,22 +655,22 @@ class Widget extends React.Component {
             display: layout !== Layouts.PLACE ? layout : "block",
             flexDirection: direction,
             gap: `${gap}px`,
-            flexWrap: "wrap",
+            // flexWrap: "wrap",
             gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
             gridTemplateRows: "repeat(auto-fill, minmax(100px, 1fr))",  
             // gridAutoRows: 'minmax(100px, auto)',  // Rows with minimum height of 100px, and grow to fit content
             // gridAutoCols: 'minmax(100px, auto)',  // Cols with minimum height of 100px, and grow to fit content
         }
 
-        if (align === "start"){
-            widgetStyle["placeContent"] = "flex-start"
-        }else if (align === "center"){
-            widgetStyle["placeContent"] = "center"
-        }else if (align === "end"){
-            widgetStyle["placeContent"] = "flex-end"
-        }else{
-            widgetStyle["placeContent"] = "unset"
-        }
+        // if (align === "start"){
+        //     widgetStyle["placeContent"] = "flex-start"
+        // }else if (align === "center"){
+        //     widgetStyle["placeContent"] = "center"
+        // }else if (align === "end"){
+        //     widgetStyle["placeContent"] = "flex-end"
+        // }else{
+        //     widgetStyle["placeContent"] = "unset"
+        // }
 
         this.updateState({
             widgetInnerStyling: widgetStyle
@@ -676,14 +695,17 @@ class Widget extends React.Component {
      * @param {string} value - Value of the style
      */
     setWidgetOuterStyle(key, value){
-        const widgetStyle = {
-            ...this.state.widgetOuterStyling,
-            [key]: value
-        }
+        // const widgetStyle = {
+        //     ...this.state.widgetOuterStyling,
+        //     [key]: value
+        // }
 
-        this.setState({
-            widgetOuterStyling: widgetStyle
-        })
+        this.setState((prevState) => ({
+            widgetOuterStyling: {
+                ...prevState.widgetOuterStyling,
+                [key]: value
+            }
+        }))
 
     }
 
@@ -693,15 +715,20 @@ class Widget extends React.Component {
      * @param {string} value - Value of the style
      */
     setWidgetInnerStyle(key, value) {
-        
+
+        // FIXME: this one clashing with other setWidgetInner style
+
         const widgetStyle = {
             ...this.state.widgetInnerStyling,
             [key]: value
         }
 
-        this.setState({
-            widgetInnerStyling: widgetStyle
-        })
+        this.setState((prevState) => ({
+            widgetInnerStyling: {
+                ...prevState.widgetInnerStyling,
+                [key]: value
+            }
+        }))
 
     }
 
@@ -1136,6 +1163,7 @@ class Widget extends React.Component {
         let fitHeight = this.state.fitContent.height
         
         if (fitWidth){
+            // width = "max-content"
             width = "max-content"
         }
 
@@ -1146,6 +1174,12 @@ class Widget extends React.Component {
         // if fit width is enabled then the minsize is the resizable size
         let minWidth = fitWidth ? this.state.size.width : this.minSize.width
         let minHeight = fitHeight ? this.state.size.height : this.minSize.height
+
+        // let minWidth = fitWidth ? "max-content" : this.minSize.width
+        // let minHeight = fitHeight ? "max-content" : this.minSize.height
+        
+        // let minWidth = this.minSize.width
+        // let minHeight = this.minSize.height
         
         return {width, height, minWidth, minHeight}
 
@@ -1175,14 +1209,15 @@ class Widget extends React.Component {
         // NOTE: first check tkinter behaviour with the width and height
 
         let outerStyle = {
+            
             ...this.state.widgetOuterStyling,
+            width: width,
+            height: height,
             cursor: this.cursor,
             zIndex: this.state.zIndex,
             position: this.state.positionType, //  don't change this if it has to be movable on the canvas
             top: `${this.state.pos.y}px`,
             left: `${this.state.pos.x}px`,
-            width: width,
-            height: height,
             minWidth: minWidth, 
             minHeight: minHeight,
             opacity: this.state.isDragging ? 0.3 : 1,

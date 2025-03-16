@@ -1,7 +1,7 @@
 import { Layouts, PosType } from "../../../canvas/constants/layouts"
 import Tools from "../../../canvas/constants/tools"
 import Widget from "../../../canvas/widgets/base"
-import { convertObjectToKeyValueString, removeKeyFromObject } from "../../../utils/common"
+import { convertObjectToKeyValueString, isNumeric, removeKeyFromObject } from "../../../utils/common"
 import { Tkinter_TO_WEB_CURSOR_MAPPING } from "../constants/cursor"
 import { Tkinter_To_GFonts } from "../constants/fontFamily"
 import { JUSTIFY, RELIEF } from "../constants/styling"
@@ -57,13 +57,13 @@ export class TkinterBase extends Widget {
                 config["pady"] = gap
             }
 
-            if (align === "start"){
-                config["anchor"] = "'nw'"
-            }else if (align === "center"){
-                config["anchor"] = "'center'"
-            }else if (align === "end"){
-                config["anchor"] = "'se'"
-            }
+            // if (align === "start"){
+            //     config["anchor"] = "'nw'"
+            // }else if (align === "center"){
+            //     config["anchor"] = "'center'"
+            // }else if (align === "end"){
+            //     config["anchor"] = "'se'"
+            // }
 
             const fillX = this.getAttrValue("flexManager.fillX")
             const fillY = this.getAttrValue("flexManager.fillY")
@@ -96,6 +96,13 @@ export class TkinterBase extends Widget {
         return layoutManager
     }
 
+    getPackAttrs = () => {
+
+        return {
+            side: this.getAttrValue("flexManager.side") ,
+        }
+    }
+
     setParentLayout(layout){
 
         if (!layout){
@@ -118,30 +125,6 @@ export class TkinterBase extends Widget {
         const {gridManager, flexManager, positioning, ...restAttrs} =  this.state.attrs
 
         if (parentLayout === Layouts.FLEX || parentLayout === Layouts.GRID) {
-
-            // const elementRect = this.elementRef.current.getBoundingClientRect() 
-            // const canvasInnerRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
-            // const {zoom, pan} = this.props.canvasMetaData
-            // console.log("pan: ", pan, zoom)
-            // let pos = {
-            //     x: ((elementRect.left - canvasInnerRect.left) - pan.x) / zoom ,
-            //     y: ((elementRect.top - canvasInnerRect.top) - pan.y)  / zoom
-            // }
-
-            // let parent = this.props.parentWidgetRef?.current;
-
-            // while (parent) {
-            //     // accounting for nested parents
-            //     const parentRect = parent.getBoundingRect()
-            //     pos.x -= ((parentRect.left - canvasInnerRect.left) - pan.x) / zoom 
-            //     pos.y -= ((parentRect.top - canvasInnerRect.top) - pan.y) / zoom 
-
-            //     // Move up to the next parent (if any)
-            //     parent = parent.parentWidgetRef?.current
-            // }
-
-            // // this.setPos(pos.x, pos.y)
-            // console.log("setting pos: ", pos, elementRect, canvasInnerRect)
 
             updates = {
                 ...updates,
@@ -172,8 +155,9 @@ export class TkinterBase extends Widget {
                     attrs: {
                         ...updateAttrs,
                         flexManager: {
-                            label: "Flex Manager",
+                            label: "Pack Manager",
                             display: "horizontal",
+                            
                             fillX: {
                                 label: "Fill X",
                                 tool: Tools.CHECK_BUTTON,
@@ -182,7 +166,8 @@ export class TkinterBase extends Widget {
                                     this.setAttrValue("flexManager.fillX", value)
                                     const widgetStyle = {
                                         ...this.state.widgetOuterStyling,
-                                        flexGrow: value ? 1 : 0,
+                                        // flexGrow: value ? 1 : 0,
+                                        width: "100%"
                                     }
 
                                     this.updateState({
@@ -200,7 +185,9 @@ export class TkinterBase extends Widget {
                                     
                                     const widgetStyle = {
                                         ...this.state.widgetOuterStyling,
-                                        flexGrow: value ? 1 : 0,
+                                        height: "100%"
+
+                                        // flexGrow: value ? 1 : 0,
                                     }
                                     this.updateState({
                                         widgetOuterStyling: widgetStyle,
@@ -221,6 +208,22 @@ export class TkinterBase extends Widget {
                                     this.updateState({
                                         widgetOuterStyling: widgetStyle,
                                     })
+                                }
+                            },
+
+                            side: {
+                                label: "Align Side",
+                                tool: Tools.SELECT_DROPDOWN,
+                                options: ["left", "right", "top", "bottom", ""].map(val => ({value: val, label: val})),
+                                value: "",
+                                onChange: (value) => {
+
+                                    // FIXME: force parent rerender because, here only child get rerendered, if only parent get rerendered the widget would move
+                                    this.setAttrValue("flexManager.side", value)
+                                    
+                                    // this.props.parentWidgetRef.current.forceRerender()
+                                    // setTimeout(this.props.parentWidgetRef.current.forceRerender, 1)
+                                    // console.log("updateing state: ", value, this.props.parentWidgetRef.current)
                                 }
                             },
                             
@@ -331,9 +334,107 @@ export class TkinterBase extends Widget {
             }
         }
 
-        this.updateState(updates)
+        console.log("updates: ", updates)
+        
+        // FIXME: updates are async causing huge problems
+
+        // this.updateState(updates, () => {
+        //     console.log("updated atters: ", this.state)
+        // })
+
+        this.updateState((prevState) => ({...prevState, ...updates}))
+
 
         return updates
+    }
+
+    renderTkinterLayout = () => {
+        const {layout, direction, gap} = this.getLayout()
+        console.log("rendering: ", layout, this.state)
+        if (layout === Layouts.FLEX){
+            return (
+                <>
+                    {["top", "bottom", "left", "right", "center"].map((pos) => (
+                        <div key={pos} style={this.getFlexLayoutStyle(pos)}>
+                            {this.props.children.filter(item => {
+                                const packAttrs = item.ref?.current?.getPackAttrs()
+                                console.log("side: ", packAttrs, item, item.ref?.current?.getPackAttrs())
+                                // const widgetSide = item.ref.current?.getAttrValue("flexManager.side") || "left"
+                                // console.log("widget side: ", item.ref.current?.__id, item.ref.current, item.ref.current.getAttrValue("flexManager.side"))
+                                return ((packAttrs?.side || "right") === pos)
+                            })}
+                        </div>
+                    ))}
+                </>
+            )
+        }
+        console.log("hell a")
+        return (<>{this.props.children}</>)
+    }
+
+    getFlexLayoutStyle = (side) => {
+        const rowStyle = {
+            display: "flex",
+            gap: "10px"
+          }
+
+        const columnStyle = {
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px"
+        }
+
+        switch (side) {
+            case "top": return { gridColumn: "1 / -1", justifySelf: "center", ...columnStyle };
+            case "bottom": return { gridColumn: "1 / -1", justifySelf: "center", ...columnStyle };
+            case "left": return { gridRow: "2", gridColumn: "1", alignSelf: "center", ...rowStyle };
+            case "right": return { gridRow: "2", gridColumn: "3", alignSelf: "center", ...rowStyle };
+            case "center": return { gridRow: "2", gridColumn: "2", alignSelf: "center", justifySelf: "center" };
+            default: return {}
+        }
+        
+    }
+
+    setLayout(value) {
+        const { layout, direction, grid = { rows: 1, cols: 1 }, gap = 10, align } = value
+
+        console.log("setting layout: ", layout)
+
+        // FIXME the display grid is still flex
+        // FIXME: this should be grid only when the widget accepts children else flex or something tp center
+        // console.log("layout value: ", value)
+        // FIXME: In grid layout the layout doesn't adapt to the size of the child if resized
+
+        let display = "block"
+
+        if (layout !== Layouts.PLACE){
+            if (this.droppableTags !== null){
+                display = "grid"
+            }else{
+                display = "flex" // this is so that the labels and other elements are centered
+            }
+        }
+        
+        let widgetStyle = {
+            ...this.state.widgetInnerStyling,
+            // display: layout !== Layouts.PLACE ? "grid" : "block",
+            display: display,
+            // flexDirection: direction,
+            gap: `${gap}px`,
+            // flexWrap: "wrap",
+            gridTemplateColumns: layout === Layouts.FLEX ? "auto 1fr auto" : "repeat(auto-fill, minmax(100px, 1fr))",
+            gridTemplateRows: layout === Layouts.FLEX ? "auto 1fr auto" : "repeat(auto-fill, minmax(100px, 1fr))",  
+            // gridAutoRows: 'minmax(100px, auto)',  // Rows with minimum height of 100px, and grow to fit content
+            // gridAutoCols: 'minmax(100px, auto)',  // Cols with minimum height of 100px, and grow to fit content
+        }
+
+        this.updateState({
+            widgetInnerStyling: widgetStyle
+        })
+
+        this.setAttrValue("layout", value)
+        this.props.onLayoutUpdate({parentId: this.__id, parentLayout: value})// inform children about the layout update
+
     }
 
     getInnerRenderStyling(){
@@ -341,18 +442,18 @@ export class TkinterBase extends Widget {
 
         const {layout: parentLayout, direction, gap} = this.getParentLayout() || {}
 
-        if (parentLayout === Layouts.FLEX){
-            const fillX = this.getAttrValue("flexManager.fillX")
-            const fillY = this.getAttrValue("flexManager.fillY")
+        // if (parentLayout === Layouts.FLEX){
+        //     const fillX = this.getAttrValue("flexManager.fillX")
+        //     const fillY = this.getAttrValue("flexManager.fillY")
 
-            // This is needed if fillX or fillY is true, as the parent is applied flex-grow
+        //     // This is needed if fillX or fillY is true, as the parent is applied flex-grow
 
-            if (fillX || fillY){
-                width = "100%"
-                height = "100%"
-            }
+        //     if (fillX || fillY){
+        //         width = "100%"
+        //         height = "100%"
+        //     }
 
-        }
+        // }
 
         const styling = {
             ...this.state.widgetInnerStyling,
@@ -363,6 +464,35 @@ export class TkinterBase extends Widget {
         }
         return styling
     }
+
+    getRenderSize(){
+
+        let {width, height, minWidth, minHeight} = super.getRenderSize()
+
+        let fillX = this.getAttrValue("flexManager.fillX") || false
+        let fillY = this.getAttrValue("flexManager.fillY") || false
+
+        if (fillX){
+            width = "100%"
+        }
+
+        if (fillY){
+            height = "100%"
+        }
+        
+        return {width, height, minWidth, minHeight}
+
+    }
+
+
+    // serialize(){
+    //     const serializedValues = super.serialize()
+    //     console.log("serialized values: ", serializedValues)
+    //     return ({
+    //         ...serializedValues,
+    //         attrs: this.serializeAttrsValues()
+    //     })
+    // }
 
     /**
      * loads the data 
@@ -514,15 +644,17 @@ export class TkinterWidgetBase extends TkinterBase{
                             // this.setWidgetInnerStyle("paddingLeft", `${value}px`)
                             // this.setWidgetInnerStyle("paddingRight", `${value}px`)
 
-                            const widgetStyle = {
-                                ...this.state.widgetInnerStyling,
-                                paddingLeft: `${value}px`,
-                                paddingRight: `${value}px`
-                            }
-                            this.setState({
+                            // const widgetStyle = {
+                               
+                            // }
+                            this.setState((prevState) => ({
 
-                                widgetInnerStyling: widgetStyle
-                            })
+                                widgetInnerStyling: {
+                                    ...prevState.widgetInnerStyling,
+                                    paddingLeft: `${value}px`,
+                                    paddingRight: `${value}px`
+                                }
+                            }))
 
 
                             this.setAttrValue("padding.padX", value)
@@ -534,15 +666,19 @@ export class TkinterWidgetBase extends TkinterBase{
                         toolProps: {min: 0, max: 140},
                         value: null,
                         onChange: (value) => {
-                            const widgetStyle = {
-                                ...this.state.widgetInnerStyling,
-                                paddingTop: `${value}px`,
-                                paddingBottom: `${value}px`
-                            }
-                            this.setState({
 
-                                widgetInnerStyling: widgetStyle
-                            })
+                            this.setState((prevState) => ({
+
+                                widgetInnerStyling: {
+                                    ...prevState.widgetInnerStyling,
+                                    paddingTop: `${value}px`,
+                                    paddingBottom: `${value}px`
+                                }
+                            }))
+                            // this.setState({
+
+                            //     widgetInnerStyling: widgetStyle
+                            // })
                             this.setAttrValue("padding.padX", value)
                         }
                     },
@@ -586,7 +722,7 @@ export class TkinterWidgetBase extends TkinterBase{
                             this.setAttrValue("margin.marginY", value)
                         }
                     },
-                },
+                },       
                 font: {
                     label: "font",
                     fontFamily: {
