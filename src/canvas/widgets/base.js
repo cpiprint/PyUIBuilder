@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 import React from "react"
 import { NotImplementedError } from "../../utils/errors"
 
@@ -25,7 +27,7 @@ import { Layout, message } from "antd"
 
 const ATTRS_KEYS = ['value', 'label', 'tool', 'onChange', 'options', 'toolProps'] // these are attrs keywords, don't use these keywords as keys while defining the attrs property or serializing
 
-
+// FIXME: the initial data in canvas should be updated so when it remounts the widget doesn't change state
 /**
  * Base class to be extended
  */
@@ -77,6 +79,8 @@ class Widget extends React.Component {
             zIndex: 0,
             selected: false,
             isWidgetVisible: true,
+
+            forceRerenderId: "",
 
             widgetName: widgetName || 'widget', // this will later be converted to variable name
             enableRename: false, // will open the widgets editable div for renaming
@@ -202,13 +206,13 @@ class Widget extends React.Component {
         this.getRenderSize = this.getRenderSize.bind(this)
         this.getInnerRenderStyling = this.getInnerRenderStyling.bind(this)
 
+        this.updateState = this.updateState.bind(this)
+
         this.stateUpdateCallback = null // allowing other components such as toolbar to subscribe to changes in this widget
 
     }
 
     componentDidMount() {
-
-        console.log("state layout: ")
         this.setLayout({layout: Layouts.FLEX, gap: 10})
 
         // if (this.state.attrs.layout){
@@ -226,7 +230,15 @@ class Widget extends React.Component {
         if (prevProps !== this.props) {
             this.canvasMetaData = this.props.canvasMetaData
         }
+
     }
+
+    // componentWillUnmount(){
+    //     // TODO: serialize and store the widget data in setWidgets under widget context especially initialData
+    //     console.log("unmounting widget: ", this.state.attrs, this.serialize())
+        
+    //     // this.props.onUnmount(this.__id, this.serialize())
+    // }
 
 
     stateChangeSubscriberCallback = (callback) => {
@@ -241,24 +253,24 @@ class Widget extends React.Component {
      * @param {} newState  - this can either be a callback or a new State like (prevState) => ({key: value})
      * @param {*} callback - callback to run after setState
      */
-    updateState = (newState, callback) => {
-       
+    updateState(newState, callback){
+        // console.trace("Callback trace");
+        // debugger; 
+        
         // FIXME: maximum recursion error when updating size, color etc
         this.setState(newState, () => {
-            console.log("updatinhg./..: ", this.state)
+            // console.log("updatinhg./..: ", this.state, newState)
+
             const { onWidgetUpdate } = this.props
 
                 
             if (this.stateUpdateCallback)
                 this.stateUpdateCallback()
+
+            // FIXME: super inefficient
             // if (onWidgetUpdate) {
             //     onWidgetUpdate(this.__id)
             // }
-
-            // const { activeWidgetId, updateToolAttrs } = this.context
-
-            // if (activeWidgetId === this.__id)
-            //     updateToolAttrs(this.getToolbarAttrs())
 
             if (callback) callback()
 
@@ -326,10 +338,13 @@ class Widget extends React.Component {
             ...this.state.attrs,
 
         })
+        
     }
 
     forceRerender = () => {
-        this.forceUpdate()
+        // this.forceUpdate() // Don't use forceUpdate widgets will loose their states
+        this.setState({forceRerenderId: `${uuidv4()}`})
+        console.log("rerender")
     }
 
     // TODO: add context menu items such as delete, add etc
@@ -501,7 +516,6 @@ class Widget extends React.Component {
     setAttrValue(path, value, callback) {
 
         this.updateState((prevState) => { // since the  setState is Async only the prevState contains the latest state
-
             const keys = path.split('.')
             const lastKey = keys.pop()
 
@@ -806,6 +820,7 @@ class Widget extends React.Component {
         // NOTE: when serializing make sure, you are only passing serializable objects not functions or other
         return ({
             zIndex: this.state.zIndex,
+            selected: this.state.selected,
             widgetName: this.state.widgetName,
             pos: this.state.pos,
             size: this.state.size,
@@ -814,7 +829,7 @@ class Widget extends React.Component {
             widgetOuterStyling: this.state.widgetOuterStyling,
             parentLayout: this.state.parentLayout,
             positionType: this.state.positionType,
-            attrs: this.serializeAttrsValues() // makes sure that functions are not serialized
+            attrs: this.serializeAttrsValues(), // makes sure that functions are not serialized
         })
 
     }
@@ -830,9 +845,9 @@ class Widget extends React.Component {
 
         data = {...data} // create a shallow copy
 
-        const {attrs={}, pos={x: 0, y: 0}, parentLayout=null, ...restData} = data
+        const {attrs={}, selected, pos={x: 0, y: 0}, parentLayout=null, ...restData} = data
 
-
+        
         let layoutUpdates = {
             parentLayout: parentLayout.layout || null
         }
@@ -887,6 +902,10 @@ class Widget extends React.Component {
 
             this.updateState({ attrs: newAttrs }, callback)
 
+            if (selected){
+                this.select()
+                console.log("selected again")
+            } 
         })  
 
     }
@@ -1090,12 +1109,14 @@ class Widget extends React.Component {
             // console.log("Dropped on Sidebar: ", this.__id)
 
 
-            const parentRect = this.getBoundingRect()
+            // const parentRect = this.getBoundingRect()
+            const canvasRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
+
             const {zoom, pan} = this.props.canvasMetaData
 
             let initialPos = {
-                x: (e.clientX - parentRect.left) / zoom,
-                y: (e.clientY - parentRect.top) / zoom,
+                x: (e.clientX - canvasRect.left) / zoom,
+                y: (e.clientY - canvasRect.top) / zoom,
             }
 
             this.props.onCreateWidgetRequest(widgetClass, {x: initialPos.x, y: initialPos.y},({ id, widgetRef }) => {

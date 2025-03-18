@@ -51,10 +51,7 @@ function Premium({ children, className = "" }) {
                     >
                         more.
                     </a> 
-                    <div className="tw-text-sm tw-mt-2">
-                    Or you could support development by sharing this tool on your socials and you'll be eligible for a 
-                    &nbsp;<a href="https://tally.so/r/mJM22X" target="_blank" rel="noreferrer noopener">free license</a>.
-                    </div>
+                   
                 </div>
 
                 <section className="tw-mt-1 tw-flex tw-w-full tw-flex-col tw-place-items-center tw-p-[2%] max-lg:tw-p-2" id="pricing">
@@ -299,6 +296,11 @@ function Premium({ children, className = "" }) {
                                 <CrownFilled />
                             </a>
                         </div>
+                    </div>
+
+                    <div className="tw-text-sm tw-mt-4">
+                        Or you could support development by sharing this tool on your socials and you'll be eligible for a 
+                        &nbsp;<a href="https://tally.so/r/mJM22X" target="_blank" rel="noreferrer noopener">free license</a>.
                     </div>
                 </section>
 

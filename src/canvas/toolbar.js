@@ -15,7 +15,7 @@ import { AudioOutlined, FileImageOutlined, FileTextOutlined, VideoCameraOutlined
 import { useWidgetContext } from "./context/widgetContext.js"
 
 
-// FIXME: Maximum recursion error
+// FIXME: input cursors problem
 // FIXME: Every time the parent attrs are changed a remount happens, which causes input cursor to go to the end
 /**
  * 
@@ -340,10 +340,12 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
 
 
     const renderToolbar = (obj, parentKey = "", toolCount=0) => {
+        // console.log("obj: ", obj)
         const keys = []
 
         return Object.entries(obj).map(([key, val], i) => {
             const keyName = parentKey ? `${parentKey}.${key}` : key
+            // console.log("obj2: ", key, val)
 
             // Highlight outer labels in blue for first-level keys
             const isFirstLevel = parentKey === ""
@@ -351,6 +353,10 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
             const outerLabelClass = isFirstLevel
                 ? "tw-text-sm tw-text-black tw-font-medium"
                 : "tw-text-sm"
+
+            if (!val?.label){
+                return null
+            }
 
             // Render tool widgets
             if (typeof val === "object" && val.tool) {

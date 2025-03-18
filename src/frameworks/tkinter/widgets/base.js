@@ -2,6 +2,7 @@ import { Layouts, PosType } from "../../../canvas/constants/layouts"
 import Tools from "../../../canvas/constants/tools"
 import Widget from "../../../canvas/widgets/base"
 import { convertObjectToKeyValueString, isNumeric, removeKeyFromObject } from "../../../utils/common"
+import { randomArrayChoice } from "../../../utils/random"
 import { Tkinter_TO_WEB_CURSOR_MAPPING } from "../constants/cursor"
 import { Tkinter_To_GFonts } from "../constants/fontFamily"
 import { JUSTIFY, RELIEF } from "../constants/styling"
@@ -16,13 +17,23 @@ export class TkinterBase extends Widget {
         super(props)
 
         this.getLayoutCode = this.getLayoutCode.bind(this)
+        
+        console.log("constructor 1: ", this.__id, this.state)
 
         this.state = {
             ...this.state,
             flexSide: "left"
         }
+
+        this.getPackSide = this.getPackSide.bind(this)
+        this.renderTkinterLayout = this.renderTkinterLayout.bind(this)
     }
 
+    componentWillUnmount(){
+        console.log("unmounting from child: ", this.state.attrs, this.serialize(), this.__id)
+        super.componentWillUnmount()
+    }
+   
     getLayoutCode(){
         const {layout: parentLayout, direction, gap, align="start"} = this.getParentLayout()
 
@@ -102,10 +113,14 @@ export class TkinterBase extends Widget {
     }
 
     getPackAttrs = () => {
-
-        return {
+        // NOTE: tis returns (creates) a new object everytime causing unncessary renders
+        return ({
             side: this.state.flexSide,
-        }
+        })
+    }
+
+    getPackSide(){
+        return this.state.flexSide
     }
 
     setParentLayout(layout){
@@ -215,16 +230,23 @@ export class TkinterBase extends Widget {
                                 label: "Align Side",
                                 tool: Tools.SELECT_DROPDOWN,
                                 options: ["left", "right", "top", "bottom", ""].map(val => ({value: val, label: val})),
-                                value: "left",
+                                value: this.state.flexSide,
                                 onChange: (value) => {
-
+                                    console.log("call 0: ", value)
                                     // FIXME: force parent rerender because, here only child get rerendered, if only parent get rerendered the widget would move
-                                    this.setAttrValue("flexManager.side", value)
-                                    
-                                    this.setState({flexSide: value}, () => {
-                                        console.log("updated side: ", this.state.attrs)
-                                        setTimeout(this.props.parentWidgetRef.current.forceRerender, 1)
+                                    this.setAttrValue("flexManager.side", value, () => {
+                                        this.updateState({flexSide: value}, () => {
+                                            console.log("call")
+                                            this.props.requestWidgetDataUpdate(this.__id)
+                                            this.stateChangeSubscriberCallback()
+                                            // console.log("force rendering: ", this.state.flexSide)
+                                            // this.props.parentWidgetRef.current.forceRerender()
+                                            // setTimeout(, 1)
+                                        })
                                     })
+                                    
+                                    
+                                    
                                     // this.props.parentWidgetRef.current.forceRerender()
                                     // console.log("updateing state: ", value, this.props.parentWidgetRef.current)
                                 }
@@ -345,29 +367,38 @@ export class TkinterBase extends Widget {
         //     console.log("updated atters: ", this.state)
         // })
 
-        this.updateState((prevState) => ({...prevState, ...updates}))
+        console.log('setting paret layiout')
+        this.updateState((prevState) => ({...prevState, ...updates}), () => {
+            console.log("updated layout state: ", this.state.attrs)
+        })
 
 
         return updates
     }
 
-    renderTkinterLayout = () => {
+    renderTkinterLayout(){
         const {layout, direction, gap} = this.getLayout()
         console.log("rendering: ", layout, this.state)
         if (layout === Layouts.FLEX){
             return (
                 <>
-                    {["top", "bottom", "left", "right", "center"].map((pos) => (
-                        <div key={pos} style={this.getFlexLayoutStyle(pos)}>
-                            {this.props.children.filter(item => {
-                                const packAttrs = item.ref?.current?.getPackAttrs()
-                                console.log("side: ", packAttrs, item, item.ref?.current?.getPackAttrs())
-                                // const widgetSide = item.ref.current?.getAttrValue("flexManager.side") || "left"
-                                // console.log("widget side: ", item.ref.current?.__id, item.ref.current, item.ref.current.getAttrValue("flexManager.side"))
-                                return ((packAttrs?.side ) === pos)
-                            })}
-                        </div>
-                    ))}
+                    {(this.props.children.length > 0) && ["top", "bottom", "left", "right", "center"].map((pos) => {
+                        
+                        const filteredChildren = this.props.children.filter((item) => {
+                            const widgetRef = item.ref?.current
+                            if (!widgetRef) return false // Ensure ref exists before accessing
+
+                            const packAttrs = widgetRef.getPackSide()// Cache value
+                            console.log("pack attrs: ", widgetRef.getPackSide())
+                            return packAttrs === pos
+                        })
+                        console.log("filtered children:", filteredChildren, pos)
+                        return (
+                            <div key={pos} style={this.getFlexLayoutStyle(pos)}>
+                                {filteredChildren}
+                            </div>
+                        )
+                    })}
                 </>
             )
         }
@@ -407,10 +438,6 @@ export class TkinterBase extends Widget {
     setLayout(value) {
         const { layout, direction, grid = { rows: 1, cols: 1 }, gap = 10, align } = value
 
-        console.log("setting layout: ", layout)
-
-        // FIXME the display grid is still flex
-        // FIXME: this should be grid only when the widget accepts children else flex or something tp center
         // console.log("layout value: ", value)
         // FIXME: In grid layout the layout doesn't adapt to the size of the child if resized
 
@@ -505,8 +532,10 @@ export class TkinterBase extends Widget {
 
 
     serialize(){
+        console.log("serialzied item: ", this.state.attrs, super.serialize(), this.__id, this.serializeAttrsValues())
         return ({
             ...super.serialize(),
+            attrs: this.serializeAttrsValues(), // makes sure that functions are not serialized
             flexSide: this.state.flexSide
         })
     }
@@ -523,7 +552,10 @@ export class TkinterBase extends Widget {
 
         data = {...data} // create a shallow copy
 
-        const {attrs={}, pos={x: 0, y: 0}, parentLayout=null, ...restData} = data
+        console.log("data reloaded: ", data)
+
+
+        const {attrs={}, selected, pos={x: 0, y: 0}, parentLayout=null, ...restData} = data
 
         let layoutUpdates = {
             parentLayout: parentLayout
@@ -551,14 +583,12 @@ export class TkinterBase extends Widget {
             pos
         }
         
-        console.log("data: ", newData)
 
         this.setState(newData,  () => {
             let layoutAttrs = this.setParentLayout(parentLayout).attrs || {}
             
             // UPdates attrs
             let newAttrs = { ...this.state.attrs, ...layoutAttrs }
-            console.log("new attrs: ", newAttrs, attrs)
             // Iterate over each path in the updates object
             Object.entries(attrs).forEach(([path, value]) => {
                 const keys = path.split('.')
@@ -582,9 +612,12 @@ export class TkinterBase extends Widget {
                 // TODO: find a better way to apply innerStyles
                 this.setWidgetInnerStyle("backgroundColor", newAttrs.styling.backgroundColor.value)
             }
-            console.log("new arttrs: ", newData)
             this.updateState({ attrs: newAttrs }, callback)
 
+            if (selected){
+                this.select()
+                console.log("selected again")
+            } 
         })  
 
 

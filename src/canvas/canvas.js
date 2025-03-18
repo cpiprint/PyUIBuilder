@@ -135,7 +135,6 @@ class Canvas extends React.Component {
     }
 
     componentWillUnmount() {
-        console.log("unmounted")
 
         this.canvasContainerRef.current.removeEventListener("mousedown", this.mouseDownEvent)
         this.canvasContainerRef.current.removeEventListener("mouseup", this.mouseUpEvent)
@@ -1210,6 +1209,53 @@ class Canvas extends React.Component {
 
     }
 
+    /**
+     * Update the widget's initial data, else when there is a remount, you'll loose all the state 
+     * 
+     * TODO: Find a efficient way to call this function
+     * 
+     * NOTE: this would cause entire widgetList to remount
+     * NOTE: this would cause the toolbar to loose active widget
+     */
+    updateWidgetData = (widgetId, latestData) => {
+        
+        const widgetObj = this.getWidgetById(widgetId)?.current
+        // console.log("Data unmount: ", this.widgets, this.widgetRefs, widgetObj, widgetId, widgetObj?.serialize(), latestData)
+
+        if (!widgetObj){
+            return
+        }
+        
+
+        this.setWidgets(prevWidgets => {
+            const updateWidget = (widgets) => {
+                return widgets.map(widget => {
+                    if (widget.id === widgetId) {
+                        return { 
+                            ...widget, 
+                            initialData: { 
+                                ...widget.initialData, 
+                                ...widgetObj.serialize() 
+                            } 
+                        };
+                    }
+        
+                    if (widget.children && widget.children.length > 0) {
+                        return { 
+                            ...widget, 
+                            children: updateWidget(widget.children) // Always return new children
+                        };
+                    }
+        
+                    return widget; // Return unchanged widget
+                });
+            };
+        
+            return updateWidget(prevWidgets);
+        })
+
+    }
+
 
     renderWidget = (widget) => {
 
@@ -1252,19 +1298,25 @@ class Canvas extends React.Component {
                     pan: this.state.currentTranslate
                 }}
 
+
                 onSelect={handleWidgetSelect}
                 
                 onWidgetDeleteRequest={this.removeWidget}
 
                 onPanToWidget={this.panToWidget}
+                
+                requestWidgetDataUpdate={this.updateWidgetData}
+                // onWidgetUpdate={this.onActiveWidgetUpdate}
+                // onWidgetUpdate={this.updateWidgetDataOnUnmount}
+                // onUnmount={this.updateWidgetDataOnUnmount}
 
-                onWidgetUpdate={this.onActiveWidgetUpdate}
                 onAddChildWidget={this.handleAddWidgetChild}
                 onCreateWidgetRequest={this.createWidget} // create widget when dropped from sidebar
                 onWidgetResizing={(resizeSide) => this.setState({ widgetResizing: resizeSide })}
                 // onWidgetDragStart={() => this.setState({isWidgetDragging: true})}
                 // onWidgetDragEnd={() => this.setState({isWidgetDragging: false})}
                 onLayoutUpdate={this.updateChildLayouts}
+
             >
                 {/* Render children inside the parent with layout applied */}
                 {renderChildren(children)}

@@ -52,7 +52,7 @@ function Header({projectName, onProjectNameChange, framework, onFrameworkChange,
                                     tw-border-gray-400 tw-rounded-md tw-no-underline tw-border-solid hover:tw-bg-[#9333EA]
                                     hover:tw-text-white tw-duration-200
                                     tw-text-black tw-text-center tw-px-4 tw-text-sm tw-cursor-pointer">
-                                        Join Waitlist
+                                        Get Updates
                 </button>
                 <Premium className="tw-text-2xl tw-bg-purple-600 tw-text-center 
                                     tw-w-[40px] tw-min-w-[40px] tw-h-[35px] tw-rounded-md 
