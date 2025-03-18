@@ -1238,6 +1238,17 @@ class Widget extends React.Component {
         )
     }
 
+    // requestUpdateWidgetPos = () => {
+    //     const canvasRectInner = this.props.canvasInnerContainerRef?.current?.getBoundingClientRect();
+    //     const elementRect = this.getBoundingRect();
+    //     const { zoom } = this.props.canvasMetaData;
+    
+    //     const left = ((elementRect?.left || 0) - canvasRectInner?.left) / zoom - 10;
+    //     const top = ((elementRect?.top || 0) - canvasRectInner?.top) / zoom - 10;
+    
+    //     this.setState({ pos: {x: left, y: top} });
+    // }
+
     /**
      * This is an internal methods don't override
      * @returns {HTMLElement}
@@ -1310,7 +1321,7 @@ class Widget extends React.Component {
 
                         const left = ((elementRect?.left || 0) - canvasRectInner?.left) / canvasZoom - 10
                         const top = ((elementRect?.top || 0) - canvasRectInner?.top) / canvasZoom - 10
-
+                        
                         return ( 
                             <div data-widget-id={this.__id}
                                 ref={this.elementRef}
@@ -1365,10 +1376,8 @@ class Widget extends React.Component {
                                         style={{
                                          
                                             position: "fixed", // transforms are applied on parent so its going to be relative to parent
-                                            // TODO: this Change left and top with elementRect.left
                                             left: left,
                                             top: top,
-
                                             // width: this.state.size.width + 20,
                                             // height: this.state.size.height + 20,
                                             // TODO: this isn't smooth when zooming

@@ -22,18 +22,17 @@ export class TkinterBase extends Widget {
 
         this.state = {
             ...this.state,
-            flexSide: "left"
+            packAttrs: {
+                side: "left",
+                anchor: "nw"
+            }
         }
 
         this.getPackSide = this.getPackSide.bind(this)
         this.renderTkinterLayout = this.renderTkinterLayout.bind(this)
     }
 
-    componentWillUnmount(){
-        console.log("unmounting from child: ", this.state.attrs, this.serialize(), this.__id)
-        super.componentWillUnmount()
-    }
-   
+ 
     getLayoutCode(){
         const {layout: parentLayout, direction, gap, align="start"} = this.getParentLayout()
 
@@ -115,12 +114,13 @@ export class TkinterBase extends Widget {
     getPackAttrs = () => {
         // NOTE: tis returns (creates) a new object everytime causing unncessary renders
         return ({
-            side: this.state.flexSide,
+            side: this.state.packAttrs.side,
+            anchor: this.state.packAttrs.anchor,
         })
     }
 
     getPackSide(){
-        return this.state.flexSide
+        return this.state.packAttrs.side
     }
 
     setParentLayout(layout){
@@ -177,7 +177,42 @@ export class TkinterBase extends Widget {
                         flexManager: {
                             label: "Pack Manager",
                             display: "horizontal",
-                            
+                            side: {
+                                label: "Align Side",
+                                tool: Tools.SELECT_DROPDOWN,
+                                options: ["left", "right", "top", "bottom", ""].map(val => ({value: val, label: val})),
+                                value: this.state.packAttrs.side,
+                                onChange: (value) => {
+                                    // FIXME: force parent rerender because, here only child get rerendered, if only parent get rerendered the widget would move
+                                    this.setAttrValue("flexManager.side", value, () => {
+                                        this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, side: value}}), () => {
+                                            this.props.requestWidgetDataUpdate(this.__id)
+                                            this.stateChangeSubscriberCallback() // call this to notify the toolbar that the widget has changed state
+                                            // this.props.parentWidgetRef.current.forceRerender()
+                                        })
+                                    })
+
+                                    
+                                    // console.log("updateing state: ", value, this.props.parentWidgetRef.current)
+                                }
+                            },
+                            anchor: {
+                                label: "Anchor",
+                                tool: Tools.SELECT_DROPDOWN,
+                                options: ["nw", "ne", "sw", "se", "center"].map(val => ({value: val, label: val})),
+                                value: this.state.packAttrs.anchor,
+                                onChange: (value) => {
+                                    this.setAttrValue("flexManager.anchor", value, () => {
+                                        console.log("anchor updated")
+                                        this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, anchor: value}}), () => {
+                                            this.props.requestWidgetDataUpdate(this.__id)
+                                            this.stateChangeSubscriberCallback() // call this to notify the toolbar that the widget has changed state
+                                            // this.props.parentWidgetRef.current.forceRerender()
+                                        })
+                                        // this.props.parentWidgetRef.current.forceRerender()
+                                    })   
+                                }
+                            },
                             fillX: {
                                 label: "Fill X",
                                 tool: Tools.CHECK_BUTTON,
@@ -223,32 +258,6 @@ export class TkinterBase extends Widget {
                                     this.updateState({
                                         widgetOuterStyling: widgetStyle,
                                     })
-                                }
-                            },
-
-                            side: {
-                                label: "Align Side",
-                                tool: Tools.SELECT_DROPDOWN,
-                                options: ["left", "right", "top", "bottom", ""].map(val => ({value: val, label: val})),
-                                value: this.state.flexSide,
-                                onChange: (value) => {
-                                    console.log("call 0: ", value)
-                                    // FIXME: force parent rerender because, here only child get rerendered, if only parent get rerendered the widget would move
-                                    this.setAttrValue("flexManager.side", value, () => {
-                                        this.updateState({flexSide: value}, () => {
-                                            console.log("call")
-                                            this.props.requestWidgetDataUpdate(this.__id)
-                                            this.stateChangeSubscriberCallback()
-                                            // console.log("force rendering: ", this.state.flexSide)
-                                            // this.props.parentWidgetRef.current.forceRerender()
-                                            // setTimeout(, 1)
-                                        })
-                                    })
-                                    
-                                    
-                                    
-                                    // this.props.parentWidgetRef.current.forceRerender()
-                                    // console.log("updateing state: ", value, this.props.parentWidgetRef.current)
                                 }
                             },
                             
@@ -359,54 +368,17 @@ export class TkinterBase extends Widget {
             }
         }
 
-        console.log("updates: ", updates)
-        
-        // FIXME: updates are async causing huge problems
 
-        // this.updateState(updates, () => {
-        //     console.log("updated atters: ", this.state)
-        // })
-
-        console.log('setting paret layiout')
-        this.updateState((prevState) => ({...prevState, ...updates}), () => {
-            console.log("updated layout state: ", this.state.attrs)
-        })
+        this.updateState((prevState) => ({...prevState, ...updates}))
 
 
         return updates
     }
 
-    renderTkinterLayout(){
-        const {layout, direction, gap} = this.getLayout()
-        console.log("rendering: ", layout, this.state)
-        if (layout === Layouts.FLEX){
-            return (
-                <>
-                    {(this.props.children.length > 0) && ["top", "bottom", "left", "right", "center"].map((pos) => {
-                        
-                        const filteredChildren = this.props.children.filter((item) => {
-                            const widgetRef = item.ref?.current
-                            if (!widgetRef) return false // Ensure ref exists before accessing
+    getFlexLayoutStyle = (side, anchor) => {
+        // let baseStyle = { display: "flex", width: "100%", height: "100%", ...this.getPackAnchorStyle(anchor) }
+        let baseStyle = { }
 
-                            const packAttrs = widgetRef.getPackSide()// Cache value
-                            console.log("pack attrs: ", widgetRef.getPackSide())
-                            return packAttrs === pos
-                        })
-                        console.log("filtered children:", filteredChildren, pos)
-                        return (
-                            <div key={pos} style={this.getFlexLayoutStyle(pos)}>
-                                {filteredChildren}
-                            </div>
-                        )
-                    })}
-                </>
-            )
-        }
-        console.log("hell a")
-        return (<>{this.props.children}</>)
-    }
-
-    getFlexLayoutStyle = (side) => {
         const rowStyle = {
             display: "flex",
             gap: "10px"
@@ -420,20 +392,101 @@ export class TkinterBase extends Widget {
 
         switch (side) {
             case "top":
-                return { gridColumn: "1 / -1", alignSelf: "stretch", width: "100%", ...columnStyle };
+                return { gridColumn: "1 / -1", alignSelf: "stretch", width: "100%", ...baseStyle, ...columnStyle };
             case "bottom":
-                return { gridColumn: "1 / -1", alignSelf: "stretch", width: "100%", ...columnStyle };
+                return { gridColumn: "1 / -1", alignSelf: "stretch", width: "100%", ...baseStyle, ...columnStyle };
             case "left":
-                return { gridRow: "2", gridColumn: "1", justifySelf: "stretch", height: "100%", ...rowStyle };
+                return { gridRow: "2", gridColumn: "1", justifySelf: "stretch", height: "100%", ...baseStyle, ...rowStyle };
             case "right":
-                return { gridRow: "2", gridColumn: "3", justifySelf: "stretch", height: "100%", ...rowStyle };
+                return { gridRow: "2", gridColumn: "3", justifySelf: "stretch", height: "100%", ...baseStyle, ...rowStyle };
             case "center":
-                return { gridRow: "2", gridColumn: "2", alignSelf: "center", justifySelf: "center" };
+                return { gridRow: "2", gridColumn: "2", alignSelf: "center", justifySelf: "center", ...baseStyle, };
             default:
                 return {};
         }
         
     }
+
+    /**
+     * Pack manager has anchor parameter
+     * @param {*} anchor 
+     */
+    getPackAnchorStyle = (anchor, isColumn) => {
+        const styleMap = {
+          nw: { justifyContent: "flex-start", alignItems: "flex-start" },
+          ne: { justifyContent: "flex-end", alignItems: "flex-start" },
+          sw: { justifyContent: "flex-start", alignItems: "flex-end" },
+          se: { justifyContent: "flex-end", alignItems: "flex-end" },
+          center: { justifyContent: "center", alignItems: "center" }
+        }
+        // return styleMap[anchor] || {}
+
+        const baseStyle = styleMap[anchor] || {};
+        const fillX = this.getAttrValue("flexManager.fillX")
+        const fillY = this.getAttrValue("flexManager.fillY")
+        
+        if (fillX) {
+            return { ...baseStyle, width: "100%", flexGrow: isColumn ? 0 : 1 }; 
+        } 
+        if (fillY) {
+            return { ...baseStyle, height: "100%", flexGrow: isColumn ? 1 : 0 };
+        } 
+        if (fillX && fillY) {
+            return { ...baseStyle, width: "100%", height: "100%", flexGrow: 1 };
+        }
+
+        return {
+            ...baseStyle, alignSelf: "stretch",   // Forces stretching in grid rows
+            justifySelf: "stretch", // Forces stretching in grid columns
+            // flexGrow: fill ? 1 : 0
+            };
+    }
+
+    /**
+     * 
+     * Helps with pack layout manager and grid manager
+     */
+    renderTkinterLayout(){
+        const {layout, direction, gap} = this.getLayout()
+        if (layout === Layouts.FLEX){
+            return (
+                <>
+                    {(this.props.children.length > 0) && ["top", "bottom", "left", "right"].map((pos) => {
+                        
+                        const filteredChildren = this.props.children.filter((item) => {
+                            const widgetRef = item.ref?.current
+                            if (!widgetRef) return false // Ensure ref exists before accessing
+
+                            const packAttrs = widgetRef.getPackAttrs()// Cache value
+                            return (packAttrs.side || "left") === pos
+                        })
+                        const isColumn = pos === "top" || pos === "bottom"; 
+                        return (
+                            <div key={pos} style={this.getFlexLayoutStyle(pos, "")}>
+                                {/* {filteredChildren} */}
+                                {filteredChildren.map((widget) => {
+                                    const widgetRef = widget.ref?.current;
+                                    const anchor = widgetRef ? widgetRef.getPackAttrs().anchor : "nw";
+                                    return (
+                                        <div key={`pack_${widgetRef.__id}`} id={`pack_${widgetRef.__id}`} 
+                                            style={{
+                                                display: "flex", 
+                                                flex: 1, 
+                                                ...this.getPackAnchorStyle(anchor, isColumn)}
+                                                }>
+                                            {widget}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )
+                    })}
+                </>
+            )
+        }
+        return (<>{this.props.children}</>)
+    }
+
 
     setLayout(value) {
         const { layout, direction, grid = { rows: 1, cols: 1 }, gap = 10, align } = value
@@ -521,22 +574,11 @@ export class TkinterBase extends Widget {
     }
 
 
-    // serialize(){
-    //     const serializedValues = super.serialize()
-    //     console.log("serialized values: ", serializedValues)
-    //     return ({
-    //         ...serializedValues,
-    //         attrs: this.serializeAttrsValues()
-    //     })
-    // }
-
-
     serialize(){
-        console.log("serialzied item: ", this.state.attrs, super.serialize(), this.__id, this.serializeAttrsValues())
         return ({
             ...super.serialize(),
             attrs: this.serializeAttrsValues(), // makes sure that functions are not serialized
-            flexSide: this.state.flexSide
+            packAttrs: this.state.packAttrs,
         })
     }
 
