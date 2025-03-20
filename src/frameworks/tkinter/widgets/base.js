@@ -508,10 +508,13 @@ export class TkinterBase extends Widget {
                 <div data-pack-container={side} style={{
                     display: "flex",
                     flexDirection: currentWidgetDirection,
-                    width: "100%"
+                    width: "100%",
+                    height: "100%"
+                    //TODO: if flex direction is top then width is 100% else height
                 }}>
 
-                    <div className="tw-flex tw-justify-center tw-items-center tw-w-full">
+                    <div className={`tw-flex tw-justify-center tw-items-center 
+                                        ${(["top", "bottom"].includes(side)) ? "tw-w-full" : "tw-h-full"}`}>
                         {widget}
                     </div>
                     
