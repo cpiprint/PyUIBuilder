@@ -635,12 +635,12 @@ class Widget extends React.Component {
 
             const elementRect = this.elementRef.current.getBoundingClientRect() 
             // console.log("winner: ", this.props.parentWidgetRef.current.getBoundingRect())
-            const parentRect = this.props.parentWidgetRef.current.getBoundingRect()
+            const parentRect = this.props.parentWidgetRef.current?.getBoundingRect()
 
             // FIXME: (low priority) once the place is moved and back to flex the position the updated position is not reflected
             let pos = {
-                x: (elementRect.left - parentRect.left) / this.canvasMetaData.zoom,
-                y: (elementRect.top - parentRect.top) / this.canvasMetaData.zoom
+                x: (elementRect.left - (parentRect?.left || 0)) / this.canvasMetaData.zoom,
+                y: (elementRect.top - (parentRect?.top || 0)) / this.canvasMetaData.zoom
             }
 
             this.setPos(pos.x, pos.y)
@@ -849,7 +849,7 @@ class Widget extends React.Component {
 
         
         let layoutUpdates = {
-            parentLayout: parentLayout.layout || null
+            parentLayout: parentLayout?.layout || null
         }
 
         if (parentLayout?.layout === Layouts.FLEX || parentLayout?.layout === Layouts.GRID){

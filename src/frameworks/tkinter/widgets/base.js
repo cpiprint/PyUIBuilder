@@ -23,7 +23,7 @@ export class TkinterBase extends Widget {
         this.state = {
             ...this.state,
             packAttrs: {
-                side: "left",
+                side: "top",
                 anchor: "nw"
             }
         }
@@ -186,7 +186,9 @@ export class TkinterBase extends Widget {
                                     // FIXME: force parent rerender because, here only child get rerendered, if only parent get rerendered the widget would move
                                     this.setAttrValue("flexManager.side", value, () => {
                                         this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, side: value}}), () => {
-                                            this.props.requestWidgetDataUpdate(this.__id)
+                                            console.log("parent: ",this.props.parentWidgetRef.current.__id)
+                                           
+                                            this.props.requestWidgetDataUpdate(this.props.parentWidgetRef.current.__id)
                                             this.stateChangeSubscriberCallback() // call this to notify the toolbar that the widget has changed state
                                             // this.props.parentWidgetRef.current.forceRerender()
                                         })
@@ -205,7 +207,10 @@ export class TkinterBase extends Widget {
                                     this.setAttrValue("flexManager.anchor", value, () => {
                                         console.log("anchor updated")
                                         this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, anchor: value}}), () => {
-                                            this.props.requestWidgetDataUpdate(this.__id)
+                                          
+                                            this.props.requestWidgetDataUpdate(this.props.parentWidgetRef.current.__id)
+                                            
+                                            // this.props.requestWidgetDataUpdate(this.__id)
                                             this.stateChangeSubscriberCallback() // call this to notify the toolbar that the widget has changed state
                                             // this.props.parentWidgetRef.current.forceRerender()
                                         })
@@ -381,24 +386,24 @@ export class TkinterBase extends Widget {
 
         const rowStyle = {
             display: "flex",
-            gap: "10px"
+            gap: "10px",
           }
 
         const columnStyle = {
             display: "flex",
             flexDirection: "column",
-            gap: "10px"
+            gap: "10px",
         }
 
         switch (side) {
             case "top":
-                return { gridColumn: "1 / -1", alignSelf: "stretch", width: "100%", ...baseStyle, ...columnStyle };
+                return { gridColumn: "1 / -1", alignSelf: "stretch", ...baseStyle, ...columnStyle };
             case "bottom":
-                return { gridColumn: "1 / -1", alignSelf: "stretch", width: "100%", ...baseStyle, ...columnStyle };
+                return { gridColumn: "1 / -1", alignSelf: "stretch", ...baseStyle, ...columnStyle };
             case "left":
-                return { gridRow: "2", gridColumn: "1", justifySelf: "stretch", height: "100%", ...baseStyle, ...rowStyle };
+                return { gridRow: "2", gridColumn: "1", justifySelf: "stretch", ...baseStyle, ...rowStyle };
             case "right":
-                return { gridRow: "2", gridColumn: "3", justifySelf: "stretch", height: "100%", ...baseStyle, ...rowStyle };
+                return { gridRow: "2", gridColumn: "3", justifySelf: "stretch", ...baseStyle, ...rowStyle };
             case "center":
                 return { gridRow: "2", gridColumn: "2", alignSelf: "center", justifySelf: "center", ...baseStyle, };
             default:
@@ -438,9 +443,92 @@ export class TkinterBase extends Widget {
         return {
             ...baseStyle, alignSelf: "stretch",   // Forces stretching in grid rows
             justifySelf: "stretch", // Forces stretching in grid columns
-            // flexGrow: fill ? 1 : 0
+            flexGrow: (fillX || fillY) ? 1 : 0
             };
     }
+      
+
+    /**
+     * adds the layout to achieve the pack from tkinter refer: https://www.youtube.com/watch?v=rbW1iJO1psk
+     * @param {*} widgets 
+     * @param {*} index 
+     * @returns 
+     */
+    renderPackWidgetsRecursively = (widgets, index = 0, lastSide="") => {
+        console.log("widgets: ", widgets, index)
+
+        //FIXME: when the first element is left, the second is top the second should also have its own container
+        if (index >= widgets.length) return null
+
+
+        const widget = widgets[index]
+        const widgetRef = widget.ref?.current
+        if (!widgetRef) return null // Ensure ref exists before accessing
+        
+        const side = widgetRef.getPackAttrs()?.side || "top"
+        
+        const direction = (s) => {
+            return  (s === "bottom"
+                        ? "column-reverse"
+                        : s === "top"
+                        ? "column"
+                        : s === "right"
+                        ? "row-reverse"
+                        : "row")
+        }
+          
+        const currentWidgetDirection = direction(side)
+
+
+        const isSameSide = lastSide === side
+        lastSide = side; // Update last side for next recursion
+
+        // console.log("current widget direction: ", isSameSide, currentWidgetDirection)
+
+        if (isSameSide) {
+            return (
+                <>
+                    {/* <div style={{
+                            display: "flex",
+                            flexDirection: direction,
+                            width: "100%"
+                    }}>{widget}</div> */}
+                    <div className="tw-flex tw-justify-center tw-items-center tw-w-full">
+                        {widget}
+                    </div>
+
+                    {/* <WidgetOuter key={index}>{widget}</WidgetOuter> */}
+                    {this.renderPackWidgetsRecursively(widgets, index + 1, side)}
+                </>
+            )
+          }
+        
+          // If next widget has a different side, create a new container for it
+          return (
+                <div data-pack-container={side} style={{
+                    display: "flex",
+                    flexDirection: currentWidgetDirection,
+                    width: "100%"
+                }}>
+
+                    <div className="tw-flex tw-justify-center tw-items-center tw-w-full">
+                        {widget}
+                    </div>
+                    
+                    {/* <div data-pack-container-inner style={{
+                        display: "flex",
+                        flexDirection: nextWidgetDirection,
+                        width: "100%"
+                    }}>
+                    </div> */}
+                    {this.renderPackWidgetsRecursively(widgets, index + 1, side)}
+                    {/* FIXME: why is the pack widgets recursively outside container? */}
+                </div>
+               
+          );
+      
+    };
+      
 
     /**
      * 
@@ -449,38 +537,11 @@ export class TkinterBase extends Widget {
     renderTkinterLayout(){
         const {layout, direction, gap} = this.getLayout()
         if (layout === Layouts.FLEX){
+
+
             return (
                 <>
-                    {(this.props.children.length > 0) && ["top", "bottom", "left", "right"].map((pos) => {
-                        
-                        const filteredChildren = this.props.children.filter((item) => {
-                            const widgetRef = item.ref?.current
-                            if (!widgetRef) return false // Ensure ref exists before accessing
-
-                            const packAttrs = widgetRef.getPackAttrs()// Cache value
-                            return (packAttrs.side || "left") === pos
-                        })
-                        const isColumn = pos === "top" || pos === "bottom"; 
-                        return (
-                            <div key={pos} style={this.getFlexLayoutStyle(pos, "")}>
-                                {/* {filteredChildren} */}
-                                {filteredChildren.map((widget) => {
-                                    const widgetRef = widget.ref?.current;
-                                    const anchor = widgetRef ? widgetRef.getPackAttrs().anchor : "nw";
-                                    return (
-                                        <div key={`pack_${widgetRef.__id}`} id={`pack_${widgetRef.__id}`} 
-                                            style={{
-                                                display: "flex", 
-                                                flex: 1, 
-                                                ...this.getPackAnchorStyle(anchor, isColumn)}
-                                                }>
-                                            {widget}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )
-                    })}
+                    {this.renderPackWidgetsRecursively(this.props.children)}
                 </>
             )
         }
@@ -506,13 +567,16 @@ export class TkinterBase extends Widget {
         
         let widgetStyle = {
             ...this.state.widgetInnerStyling,
-            // display: layout !== Layouts.PLACE ? "grid" : "block",
-            display: display,
+            display: layout !== Layouts.PLACE ? layout : "block",
+            flexDirection: "column",
             // flexDirection: direction,
             gap: `${gap}px`,
             // flexWrap: "wrap",
-            gridTemplateColumns: layout === Layouts.FLEX ? "auto 1fr auto" : "repeat(auto-fill, minmax(100px, 1fr))",
-            gridTemplateRows: layout === Layouts.FLEX ? "auto 1fr auto" : "repeat(auto-fill, minmax(100px, 1fr))",  
+
+            gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+            gridTemplateRows: "repeat(auto-fill, minmax(100px, 1fr))",  
+            // gridTemplateColumns: layout === Layouts.FLEX ? "minmax(auto, 1fr) 1fr minmax(auto, 1fr)" : "repeat(auto-fill, minmax(100px, 1fr))",
+            // gridTemplateRows: layout === Layouts.FLEX ? "minmax(auto, 1fr) 1fr minmax(auto, 1fr)" : "repeat(auto-fill, minmax(100px, 1fr))",  
             // gridAutoRows: 'minmax(100px, auto)',  // Rows with minimum height of 100px, and grow to fit content
             // gridAutoCols: 'minmax(100px, auto)',  // Cols with minimum height of 100px, and grow to fit content
         }
@@ -528,7 +592,7 @@ export class TkinterBase extends Widget {
 
     getInnerRenderStyling(){
         let {width, height, minWidth, minHeight} = this.getRenderSize()
-
+        
         const {layout: parentLayout, direction, gap} = this.getParentLayout() || {}
 
         // if (parentLayout === Layouts.FLEX){
@@ -543,7 +607,7 @@ export class TkinterBase extends Widget {
         //     }
 
         // }
-
+        
         const styling = {
             ...this.state.widgetInnerStyling,
             width, 

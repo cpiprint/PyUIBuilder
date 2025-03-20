@@ -224,6 +224,8 @@ class Canvas extends React.Component {
             }
         }
 
+        console.log("inner widget: ", innerWidget, target)
+
         return innerWidget
     }
 
@@ -253,7 +255,6 @@ class Canvas extends React.Component {
     }
 
     mouseDownEvent(event) {
-
         this.mousePos = { x: event.clientX, y: event.clientY }
 
         let selectedWidget = this.getWidgetFromTarget(event.target)
@@ -1217,7 +1218,7 @@ class Canvas extends React.Component {
      * NOTE: this would cause entire widgetList to remount
      * NOTE: this would cause the toolbar to loose active widget
      */
-    updateWidgetData = (widgetId, latestData) => {
+    updateWidgetData = (widgetId) => {
         
         const widgetObj = this.getWidgetById(widgetId)?.current
         // console.log("Data unmount: ", this.widgets, this.widgetRefs, widgetObj, widgetId, widgetObj?.serialize(), latestData)
@@ -1256,6 +1257,33 @@ class Canvas extends React.Component {
 
     }
 
+    // FIXME: this must update the childrens corectly
+    updateWidgetAndChildren = (widgetId) => {
+         const serializeWidgetRecursively = (widget) => {
+        const widgetObj = this.getWidgetById(widget.id)?.current;
+        if (!widgetObj) return widget; // If no widget reference found, return unchanged
+
+        return {
+            ...widget,
+            initialData: {
+                ...widget.initialData,
+                ...widgetObj.serialize()
+            },
+            children: widget.children?.map(serializeWidgetRecursively) || [] // Recursively serialize children
+        };
+    };
+
+        this.setWidgets(prevWidgets => {
+            const updateWidgets = (widgets) => {
+                return widgets.map(widget => 
+                    widget.id === widgetId ? serializeWidgetRecursively(widget) : widget
+                );
+            };
+
+            return updateWidgets(prevWidgets);
+        });
+    };
+    
 
     renderWidget = (widget) => {
 
@@ -1305,7 +1333,8 @@ class Canvas extends React.Component {
 
                 onPanToWidget={this.panToWidget}
                 
-                requestWidgetDataUpdate={this.updateWidgetData}
+                requestWidgetDataUpdate={this.updateWidgetAndChildren}
+                // requestWidgetDataUpdate={this.updateWidgetData}
                 // onWidgetUpdate={this.onActiveWidgetUpdate}
                 // onWidgetUpdate={this.updateWidgetDataOnUnmount}
                 // onUnmount={this.updateWidgetDataOnUnmount}
