@@ -18,8 +18,6 @@ export class TkinterBase extends Widget {
 
         this.getLayoutCode = this.getLayoutCode.bind(this)
         
-        console.log("constructor 1: ", this.__id, this.state)
-
         this.state = {
             ...this.state,
             packAttrs: {
@@ -177,47 +175,27 @@ export class TkinterBase extends Widget {
                         flexManager: {
                             label: "Pack Manager",
                             display: "horizontal",
-                            side: {
-                                label: "Align Side",
-                                tool: Tools.SELECT_DROPDOWN,
-                                options: ["left", "right", "top", "bottom", ""].map(val => ({value: val, label: val})),
-                                value: this.state.packAttrs.side,
-                                onChange: (value) => {
-                                    // FIXME: force parent rerender because, here only child get rerendered, if only parent get rerendered the widget would move
-                                    this.setAttrValue("flexManager.side", value, () => {
-                                        this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, side: value}}), () => {
-                                            console.log("parent: ",this.props.parentWidgetRef.current.__id)
-                                           
-                                            this.props.requestWidgetDataUpdate(this.props.parentWidgetRef.current.__id)
-                                            this.stateChangeSubscriberCallback() // call this to notify the toolbar that the widget has changed state
-                                            // this.props.parentWidgetRef.current.forceRerender()
-                                        })
-                                    })
-
-                                    
-                                    // console.log("updateing state: ", value, this.props.parentWidgetRef.current)
-                                }
-                            },
-                            anchor: {
-                                label: "Anchor",
-                                tool: Tools.SELECT_DROPDOWN,
-                                options: ["nw", "ne", "sw", "se", "center"].map(val => ({value: val, label: val})),
-                                value: this.state.packAttrs.anchor,
-                                onChange: (value) => {
-                                    this.setAttrValue("flexManager.anchor", value, () => {
-                                        console.log("anchor updated")
-                                        this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, anchor: value}}), () => {
+                           
+                            // anchor: {
+                            //     label: "Anchor",
+                            //     tool: Tools.SELECT_DROPDOWN,
+                            //     options: ["nw", "ne", "sw", "se", "center"].map(val => ({value: val, label: val})),
+                            //     value: this.state.packAttrs.anchor,
+                            //     onChange: (value) => {
+                            //         this.setAttrValue("flexManager.anchor", value, () => {
+                            //             console.log("anchor updated")
+                            //             this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, anchor: value}}), () => {
                                           
-                                            this.props.requestWidgetDataUpdate(this.props.parentWidgetRef.current.__id)
+                            //                 this.props.requestWidgetDataUpdate(this.props.parentWidgetRef.current.__id)
                                             
-                                            // this.props.requestWidgetDataUpdate(this.__id)
-                                            this.stateChangeSubscriberCallback() // call this to notify the toolbar that the widget has changed state
-                                            // this.props.parentWidgetRef.current.forceRerender()
-                                        })
-                                        // this.props.parentWidgetRef.current.forceRerender()
-                                    })   
-                                }
-                            },
+                            //                 // this.props.requestWidgetDataUpdate(this.__id)
+                            //                 this.stateChangeSubscriberCallback() // call this to notify the toolbar that the widget has changed state
+                            //                 // this.props.parentWidgetRef.current.forceRerender()
+                            //             })
+                            //             // this.props.parentWidgetRef.current.forceRerender()
+                            //         })   
+                            //     }
+                            // },
                             fillX: {
                                 label: "Fill X",
                                 tool: Tools.CHECK_BUTTON,
@@ -249,22 +227,40 @@ export class TkinterBase extends Widget {
                                     }))
                                 }
                             },
-                            expand: {
-                                label: "Expand",
-                                tool: Tools.CHECK_BUTTON,
-                                value: false,
+                            side: {
+                                label: "Align Side",
+                                tool: Tools.SELECT_DROPDOWN,
+                                options: ["left", "right", "top", "bottom", ""].map(val => ({value: val, label: val})),
+                                value: this.state.packAttrs.side,
                                 onChange: (value) => {
-                                    this.setAttrValue("flexManager.expand", value)
-                                    
-                                    const widgetStyle = {
-                                        ...this.state.widgetOuterStyling,
-                                        flexGrow: value ? 1 : 0,
-                                    }
-                                    this.updateState({
-                                        widgetOuterStyling: widgetStyle,
+                                    this.setAttrValue("flexManager.side", value, () => {
+                                        this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, side: value}}), () => {
+                                            this.props.requestWidgetDataUpdate(this.props.parentWidgetRef.current.__id)
+                                            this.stateChangeSubscriberCallback() // call this to notify the toolbar that the widget has changed state
+                                            // this.props.parentWidgetRef.current.forceRerender()
+                                        })
                                     })
+
+                                    
+                                    // console.log("updateing state: ", value, this.props.parentWidgetRef.current)
                                 }
                             },
+                            // expand: {
+                            //     label: "Expand",
+                            //     tool: Tools.CHECK_BUTTON,
+                            //     value: false,
+                            //     onChange: (value) => {
+                            //         this.setAttrValue("flexManager.expand", value)
+                                    
+                            //         const widgetStyle = {
+                            //             ...this.state.widgetOuterStyling,
+                            //             flexGrow: value ? 1 : 0,
+                            //         }
+                            //         this.updateState({
+                            //             widgetOuterStyling: widgetStyle,
+                            //         })
+                            //     }
+                            // },
                             
                         }
                     }
@@ -381,6 +377,7 @@ export class TkinterBase extends Widget {
     }
 
     getFlexLayoutStyle = (side, anchor) => {
+        // NOTE: may no longer be required
         // let baseStyle = { display: "flex", width: "100%", height: "100%", ...this.getPackAnchorStyle(anchor) }
         let baseStyle = { }
 
@@ -417,6 +414,7 @@ export class TkinterBase extends Widget {
      * @param {*} anchor 
      */
     getPackAnchorStyle = (anchor, isColumn) => {
+        // NOTE: may no longer be required
         const styleMap = {
           nw: { justifyContent: "flex-start", alignItems: "flex-start" },
           ne: { justifyContent: "flex-end", alignItems: "flex-start" },
@@ -455,9 +453,7 @@ export class TkinterBase extends Widget {
      * @returns 
      */
     renderPackWidgetsRecursively = (widgets, index = 0, lastSide="") => {
-        console.log("widgets: ", widgets, index)
 
-        //FIXME: when the first element is left, the second is top the second should also have its own container
         if (index >= widgets.length) return null
 
 
@@ -510,22 +506,13 @@ export class TkinterBase extends Widget {
                     flexDirection: currentWidgetDirection,
                     width: "100%",
                     height: "100%"
-                    //TODO: if flex direction is top then width is 100% else height
                 }}>
 
                     <div className={`tw-flex tw-justify-center tw-items-center 
                                         ${(["top", "bottom"].includes(side)) ? "tw-w-full" : "tw-h-full"}`}>
                         {widget}
                     </div>
-                    
-                    {/* <div data-pack-container-inner style={{
-                        display: "flex",
-                        flexDirection: nextWidgetDirection,
-                        width: "100%"
-                    }}>
-                    </div> */}
                     {this.renderPackWidgetsRecursively(widgets, index + 1, side)}
-                    {/* FIXME: why is the pack widgets recursively outside container? */}
                 </div>
                
           );
@@ -661,9 +648,6 @@ export class TkinterBase extends Widget {
 
         data = {...data} // create a shallow copy
 
-        console.log("data reloaded: ", data)
-
-
         const {attrs={}, selected, pos={x: 0, y: 0}, parentLayout=null, ...restData} = data
 
         let layoutUpdates = {
@@ -725,7 +709,6 @@ export class TkinterBase extends Widget {
 
             if (selected){
                 this.select()
-                console.log("selected again")
             } 
         })  
 

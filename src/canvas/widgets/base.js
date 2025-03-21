@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import React from "react"
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { NotImplementedError } from "../../utils/errors"
 
 import Tools from "../constants/tools"
@@ -13,7 +13,6 @@ import EditableDiv from "../../components/editableDiv"
 import WidgetContainer from "../constants/containers"
 import { DragContext } from "../../components/draggable/draggableContext"
 import { isNumeric, removeKeyFromObject } from "../../utils/common"
-import { info } from "autoprefixer"
 import { Layout, message } from "antd"
 
 
@@ -21,7 +20,7 @@ import { Layout, message } from "antd"
 
 // FIXME: the drag drop indicator is not going invisible if the drop happens on the child
 
-// FIXME: once the width and height is set to fit-content, it can no longer be resized
+// FIXME: once the width and height is set to fit-content, it can no longer be resized (while resizing it shouldn't be fit-width and height instead it should show the actual width and height)
 
 // FIXME: if the label, buttons are dropped directly on canvas, the background colors don't apply
 
@@ -209,10 +208,13 @@ class Widget extends React.Component {
         this.updateState = this.updateState.bind(this)
 
         this.stateUpdateCallback = null // allowing other components such as toolbar to subscribe to changes in this widget
+        this.resizeObserver = null
+
 
     }
 
     componentDidMount() {
+
         this.setLayout({layout: Layouts.FLEX, gap: 10})
 
         // if (this.state.attrs.layout){
@@ -224,6 +226,32 @@ class Widget extends React.Component {
             this.setWidgetInnerStyle('backgroundColor', this.state.attrs.styling?.backgroundColor.value || "#fff")
 
         this.load(this.props.initialData || {}) // load the initial data
+
+        // The elementRect is received only after the elemet is added so, it may not be accurate so use resize handler
+        // this.resizeObserver = new MutationObserver(this.handleResizeEvents)
+        // if (this.elementRef.current) {
+        //     // this.resizeObserver.observe(this.elementRef.current,  { attributes: true})
+        // }
+
+
+        
+    }
+
+    handleResizeEvents = () => {
+        if (!this.elementRef.current) return;
+
+        const elementRect = this.elementRef.current.getBoundingClientRect();
+        
+        const parentRect = this.props.parentWidgetRef?.current?.getBoundingRect()
+        
+        
+        const left = ((elementRect.left || 0) - (parentRect?.left || this.props.canvasRectInner?.left)) / this.props.canvasZoom;
+        const top = ((elementRect.top || 0) - (parentRect?.top || this.props.canvasRectInner?.top)) / this.props.canvasZoom;
+
+        // const left = (elementRect?.left || 0)
+        // const top = (elementRect?.top || 0)
+
+        this.setState({pos: { x: left, y: top }});
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -231,6 +259,10 @@ class Widget extends React.Component {
             this.canvasMetaData = this.props.canvasMetaData
         }
 
+    }
+
+    componentWillUnmount(){
+        // this.resizeObserver.disconnect()
     }
 
     // componentWillUnmount(){
@@ -344,7 +376,6 @@ class Widget extends React.Component {
     forceRerender = () => {
         // this.forceUpdate() // Don't use forceUpdate widgets will loose their states
         this.setState({forceRerenderId: `${uuidv4()}`})
-        console.log("rerender")
     }
 
     // TODO: add context menu items such as delete, add etc
@@ -469,10 +500,6 @@ class Widget extends React.Component {
 
     getWidgetFunctions() {
         return this.functions
-    }
-
-    getId() {
-        return this.__id
     }
 
     getElement() {
@@ -818,11 +845,20 @@ class Widget extends React.Component {
      */
     serialize(){
         // NOTE: when serializing make sure, you are only passing serializable objects not functions or other
+        
+        const elementRect = this.getBoundingRect()
+        
+        const pos = {
+            x: elementRect.x,
+            y: elementRect.y
+        }
+        
         return ({
             zIndex: this.state.zIndex,
             selected: this.state.selected,
             widgetName: this.state.widgetName,
-            pos: this.state.pos,
+            // pos: this.state.pos,
+            pos: pos,
             size: this.state.size,
             widgetContainer: this.state.widgetContainer,
             widgetInnerStyling: this.state.widgetInnerStyling,
@@ -904,7 +940,6 @@ class Widget extends React.Component {
 
             if (selected){
                 this.select()
-                console.log("selected again")
             } 
         })  
 
@@ -1250,6 +1285,20 @@ class Widget extends React.Component {
     // }
 
     /**
+     * 
+     * @param {"sw"|"ne"|"se"|"nw"|null} side 
+     */
+    handleWidgetResize = (side) => {
+        if (side){
+            this.props.onWidgetResizing(side)
+            this.setState({ dragEnabled: false })
+        }else{
+            this.setState({ dragEnabled: true })
+            this.props.onWidgetResizing("")
+        }
+    }
+
+    /**
      * This is an internal methods don't override
      * @returns {HTMLElement}
      */
@@ -1302,10 +1351,8 @@ class Widget extends React.Component {
 
         // const boundingRect = this.getBoundingRect
 
-        const {zoom: canvasZoom, pan: canvasPan} = this.canvasMetaData
+      
         
-        const elementRect = this.elementRef.current?.getBoundingClientRect()
-
         return (
 
             <DragContext.Consumer>
@@ -1315,138 +1362,72 @@ class Widget extends React.Component {
                         // const canvasRect = this.canvas.getBoundingClientRect()
                         const canvasRectInner = this.props.canvasInnerContainerRef?.current?.getBoundingClientRect()
 
-                        const elementRect = this.getBoundingRect()
 
-                        const {zoom, pan} = this.props.canvasMetaData
+                        const {zoom} = this.props.canvasMetaData
 
-                        const left = ((elementRect?.left || 0) - canvasRectInner?.left) / canvasZoom - 10
-                        const top = ((elementRect?.top || 0) - canvasRectInner?.top) / canvasZoom - 10
-                        
                         return ( 
+
                             <div data-widget-id={this.__id}
-                                ref={this.elementRef}
-                                className={`tw-shadow-xl tw-w-fit tw-h-fit ${!this.state.isWidgetVisible ? "tw-hidden" : ""}`}
-                                style={outerStyle}
-                                data-draggable-type={this.getWidgetType()} // helps with droppable 
-                                data-container={this.state.widgetContainer} // indicates how the canvas should handle dragging, one is sidebar other is canvas
+                                    ref={this.elementRef}
+                                    className={`tw-shadow-xl tw-w-fit tw-h-fit ${!this.state.isWidgetVisible ? "tw-hidden" : ""}`}
+                                    style={outerStyle}
+                                    data-draggable-type={this.getWidgetType()} // helps with droppable 
+                                    data-container={this.state.widgetContainer} // indicates how the canvas should handle dragging, one is sidebar other is canvas
 
-                                data-drag-start-within // this attribute indicates that the drag is occurring from within the project and not a outside file drop
+                                    data-drag-start-within // this attribute indicates that the drag is occurring from within the project and not a outside file drop
 
-                                draggable={this.state.dragEnabled}
+                                    draggable={this.state.dragEnabled}
 
-                                onDragOver={(e) => this.handleDragOver(e, draggedElement)}
-                                onDrop={(e) => {this.handleDropEvent(e, draggedElement, widgetClass, posMetaData); onDragEnd()}}
+                                    onDragOver={(e) => this.handleDragOver(e, draggedElement)}
+                                    onDrop={(e) => {this.handleDropEvent(e, draggedElement, widgetClass, posMetaData); onDragEnd()}}
 
-                                onDragEnter={(e) => this.handleDragEnter(e, draggedElement, setOverElement)}
-                                onDragLeave={(e) => this.handleDragLeave(e, draggedElement, overElement)}
+                                    onDragEnter={(e) => this.handleDragEnter(e, draggedElement, setOverElement)}
+                                    onDragLeave={(e) => this.handleDragLeave(e, draggedElement, overElement)}
 
-                                onDragStart={(e) => this.handleDragStart(e, onDragStart)}
-                                onDragEnd={(e) => this.handleDragEnd(onDragEnd)}
+                                    onDragStart={(e) => this.handleDragStart(e, onDragStart)}
+                                    onDragEnd={(e) => this.handleDragEnd(onDragEnd)}
 
-                                // onPointerDown={setInitialPos}
-                                onPointerDown={(e) => handleSetInitialPosition(e, setPosMetaData)}         
-                            >
-                                <div className="tw-relative tw-w-full  tw-h-full tw-top-0 tw-left-0"
+                                    // onPointerDown={setInitialPos}
+                                    onPointerDown={(e) => handleSetInitialPosition(e, setPosMetaData)}         
+                                >
+                                    <div className="tw-relative tw-w-full  tw-h-full tw-top-0 tw-left-0"
+                                            
+                                        >
                                         
-                                    >
-                                    
 
-                                    <div className="tw-relative tw-top-0 tw-left-0 tw-w-full tw-h-full" ref={this.innerAreaRef}
-                                        >
-                                        {this.renderContent()}
-                                    </div>
-                                    {
-                                        // show drop style on drag hover
-                                        draggedElement && this.state.showDroppableStyle.show &&
-                                        <div className={`${this.state.showDroppableStyle.allow ? "tw-border-blue-600" : "tw-border-red-600"} 
-                                                                tw-absolute tw-top-[-5px] tw-left-[-5px] tw-w-full tw-h-full tw-z-[2]
-                                                                tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
-
-                                                                `}
-                                            style={{
-                                                width: "calc(100% + 10px)",
-                                                height: "calc(100% + 10px)",
-                                            }}
-                                        >
+                                        <div className="tw-relative tw-top-0 tw-left-0 tw-w-full tw-h-full" ref={this.innerAreaRef}
+                                            >
+                                            {this.renderContent()}
                                         </div>
-                                    }
-                                
-                                    <div className={`tw-fixed tw-pointer-events-none tw-bg-transparent tw-opacity-100
-                                                    ${this.state.selected ? 'tw-border-2 tw-border-solid tw-border-blue-500' : 'tw-hidden'}`}
-                                        style={{
-                                         
-                                            position: "fixed", // transforms are applied on parent so its going to be relative to parent
-                                            left: left,
-                                            top: top,
-                                            // width: this.state.size.width + 20,
-                                            // height: this.state.size.height + 20,
-                                            // TODO: this isn't smooth when zooming
-                                            width: (elementRect?.width/zoom || this.state.size.width) + 20,
-                                            height: (elementRect?.height/zoom || this.state.size.height) + 20,
-                                            zIndex: 1,
-                                        }}
-                                        >
+                                        {
+                                            // show drop style on drag hover
+                                            draggedElement && this.state.showDroppableStyle.show &&
+                                            <div className={`${this.state.showDroppableStyle.allow ? "tw-border-blue-600" : "tw-border-red-600"} 
+                                                                    tw-absolute tw-top-[-5px] tw-left-[-5px] tw-w-full tw-h-full tw-z-[2]
+                                                                    tw-border-2 tw-border-dashed  tw-rounded-lg tw-pointer-events-none
 
-                                        <div className={`"tw-relative tw-w-full  tw-h-full"`}> {/* ${this.state.isDragging ? "tw-pointer-events-none" : "tw-pointer-events-auto"} */}
-                                            <EditableDiv value={this.state.widgetName} onChange={this.setWidgetName}
-                                                maxLength={40}
-                                                openEdit={this.state.enableRename}
-                                                className="tw-text-sm tw-w-fit tw-max-w-[160px] tw-text-clip tw-min-w-[150px] 
-                                                                        tw-overflow-hidden tw-absolute tw--top-6 tw-h-6"
-                                            />
+                                                                    `}
+                                                style={{
+                                                    width: "calc(100% + 10px)",
+                                                    height: "calc(100% + 10px)",
+                                                }}
+                                            >
+                                            </div>
+                                        }
 
-                                            <div
-                                                className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--left-1 tw--top-1 tw-bg-blue-500"
-                                                style={{ cursor: Cursor.NW_RESIZE }}
-                                                onMouseDown={(e) => {
-                                                    e.stopPropagation()
-                                                    e.preventDefault()
-                                                    this.props.onWidgetResizing("nw")
-                                                    this.setState({ dragEnabled: false })
-                                                }}
-                                                onMouseUp={() => this.setState({ dragEnabled: true })}
-                                            />
-                                            <div
-                                                className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--right-1 tw--top-1 tw-bg-blue-500"
-                                                style={{ cursor: Cursor.SW_RESIZE }}
-                                                onMouseDown={(e) => {
-                                                    e.stopPropagation()
-                                                    e.preventDefault()
-                                                    this.props.onWidgetResizing("ne")
-                                                    this.setState({ dragEnabled: false })
-                                                }}
-                                                onMouseUp={() => this.setState({ dragEnabled: true })}
-                                            />
-                                            <div
-                                                className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--left-1 tw--bottom-1 tw-bg-blue-500"
-                                                style={{ cursor: Cursor.SW_RESIZE }}
-                                                onMouseDown={(e) => {
-                                                    e.stopPropagation()
-                                                    e.preventDefault()
-                                                    this.props.onWidgetResizing("sw")
-                                                    this.setState({ dragEnabled: false })
-                                                }}
-                                                onMouseUp={() => this.setState({ dragEnabled: true })}
-                                            />
-                                            <div
-                                                className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--right-1 tw--bottom-1 tw-bg-blue-500"
-                                                style={{ cursor: Cursor.SE_RESIZE }}
-                                                onMouseDown={(e) => {
-                                                    e.stopPropagation()
-                                                    e.preventDefault()
-                                                    this.props.onWidgetResizing("se")
-                                                    this.setState({ dragEnabled: false })
-                                                }}
-                                                onMouseUp={() => this.setState({ dragEnabled: true })}
-                                            />
-
-                                        </div>
+                                        <ResizeHandle 
+                                                canvasRect={canvasRectInner}
+                                                canvasZoom={zoom}
+                                                elementRef={this.elementRef}
+                                                show={this.state.selected}
+                                                onWidgetResizing={this.handleWidgetResize}
+                                                enableRename={this.state.enableRename}
+                                                widgetName={this.state.widgetName}
+                                                setWidgetName={this.setWidgetName}
+                                                />
 
                                     </div>
-
-
                                 </div>
-                            </div>
                             )
                     }
                 }
@@ -1456,6 +1437,139 @@ class Widget extends React.Component {
 
     }
 
+}
+
+/**
+ * 
+ * a component that displays resize handles, don't remove this function and try to add it directly
+ * to base widget as with base widget getBoundingClient rect is always stale without useEffect
+ * 
+ * // TODO: make this smoother
+ * 
+ */
+function ResizeHandle({elementRef, show, canvasRect, 
+                        canvasZoom, onWidgetResizing,
+                        widgetName, setWidgetName, enableRename
+                    }){
+    const [rect, setRect] = useState({
+        left: 0, 
+        top: 0, 
+        width: 0, 
+        height: 0
+    })
+
+    const timeoutRef = useRef(null)
+    const isResizingRef = useRef(false)
+
+    useLayoutEffect(() => {
+        if (!elementRef.current)
+            return
+
+        const updateRect = () => {
+                const elementRect = elementRef.current?.getBoundingClientRect()
+
+                if (!elementRect){
+                    return
+                }
+
+                const left = ((elementRect.left || 0) - canvasRect.left) / canvasZoom - 10;
+                const top = ((elementRect.top || 0) - canvasRect.top) / canvasZoom - 10;
+                const width = (elementRect.width / canvasZoom) + 20;
+                const height = (elementRect.height / canvasZoom) + 20;
+                setRect({ left, top, width, height });
+        }
+
+        clearTimeout(timeoutRef.current);
+       
+        if (!isResizingRef.current)
+            timeoutRef.current = setTimeout(updateRect, 16); // ~60fps
+
+        else{
+            updateRect()
+        }
+
+    }, [elementRef, canvasZoom, canvasRect])
+
+    const handleResizing = (side) => {
+
+        onWidgetResizing(side)
+
+        if (side){
+            isResizingRef.current = true
+        }else{
+            isResizingRef.current = false
+        }
+
+    }
+
+    return (
+        <div className={`tw-fixed tw-pointer-events-none tw-bg-transparent tw-opacity-100
+            ${show ? 'tw-border-2 tw-border-solid tw-border-blue-500' : 'tw-hidden'}`}
+            style={{
+
+                position: "fixed", // transforms are applied on parent so its going to be relative to parent
+                left: rect.left,
+                top: rect.top,
+                width: rect.width, // (elementRect?.width/zoom || this.state.size.width) + 20,
+                height: rect.height, //(elementRect?.height/zoom || this.state.size.height) + 20,
+                zIndex: 1,
+            }}
+            >
+
+            <div className={`"tw-relative tw-w-full  tw-h-full"`}> {/* ${this.state.isDragging ? "tw-pointer-events-none" : "tw-pointer-events-auto"} */}
+                <EditableDiv value={widgetName} onChange={setWidgetName}
+                    maxLength={40}
+                    openEdit={enableRename}
+                    className="tw-text-sm tw-w-fit tw-max-w-[160px] tw-text-clip tw-min-w-[150px] 
+                                            tw-overflow-hidden tw-absolute tw--top-6 tw-h-6"
+                />
+
+                <div
+                    className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--left-1 tw--top-1 tw-bg-blue-500"
+                    style={{ cursor: Cursor.NW_RESIZE }}
+                    onMouseDown={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        handleResizing("nw")
+                    }}
+                    onMouseUp={() => handleResizing(null)}
+                />
+                <div
+                    className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--right-1 tw--top-1 tw-bg-blue-500"
+                    style={{ cursor: Cursor.SW_RESIZE }}
+                    onMouseDown={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        handleResizing("ne")
+                    }}
+                    onMouseUp={() => handleResizing(null)}
+                />
+                <div
+                    className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--left-1 tw--bottom-1 tw-bg-blue-500"
+                    style={{ cursor: Cursor.SW_RESIZE }}
+                    onMouseDown={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        handleResizing("sw")
+                    }}
+                    onMouseUp={() => handleResizing(null)}
+                />
+                <div
+                    className="tw-w-2 tw-h-2 tw-rounded-full tw-absolute tw-pointer-events-auto tw--right-1 tw--bottom-1 tw-bg-blue-500"
+                    style={{ cursor: Cursor.SE_RESIZE }}
+                    onMouseDown={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        handleResizing("se")
+                    }}
+                    onMouseUp={() => handleResizing(null)}
+                />
+
+            </div>
+
+        </div>
+
+    )
 }
 
 
