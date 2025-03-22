@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react"
+import { memo, useEffect, useMemo, useRef, useState } from "react"
 
 import {
     Checkbox, ColorPicker, Input,
@@ -29,11 +29,15 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
 
     const {activeWidget} = useWidgetContext()
 
-    console.log("active widget: ", activeWidget)
-
     // console.log("active widget context: ", activeWidgetAttrs)
     const [toolbarOpen, setToolbarOpen] = useState(isOpen)
     const [toolbarAttrs, setToolbarAttrs] = useState({})
+
+    // TODO: From here
+    const focusedInputRef = useRef()
+
+    const [cursorPos, setCursorPos] = useState(0) // store cursor position for focused input so during remount if the cursor position goes to end we can use this
+    const [activeInputKey, setActiveInputKey] = useState(null)
 
     const {uploadedAssets} = useFileUploadContext()
 
@@ -47,13 +51,24 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
             activeWidget.stateChangeSubscriberCallback(stateUpdatedCallback)
             // console.log("sytate update: ", activeWidget.getToolbarAttrs())
             setToolbarAttrs(activeWidget.getToolbarAttrs())
+
+           
         }
 
-    }, [activeWidget]) // , activeWidget?.state
+
+    }, [activeWidget, focusedInputRef, cursorPos]) // , activeWidget?.state
 
     useEffect(() => {
         setToolbarOpen(isOpen)
     }, [isOpen])
+
+
+    useEffect(() => {
+        if (focusedInputRef.current?.input && activeInputKey) {
+            // this fixes the cursor going to the end issue during remount
+            focusedInputRef.current.setSelectionRange(cursorPos, cursorPos)
+        }
+    }, [toolbarAttrs, focusedInputRef, cursorPos])
 
     // useEffect(() => {
    
@@ -110,10 +125,30 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
 
     }, [uploadedAssets])
 
+    const handleInputFocus = (key, event) => {
+
+        const {value, target} = event
+
+        setActiveInputKey(key)
+        setCursorPos(target.selectionStart)
+        focusedInputRef.current = event.target
+    }
+
+    const handleInputBlur = () => {
+        setActiveInputKey(null);
+        focusedInputRef.current = null;
+    }
 
     const handleChange = (value, callback) => {
         if (callback) {
             callback(value)
+        }
+
+        if (focusedInputRef.current?.input) {
+            console.log("handling change: ", focusedInputRef.current.input.selectionStart)
+            setCursorPos(focusedInputRef.current.input.selectionStart);
+        }else{
+            setCursorPos(0)
         }
     }
 
@@ -207,6 +242,9 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
                         min={1}
                         value={val.value?.gap || 10}
                         size="small"
+                        onFocus={(e) => handleInputFocus(val.label, e)}
+                        onBlur={handleInputBlur}
+                        ref={activeInputKey === val.label ? focusedInputRef : null}
                         onChange={(value) => {
                             handleChange({ ...val.value, gap: value }, val.onChange)
                         }}
@@ -263,6 +301,10 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
                 {val.tool === Tools.INPUT && (
                     <Input
                         {...val.toolProps}
+                        // value={val.value}
+                        onFocus={(event) => handleInputFocus(val.label, event)}
+                        onBlur={handleInputBlur}
+                        ref={activeInputKey === val.label ? focusedInputRef : null}
                         value={val.value}
                         onChange={(e) => handleChange(e.target.value, val.onChange)}
                     />
@@ -273,6 +315,9 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
                         {...val.toolProps}
                         value={val.value || 0}
                         size="small"
+                        onFocus={(event) => handleInputFocus(val.label, event)}
+                        onBlur={handleInputBlur}
+                        ref={activeInputKey === val.label ? focusedInputRef : null}
                         onChange={(value) => handleChange(value, val.onChange)}
                     />
                 )}
