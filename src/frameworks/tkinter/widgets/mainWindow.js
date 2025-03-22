@@ -97,6 +97,7 @@ class MainWindow extends TkinterBase{
                     </div>
                 </div>
                 <div className="tw-p-2 tw-w-full tw-relative tw-h-full tw-overflow-hidden tw-content-start" 
+                        ref={this.styleAreaRef}
                         style={{...this.getInnerRenderStyling(), width: "100%", height: "calc(100% - 25px)"}}>
                     {/* {this.props.children} */}
                     {this.renderTkinterLayout()} {/* This is required for pack layouts, so if your widget accepts child widgets, ensure to add this */}

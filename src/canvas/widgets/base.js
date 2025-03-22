@@ -1,6 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
+
+import lo from 'lodash'
+
 import { NotImplementedError } from "../../utils/errors"
 
 import Tools from "../constants/tools"
@@ -12,7 +15,7 @@ import EditableDiv from "../../components/editableDiv"
 
 import WidgetContainer from "../constants/containers"
 import { DragContext } from "../../components/draggable/draggableContext"
-import { isNumeric, removeKeyFromObject } from "../../utils/common"
+import { getGridPosition, isNumeric, removeKeyFromObject } from "../../utils/common"
 import { Layout, message } from "antd"
 
 
@@ -66,6 +69,8 @@ class Widget extends React.Component {
         this.swappableAreaRef = React.createRef() // helps identify if the users intent is to swap or drop inside the widget
         this.innerAreaRef = React.createRef() // this is the inner area where swap is prevented and only drop is accepted
 
+        this.styleAreaRef = React.createRef() //  use ref this where inner widget style is applied
+
         this.functions = {
             "load": { "args1": "number", "args2": "string" }
         }
@@ -79,7 +84,7 @@ class Widget extends React.Component {
             selected: false,
             isWidgetVisible: true,
 
-            forceRerenderId: "",
+            // forceRerenderId: "",
 
             widgetName: widgetName || 'widget', // this will later be converted to variable name
             enableRename: false, // will open the widgets editable div for renaming
@@ -225,7 +230,10 @@ class Widget extends React.Component {
         if (this.state.attrs.styling.backgroundColor)
             this.setWidgetInnerStyle('backgroundColor', this.state.attrs.styling?.backgroundColor.value || "#fff")
 
-        this.load(this.props.initialData || {}) // load the initial data
+        this.load(this.props.initialData || {}, () => {
+            console.log("component remounted: ", this.__id)
+
+        }) // load the initial data
 
         // The elementRect is received only after the elemet is added so, it may not be accurate so use resize handler
         // this.resizeObserver = new MutationObserver(this.handleResizeEvents)
@@ -237,27 +245,20 @@ class Widget extends React.Component {
         
     }
 
-    handleResizeEvents = () => {
-        if (!this.elementRef.current) return;
-
-        const elementRect = this.elementRef.current.getBoundingClientRect();
-        
-        const parentRect = this.props.parentWidgetRef?.current?.getBoundingRect()
-        
-        
-        const left = ((elementRect.left || 0) - (parentRect?.left || this.props.canvasRectInner?.left)) / this.props.canvasZoom;
-        const top = ((elementRect.top || 0) - (parentRect?.top || this.props.canvasRectInner?.top)) / this.props.canvasZoom;
-
-        // const left = (elementRect?.left || 0)
-        // const top = (elementRect?.top || 0)
-
-        this.setState({pos: { x: left, y: top }});
-    }
-
     componentDidUpdate(prevProps, prevState) {
         if (prevProps !== this.props) {
             this.canvasMetaData = this.props.canvasMetaData
         }
+
+        const compareAttrs = ['attrs', 'widgetName', 'parentLayout', 'positionType']
+
+        // TODO: maybe find more efficient way to update the canvas about teh child updates???
+        if (!lo.isEqual(lo.pick(prevState, compareAttrs), lo.pick(this.state, compareAttrs))){
+            // THIS IS inefficeint
+            // this.props.requestThisWidgetDataUpdate(this.__id)
+            setTimeout(() => this.props.requestWidgetDataUpdate(this.__id), 1)
+        }
+        // call update widgets
 
     }
 
@@ -640,7 +641,8 @@ class Widget extends React.Component {
      * @param {Layouts} parentLayout 
      */
     setParentLayout(parentLayout){
-
+        // FIXME: changing from one layout to another isn't working as expected
+        // TODO: add styleAreaRef to every where there is innerWidgetSTyle
         if (!parentLayout){
             // if parent layout is null (i,e the widget is on the canvas)
             return {}
@@ -672,6 +674,17 @@ class Widget extends React.Component {
 
             this.setPos(pos.x, pos.y)
             // console.log("setting pos: ", pos)
+
+            if (layout === Layouts.GRID){
+                setTimeout(() => {
+                    const gridPos = getGridPosition(this.elementRef.current,  this.props.parentWidgetRef.current.styleAreaRef.current)
+                    if (gridPos){
+                        this.setAttrValue("gridManager.row", gridPos.row)
+                        this.setAttrValue("gridManager.column", gridPos.column)
+                    }
+
+                }, 1)
+            }
             
         }else if (layout === Layouts.PLACE){
             updates = {
@@ -881,7 +894,9 @@ class Widget extends React.Component {
 
         data = {...data} // create a shallow copy
 
-        const {attrs={}, selected, pos={x: 0, y: 0}, parentLayout=null, ...restData} = data
+        const {attrs={}, selected, pos={x: 0, y: 0}, ...restData} = data
+
+        const parentLayout = this.props.parentWidgetRef?.current?.getLayout() // don't get the parentLayout from serialized data as it may have become stale
 
         
         let layoutUpdates = {
@@ -1128,23 +1143,7 @@ class Widget extends React.Component {
 
         } else if (container === WidgetContainer.SIDEBAR) {
 
-            // const { initialPos } = posMetaData
 
-            // const canvasInnerRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
-          
-            // const newInitialPos = {
-            //     x: (initialPos.x - canvasInnerRect.left),
-            //     y: (initialPos.y - canvasInnerRect.top)
-            // }
-
-            // posMetaData = {
-            //     ...posMetaData,
-            //     initialPos: newInitialPos,
-            // }
-            // console.log("Dropped on Sidebar: ", this.__id)
-
-
-            // const parentRect = this.getBoundingRect()
             const canvasRect = this.props.canvasInnerContainerRef.current.getBoundingClientRect()
 
             const {zoom, pan} = this.props.canvasMetaData

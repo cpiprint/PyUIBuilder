@@ -98,6 +98,7 @@ export class CheckBox extends TkinterWidgetBase{
         return (
             <div className="tw-flex tw-p-1 tw-w-full tw-h-full tw-rounded-md tw-overflow-hidden"
                 style={this.getInnerRenderStyling()}
+                ref={this.styleAreaRef}
                 >
                 
                 <div className="tw-flex tw-gap-2 tw-w-full tw-h-full tw-place-items-center tw-place-content-center">

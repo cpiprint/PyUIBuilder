@@ -81,6 +81,7 @@ class MainWindow extends CustomTkBase{
                     </div>
                 </div>
                 <div className="tw-p-2 tw-w-full tw-relative tw-h-full tw-overflow-hidden tw-content-start" 
+                        ref={this.styleAreaRef}
                         style={this.state.widgetInnerStyling}>
                     {this.props.children}
                 </div>

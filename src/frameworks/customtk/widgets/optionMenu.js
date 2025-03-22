@@ -103,6 +103,7 @@ class OptionMenu extends CustomTkWidgetBase{
 
         return (
             <div className="tw-flex tw-p-1 tw-w-full tw-h-full tw-rounded-md tw-overflow-hidden"
+                ref={this.styleAreaRef}    
                 style={this.getInnerRenderStyling()}
                 onClick={this.toggleDropDownOpen}
                 >

@@ -122,6 +122,7 @@ class Label extends TkinterWidgetBase{
                     }}
                 >
                 <div className="tw-p-2 tw-w-full tw-h-full  tw-flex tw-place-content-center tw-place-items-center " 
+                        ref={this.styleAreaRef}
                         style={this.getInnerRenderStyling()}>
                     {/* {this.props.children} */}
                     {

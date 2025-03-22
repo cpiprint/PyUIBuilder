@@ -1257,7 +1257,6 @@ class Canvas extends React.Component {
 
     }
 
-    // FIXME: this must update the childrens corectly
     updateWidgetAndChildren = (widgetId) => {
          const serializeWidgetRecursively = (widget) => {
         const widgetObj = this.getWidgetById(widget.id)?.current;

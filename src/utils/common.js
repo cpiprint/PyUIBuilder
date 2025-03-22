@@ -70,3 +70,28 @@ export function convertObjectToKeyValueString(obj){
 					.map(([key, value]) => `${key}=${value}`)
 					.join(', ')
 }
+
+
+/**
+ * 
+ * @param {HTMLElement} widget 
+ * @param {HTMLElement} gridContainer 
+ * @returns 
+ */
+export const getGridPosition = (widget, gridContainer) => {
+	if (!widget || !gridContainer) return null;
+	
+	const widgets = Array.from(gridContainer.children); // Get all grid items
+	// const index = widgets.indexOf(widget);
+	const widgetIndex = widgets.indexOf(widget);
+	
+	if (widgetIndex === -1) return null; // Widget not found
+
+	const gridStyles = getComputedStyle(gridContainer);
+	const columnCount = gridStyles.gridTemplateColumns.split(' ').length;
+
+	const row = Math.floor(widgetIndex / columnCount) + 1;
+	const column = (widgetIndex % columnCount) + 1;
+
+	return { row, column };
+}

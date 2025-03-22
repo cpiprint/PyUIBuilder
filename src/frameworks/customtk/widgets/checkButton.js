@@ -213,6 +213,7 @@ export class RadioButton extends CustomTkWidgetBase{
 
         return (
             <div className="tw-flex tw-p-1 tw-w-full tw-h-full tw-rounded-md tw-overflow-hidden"
+                ref={this.styleAreaRef}
                 style={this.getInnerRenderStyling()}
                 >
                 <div className="tw-flex tw-flex-col tw-gap-2 tw-w-fit tw-h-fit">

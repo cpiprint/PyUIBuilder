@@ -46,7 +46,9 @@ class Frame extends TkinterBase{
         // console.log("widget styling: ", this.state.widgetInnerStyling)
         return (
             <div className="tw-w-flex tw-flex-col tw-w-full tw-h-full tw-relative tw-rounded-md tw-overflow-hidden">
-                <div className="tw-p-2 tw-w-full tw-h-full tw-content-start" style={this.getInnerRenderStyling()}>
+                <div className="tw-p-2 tw-w-full tw-h-full tw-content-start" 
+                    ref={this.styleAreaRef}
+                    style={this.getInnerRenderStyling()}>
                     {this.props.children}
                 </div>
             </div>

@@ -61,8 +61,24 @@ export class TkinterBase extends Widget {
 
         }else if (parentLayout === Layouts.FLEX){
 
-            const config = {
-                side: direction === "row" ? "tk.LEFT" : "tk.TOP",
+            const packSide = this.getAttrValue("flexManager.side")
+
+            const config = {}
+
+            if (packSide === "" || packSide === "top"){
+                
+                config['side'] = `tk.TOP`
+            
+            }else if (packSide === "left"){
+                
+                config['side'] = `tk.LEFT`
+    
+            }else if (packSide === "right"){
+
+                config['side'] = `tk.RIGHT`
+
+            }else{
+                config['side'] = `tk.BOTTOM`
             }
 
             if (gap > 0){
@@ -126,19 +142,11 @@ export class TkinterBase extends Widget {
         if (!layout){
             return {}
         } 
-        super.setParentLayout(layout)
+        let updates = super.setParentLayout(layout)
 
         const {layout: parentLayout, direction, gap} = layout
 
         // show attributes related to the layout manager
-        let updates = {
-            parentLayout: layout,
-        }
-        
-        // this.removeAttr("gridManager")
-        // this.removeAttr("flexManager")
-        // this.removeAttr("positioning")
-
         // remove gridManager, flexManager positioning 
         const {gridManager, flexManager, positioning, ...restAttrs} =  this.state.attrs
 
@@ -284,7 +292,6 @@ export class TkinterBase extends Widget {
                                 onChange: (value) => {
                                     
                                     const previousRow = this.getWidgetOuterStyle("gridRow") || "1/1"
-                                    
                                     let [_row=1, rowSpan=1] = previousRow.replace(/\s+/g, '').split("/").map(Number)
                                     
                                     if (value > rowSpan){
@@ -292,7 +299,6 @@ export class TkinterBase extends Widget {
                                         rowSpan = value
                                         this.setAttrValue("gridManager.rowSpan", rowSpan)
                                     }
-                                    
                                     this.setAttrValue("gridManager.row", value)
                                     this.setWidgetOuterStyle("gridRow", `${value+' / '+rowSpan}`)
                                 }
@@ -565,8 +571,6 @@ export class TkinterBase extends Widget {
 
             gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
             gridTemplateRows: "repeat(auto-fill, minmax(100px, 1fr))",  
-            // gridTemplateColumns: layout === Layouts.FLEX ? "minmax(auto, 1fr) 1fr minmax(auto, 1fr)" : "repeat(auto-fill, minmax(100px, 1fr))",
-            // gridTemplateRows: layout === Layouts.FLEX ? "minmax(auto, 1fr) 1fr minmax(auto, 1fr)" : "repeat(auto-fill, minmax(100px, 1fr))",  
             // gridAutoRows: 'minmax(100px, auto)',  // Rows with minimum height of 100px, and grow to fit content
             // gridAutoCols: 'minmax(100px, auto)',  // Cols with minimum height of 100px, and grow to fit content
         }
@@ -648,7 +652,10 @@ export class TkinterBase extends Widget {
 
         data = {...data} // create a shallow copy
 
-        const {attrs={}, selected, pos={x: 0, y: 0}, parentLayout=null, ...restData} = data
+        const {attrs={}, selected, pos={x: 0, y: 0},  ...restData} = data
+
+        const parentLayout = this.props.parentWidgetRef?.current?.getLayout()
+
 
         let layoutUpdates = {
             parentLayout: parentLayout

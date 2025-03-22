@@ -66,6 +66,7 @@ export class Input extends CustomTkWidgetBase{
         return (
             <div className="tw-w-flex tw-flex-col tw-w-full tw-h-full tw-rounded-md tw-overflow-hidden">
                 <div className="tw-p-2 tw-w-full tw-h-full tw-flex tw-place-items-center" 
+                        ref={this.styleAreaRef}
                         style={this.getInnerRenderStyling()}>
                     <div className="tw-text-sm tw-text-gray-300">
                         {this.getAttrValue("placeHolder")}

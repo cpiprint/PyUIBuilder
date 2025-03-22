@@ -77,7 +77,9 @@ class TopLevel extends Widget{
                         </div>
                     </div>
                 </div>
-                <div className="tw-p-2 tw-w-full tw-h-full tw-content-start" style={this.state.widgetInnerStyling}>
+                <div className="tw-p-2 tw-w-full tw-h-full tw-content-start" 
+                    ref={this.styleAreaRef}
+                    style={this.state.widgetInnerStyling}>
                     {this.props.children}
                 </div>
             </div>

@@ -143,7 +143,9 @@ class Slider extends CustomTkWidgetBase{
         return (
             <div className="tw-w-flex tw-flex-col tw-w-full tw-h-full tw-rounded-md tw-overflow-hidden">
                 <div className="flex flex-col items-center justify-center h-screen 
-                                bg-gray-100" style={this.getInnerRenderStyling()}>
+                                bg-gray-100" 
+                            ref={this.styleAreaRef}
+                            style={this.getInnerRenderStyling()}>
                     <div className="w-full max-w-md">
                         <input
                             type="range"
