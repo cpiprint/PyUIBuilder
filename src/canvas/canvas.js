@@ -317,7 +317,7 @@ class Canvas extends React.Component {
         } else if (event.button === 2) {
             //right click
 
-            if (this.selectedWidget && this.selectedWidget.__id !== selectedWidget.__id) {
+            if (this.selectedWidget && this.selectedWidget.__id !== selectedWidget?.__id) {
                 this.clearSelections()
             }
 
@@ -1009,6 +1009,7 @@ class Canvas extends React.Component {
             
             setTimeout(() => {
                 if (parentLayout !== Layouts.PLACE) {
+                    // FIXME: need to swap grid col and row as well for this to be effective
                     // swap only for grid and flex placements
                     const swapClosest = this.__checkClosestShiftElement({
                         event,

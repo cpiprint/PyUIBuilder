@@ -77,7 +77,9 @@ function Premium({ children, className = "" }) {
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-x-circle-fill tw-text-red-600 tw-text-base"></i>
-                                    <span>Premium widgets</span>
+                                    <span>Premium widgets &nbsp;
+                                        <span className="tw-text-sm">(eg: tab widget, multi-page support, 3rd party widget library support etc)</span>
+                                    </span>
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-x-circle-fill tw-text-red-600 tw-text-base"></i>
@@ -154,7 +156,9 @@ function Premium({ children, className = "" }) {
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
-                                    <span>Premium widgets</span>
+                                    <span>Premium widgets &nbsp;
+                                    <span className="tw-text-sm">(eg: tab widget, multi-page support, 3rd party widget library support etc)</span>
+                                    </span>
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
@@ -230,7 +234,7 @@ function Premium({ children, className = "" }) {
                                 Support open-source development 🚀. Plus, get added benefits.
                             </p>
                             <hr />
-                            <ul className="tw-mt-4 tw-flex tw-flex-col tw-gap-3 tw-text-xl tw-text-gray-600">
+                            <ul className="tw-mt-4 tw-flex tw-flex-col tw-gap-3 tw-text-xl">
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
                                     <span>Access to web-based editor</span>
@@ -241,7 +245,9 @@ function Premium({ children, className = "" }) {
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
-                                    <span>Premium widgets</span>
+                                    <span>Premium widgets &nbsp;
+                                    <span className="tw-text-sm">(eg: tab widget, multi-page support, 3rd party widget library support etc)</span>
+                                    </span>
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>

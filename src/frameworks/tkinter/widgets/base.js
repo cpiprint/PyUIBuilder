@@ -5,7 +5,7 @@ import { convertObjectToKeyValueString, isNumeric, removeKeyFromObject } from ".
 import { randomArrayChoice } from "../../../utils/random"
 import { Tkinter_TO_WEB_CURSOR_MAPPING } from "../constants/cursor"
 import { Tkinter_To_GFonts } from "../constants/fontFamily"
-import { JUSTIFY, RELIEF } from "../constants/styling"
+import { GRID_STICKY, JUSTIFY, RELIEF } from "../constants/styling"
 
 
 
@@ -287,79 +287,100 @@ export class TkinterBase extends Widget {
                             row: {
                                 label: "Row",
                                 tool: Tools.NUMBER_INPUT, 
-                                toolProps: { placeholder: "width", max: 1000, min: 1 },
-                                value: 1,
+                                toolProps: { placeholder: "row", max: 1000, min: 0 },
+                                value: 0,
                                 onChange: (value) => {
                                     
-                                    const previousRow = this.getWidgetOuterStyle("gridRow") || "1/1"
-                                    let [_row=1, rowSpan=1] = previousRow.replace(/\s+/g, '').split("/").map(Number)
+                                    const previousRow = this.getWidgetOuterStyle("gridRow") || "0 / span 1"
+                                    let [_row=1, rowSpan=1] = previousRow.replace(/\s+/g, '').split("/span").map(Number)
                                     
-                                    if (value > rowSpan){
-                                        // rowSpan should always be greater than or eq to row
-                                        rowSpan = value
-                                        this.setAttrValue("gridManager.rowSpan", rowSpan)
-                                    }
+                                    // if (value > rowSpan){
+                                    //     // rowSpan should always be greater than or eq to row
+                                    //     rowSpan = value
+                                    //     this.setAttrValue("gridManager.rowSpan", rowSpan)
+                                    // }
                                     this.setAttrValue("gridManager.row", value)
-                                    this.setWidgetOuterStyle("gridRow", `${value+' / '+rowSpan}`)
+                                    this.setWidgetOuterStyle("gridRow", `${value+' / span '+rowSpan}`)
                                 }
                             },
                             rowSpan: {
                                 label: "Row span",
                                 tool: Tools.NUMBER_INPUT,
-                                toolProps: { placeholder: "height", max: 1000, min: 1 },
+                                toolProps: { placeholder: "row span", max: 1000, min: 1 },
                                 value: 1,
                                 onChange: (value) => {
                                     
-                                    const previousRow = this.getWidgetOuterStyle("gridRow") || "1/1"
+                                    const previousRow = this.getWidgetOuterStyle("gridRow") || "1 / span 1"
                                     
-                                    const [row=1, _rowSpan=1] = previousRow.replace(/\s+/g, '').split("/").map(Number)
+                                    // const [row=1, _rowSpan=1] = previousRow.replace(/\s+/g, '').split("/").map(Number)
+                                    const [row=1, rowSpan=1] = previousRow.replace(/\s+/g, '').split("/span").map(Number)
                                     
-                                    if (value < row){
-                                        value = row + 1
+                                    // if (value < row){
+                                    //     value = row + 1
+                                    // }
+                                    if (value < 1){
+                                        value = 1
                                     }
                                     
                                     this.setAttrValue("gridManager.rowSpan", value)
-                                    this.setWidgetOuterStyle("gridRow", `${row + ' / ' +value}`)
+                                    this.setWidgetOuterStyle("gridRow", `${(row || 1) + ' / span ' +value}`)
                                 }
                             },
                             column: {
                                 label: "Column",
                                 tool: Tools.NUMBER_INPUT,
-                                toolProps: { placeholder: "height", max: 1000, min: 1 },
-                                value: 1,
+                                toolProps: { placeholder: "column", max: 1000, min: 0 },
+                                value: 0,
                                 onChange: (value) => {
                                     
-                                    const previousRow = this.getWidgetOuterStyle("gridColumn") || "1/1"
+                                    const previousRow = this.getWidgetOuterStyle("gridColumn") || "0 / span 1"
 
-                                    let [_col=1, colSpan=1] = previousRow.replace(/\s+/g, '').split("/").map(Number)
+                                    let [_col=1, colSpan=1] = previousRow.replace(/\s+/g, '').split("/span").map(Number)
 
-                                    if (value > colSpan){
-                                        // The colSpan has always be equal or greater than col
-                                        colSpan = value
-                                        this.setAttrValue("gridManager.columnSpan", colSpan)
-                                    }
+                                    // if (value > colSpan){
+                                    //     // The colSpan has always be equal or greater than col
+                                    //     colSpan = value
+                                    //     this.setAttrValue("gridManager.columnSpan", colSpan)
+                                    // }
 
                                     this.setAttrValue("gridManager.column", value)
-                                    this.setWidgetOuterStyle("gridColumn", `${value +' / ' + colSpan}`)
+                                    this.setWidgetOuterStyle("gridColumn", `${value +' / span ' + colSpan}`)
                                 }
                             },
                             columnSpan: {
                                 label: "Column span",
                                 tool: Tools.NUMBER_INPUT,
-                                toolProps: { placeholder: "height", max: 1000, min: 1 },
+                                toolProps: { placeholder: "column span", max: 1000, min: 1 },
                                 value: 1,
                                 onChange: (value) => {
                             
-                                    const previousCol = this.getWidgetOuterStyle("gridColumn") || "1/1"
+                                    const previousCol = this.getWidgetOuterStyle("gridColumn") || "1 / span 1"
 
-                                    const [col=1, _colSpan=1] = previousCol.replace(/\s+/g, '').split("/").map(Number)
+                                    const [col=1, _colSpan=1] = previousCol.replace(/\s+/g, '').split("/span").map(Number)
 
-                                    if (value < col){
-                                        value = col + 1
+                                    // if (value < col){
+                                    //     value = col + 1
+                                    // }
+
+                                    if (value < 1){
+                                        value = 1
                                     }
                                     
                                     this.setAttrValue("gridManager.columnSpan", value)
-                                    this.setWidgetOuterStyle("gridColumn", `${col + ' / ' + value}`)
+                                    this.setWidgetOuterStyle("gridColumn", `${(col || 1) + ' / span ' + value}`)
+                                }
+                            },
+                            sticky: {
+                                // TODO: from here
+                                label: "Sticky",
+                                tool: Tools.SELECT_DROPDOWN,
+                                toolProps: { placeholder: "Sticky", },
+                                options: Object.keys(GRID_STICKY).map((val) => ({value: val, label: val})),
+                                value: GRID_STICKY.NONE,
+                                onChange: (value) => {
+                            
+                                    this.setAttrValue("gridManager.sticky", value)
+                                    
                                 }
                             },
                         }
@@ -551,28 +572,72 @@ export class TkinterBase extends Widget {
         // console.log("layout value: ", value)
         // FIXME: In grid layout the layout doesn't adapt to the size of the child if resized
 
-        let display = "block"
-
-        if (layout !== Layouts.PLACE){
-            if (this.droppableTags !== null){
-                display = "grid"
-            }else{
-                display = "flex" // this is so that the labels and other elements are centered
-            }
-        }
-        
         let widgetStyle = {
             ...this.state.widgetInnerStyling,
-            display: layout !== Layouts.PLACE ? layout : "block",
+            display: layout !== Layouts.PLACE ? (layout === "grid" ? "grid" : "flex" ) : "block",
             flexDirection: "column",
             // flexDirection: direction,
             gap: `${gap}px`,
-            // flexWrap: "wrap",
+            gridTemplateColumns: "repeat(3, max-content)",
+            gridTemplateRows: "repeat(3, max-content)",
+            // gridTemplateColumns: "repeat(auto-fill, minmax(100px, auto))",
+            // gridTemplateRows: "repeat(auto-fill, minmax(100px, auto))",  
+            
+        }
 
-            gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
-            gridTemplateRows: "repeat(auto-fill, minmax(100px, 1fr))",  
-            // gridAutoRows: 'minmax(100px, auto)',  // Rows with minimum height of 100px, and grow to fit content
-            // gridAutoCols: 'minmax(100px, auto)',  // Cols with minimum height of 100px, and grow to fit content
+
+        if (layout === Layouts.GRID){
+
+
+            const {gridManager, flexManager, positioning, ...restAttrs} =  this.state.attrs
+
+            const updates = {
+                attrs: {
+                    ...restAttrs,
+                    gridConfig: {
+                        label: "Grid Configure",
+                        display: "horizontal",
+                        noOfRows: {
+                            label: "No of rows",
+                            tool: Tools.NUMBER_INPUT, 
+                            toolProps: { placeholder: "no of rows", max: 1000, min: 1 },
+                            value: 3,
+                            onChange: (value) => {
+                                this.setAttrValue("gridConfig.noOfRows", value)
+
+                                const widgetStyle = {
+                                    ...this.state.widgetInnerStyling,
+                                    gridTemplateRows: `repeat(${value}, max-content)`
+                                }
+
+                                this.updateState({
+                                    widgetInnerStyling: widgetStyle
+                                })
+                            }
+                        },
+                        noOfCols: {
+                            label: "No of cols",
+                            tool: Tools.NUMBER_INPUT, 
+                            toolProps: { placeholder: "no of cols", max: 1000, min: 1 },
+                            value: 3,
+                            onChange: (value) => {
+                                this.setAttrValue("gridConfig.noOfCols", value)
+
+                                const widgetStyle = {
+                                    ...this.state.widgetInnerStyling,
+                                    gridTemplateColumns: `repeat(${value}, max-content)`
+                                }
+
+                                this.updateState({
+                                    widgetInnerStyling: widgetStyle
+                                })
+                            }
+                        },    
+                    },
+                }
+            }
+            this.updateState((prevState) => ({...prevState, ...updates}))
+
         }
 
         this.updateState({

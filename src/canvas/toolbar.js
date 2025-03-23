@@ -343,7 +343,7 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
                         showSearch
                         value={val.value || ""}
                         placeholder={`${val.label}`}
-                        className="tw-w-full"
+                        className="tw-w-full tw-min-w-[80px]"
                         filterOption={(input, option) =>
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                         }

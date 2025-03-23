@@ -718,8 +718,8 @@ class Widget extends React.Component {
             flexDirection: direction,
             gap: `${gap}px`,
             // flexWrap: "wrap",
-            gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
-            gridTemplateRows: "repeat(auto-fill, minmax(100px, 1fr))",  
+            gridTemplateColumns: "repeat(auto-fill, minmax(100px, auto))",
+            gridTemplateRows: "repeat(auto-fill, minmax(100px, auto))",  
             // gridAutoRows: 'minmax(100px, auto)',  // Rows with minimum height of 100px, and grow to fit content
             // gridAutoCols: 'minmax(100px, auto)',  // Cols with minimum height of 100px, and grow to fit content
         }
@@ -826,14 +826,14 @@ class Widget extends React.Component {
         })
     }
 
-    openRenaming() {
+    openRenaming = () => {
+        this.select()
         this.setState({
-            selected: true,
             enableRename: true
         })
     }
 
-    closeRenaming() {
+    closeRenaming = () => {
         this.setState({
             enableRename: false
         })
@@ -1487,7 +1487,7 @@ function ResizeHandle({elementRef, show, canvasRect,
             updateRect()
         }
 
-    }, [elementRef, canvasZoom, canvasRect])
+    }, [elementRef, canvasZoom, canvasRect, enableRename])
 
     const handleResizing = (side) => {
 

@@ -99,7 +99,7 @@ function Sidebar({tabs}){
                         <ShareAltOutlined />
                     </Share>
                     <a className="tw-cursor-pointer tw-text-xl tw-text-gray-700" 
-                            href="https://pyuibuilder-docs.pages.dev/"
+                            href="https://docs.pyuibuilder.com/"
                             target="_blank" rel="noopener noreferrer">
                         <i className="bi bi-book-half"></i>
                     </a>
