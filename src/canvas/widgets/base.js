@@ -678,6 +678,8 @@ class Widget extends React.Component {
                     if (gridPos){
                         this.setAttrValue("gridManager.row", gridPos.row)
                         this.setAttrValue("gridManager.column", gridPos.column)
+                        this.setWidgetOuterStyle("gridRow", `${gridPos.row + ' / span ' + 1}`)
+                        this.setWidgetOuterStyle("gridColumn", `${gridPos.column + ' / span ' + 1}`)
                     }
 
                 }, 1)

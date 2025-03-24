@@ -11,6 +11,8 @@ import { Tkinter_To_GFonts } from "../constants/fontFamily"
 import { GRID_STICKY, JUSTIFY, RELIEF } from "../constants/styling"
 
 
+// FIXME: grid sticky may clash with flex sticky when changing layout, check it once
+// FIXME: widget items should add width and height in tkinter code especially in frame
 
 export class TkinterBase extends Widget {
 
@@ -123,7 +125,7 @@ export class TkinterBase extends Widget {
         }else if (parentLayout === Layouts.GRID){
             const row = this.getAttrValue("gridManager.row")
             const col = this.getAttrValue("gridManager.column")
-            layoutManager = `grid(row=${row}, column=${col})`
+            layoutManager = `grid(row=${row-1}, column=${col-1})` // unlike css grid tkinter grid starts from 0
         }
 
         return layoutManager
@@ -143,7 +145,7 @@ export class TkinterBase extends Widget {
 
             if (rowWeights){
                 const correctedRowWeight = Object.fromEntries(
-                    Object.entries(rowWeights).map(([_, { gridNo, weight }]) => [gridNo, weight])
+                    Object.entries(rowWeights).map(([_, { gridNo, weight }]) => [gridNo-1, weight]) // tkinter grid starts from 0 unlike css grid
                 );// converts the format : {index: {gridNo, weight}} to {gridNo: weight}
 
                 const groupByWeight = Object.entries(correctedRowWeight).reduce((acc, [gridNo, weight]) => {
@@ -161,7 +163,7 @@ export class TkinterBase extends Widget {
 
             if (colWeights){
                 const correctedColWeight = Object.fromEntries(
-                    Object.entries(colWeights).map(([_, { gridNo, weight }]) => [gridNo, weight])
+                    Object.entries(colWeights).map(([_, { gridNo, weight }]) => [gridNo-1, weight]) //  tkinter grid starts from 0, so -1
                 );// converts the format : {index: {gridNo, weight}} to {gridNo: weight}
 
                 const groupByWeight = Object.entries(correctedColWeight).reduce((acc, [gridNo, weight]) => {
@@ -178,8 +180,6 @@ export class TkinterBase extends Widget {
             }
             
         }
-
-        console.log("configuration: ", rowConfigure, columnConfigure)
 
         return [...rowConfigure, ...columnConfigure]
 
@@ -369,18 +369,13 @@ export class TkinterBase extends Widget {
                             row: {
                                 label: "Row",
                                 tool: Tools.NUMBER_INPUT, 
-                                toolProps: { placeholder: "row", max: 1000, min: 0 },
+                                toolProps: { placeholder: "row", max: 1000, min: 1 },
                                 value: 0,
                                 onChange: (value) => {
                                     
-                                    const previousRow = this.getWidgetOuterStyle("gridRow") || "0 / span 1"
+                                    const previousRow = this.getWidgetOuterStyle("gridRow") || "1 / span 1"
                                     let [_row=1, rowSpan=1] = previousRow.replace(/\s+/g, '').split("/span").map(Number)
                                     
-                                    // if (value > rowSpan){
-                                    //     // rowSpan should always be greater than or eq to row
-                                    //     rowSpan = value
-                                    //     this.setAttrValue("gridManager.rowSpan", rowSpan)
-                                    // }
                                     this.setAttrValue("gridManager.row", value)
                                     this.setWidgetOuterStyle("gridRow", `${value+' / span '+rowSpan}`)
                                 }
@@ -411,11 +406,11 @@ export class TkinterBase extends Widget {
                             column: {
                                 label: "Column",
                                 tool: Tools.NUMBER_INPUT,
-                                toolProps: { placeholder: "column", max: 1000, min: 0 },
+                                toolProps: { placeholder: "column", max: 1000, min: 1 },
                                 value: 0,
                                 onChange: (value) => {
                                     
-                                    const previousRow = this.getWidgetOuterStyle("gridColumn") || "0 / span 1"
+                                    const previousRow = this.getWidgetOuterStyle("gridColumn") || "1 / span 1"
 
                                     let [_col=1, colSpan=1] = previousRow.replace(/\s+/g, '').split("/span").map(Number)
 
@@ -440,9 +435,6 @@ export class TkinterBase extends Widget {
 
                                     const [col=1, _colSpan=1] = previousCol.replace(/\s+/g, '').split("/span").map(Number)
 
-                                    // if (value < col){
-                                    //     value = col + 1
-                                    // }
 
                                     if (value < 1){
                                         value = 1
@@ -457,18 +449,22 @@ export class TkinterBase extends Widget {
                                 label: "Sticky",
                                 tool: Tools.SELECT_DROPDOWN,
                                 toolProps: { placeholder: "Sticky", },
-                                options: Object.keys(GRID_STICKY).map((val) => ({value: val, label: val})),
+                                options: Object.values(GRID_STICKY).map((val) => ({value: val, label: val})),
                                 value: GRID_STICKY.NONE,
                                 onChange: (value) => {
                             
                                     this.setAttrValue("gridManager.sticky", value)
                                     
-                                    const widgetStyling = {
-                                        ...this.getGridStickyStyling(value)
-                                    }
-                                    this.updateState({
-                                        widgetOuterStyling: widgetStyling
+                                    
+                                    this.updateState((prev) => ({
+                                        widgetOuterStyling: {
+                                            ...prev.widgetOuterStyling,    
+                                            ...this.getGridStickyStyling(value)
+                                        }
+                                    }), () => {
+                                        console.log("updated grid sticky: ", this.state.widgetOuterStyling, this.getGridStickyStyling(value), value)
                                     })
+
                                     // this.setW
 
                                 }

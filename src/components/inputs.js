@@ -192,7 +192,7 @@ export const DynamicGridWeightInput = React.memo(({value, onChange, gridInputPro
     const addInput = () => {
 
         const newObjectIndex = Object.keys(weightMapping).length
-        setWeightMapping({...weightMapping, [newObjectIndex]: {gridNo: 0, weight: 0}})
+        setWeightMapping({...weightMapping, [newObjectIndex]: {gridNo: 1, weight: 0}})
     }
 
     // Remove an input by index, but keep the first one
@@ -224,7 +224,7 @@ export const DynamicGridWeightInput = React.memo(({value, onChange, gridInputPro
                         }
                         <InputNumber
                             value={gridNo}
-                            min={0}
+                            min={1}
                             onChange={(value) => handleGridNoChange(idx, value, weight)}
                             placeholder={`Input ${index + 1}`}
                             {...gridInputProps}
