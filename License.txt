@@ -5,7 +5,7 @@ Below is the License for source code of PyUIBuilder. For license regarding sourc
 
 -----------------------
 
-The source code for PyUIBuilder is Dual licensed, most parts of the code comes under AGPL, 
+The source code for PyUIBuilder is Dual licensed, some parts of the code comes under AGPL, 
 some parts under a different non-commercial use license. Read the second part after the definition of the AGPL license.
 
 Sub-folders with non-commercial use license will contain the second license as well. 

@@ -34,7 +34,8 @@ class Frame extends TkinterBase{
         return [
                 `${variableName} = tk.Frame(master=${parent})`,
                 `${variableName}.config(bg="${bg}")`,
-                `${variableName}.${this.getLayoutCode()}`
+                `${variableName}.${this.getLayoutCode()}`,
+                ...this.getGridLayoutConfigurationCode(variableName)
             ]
     }
 

@@ -1011,6 +1011,7 @@ class Canvas extends React.Component {
                 if (parentLayout !== Layouts.PLACE) {
                     // FIXME: need to swap grid col and row as well for this to be effective
                     // swap only for grid and flex placements
+                    /** TODO: Fix and uncomment below later
                     const swapClosest = this.__checkClosestShiftElement({
                         event,
                         parentWidgetId,
@@ -1020,6 +1021,7 @@ class Canvas extends React.Component {
                     if (swapClosest.closestChild) {
                         this.shiftWidgetPosition(parentWidgetId, dragElementID, swapClosest.closestIndex)
                     }
+                    */
                 }
             }, 1)
 

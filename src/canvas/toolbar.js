@@ -15,8 +15,6 @@ import { AudioOutlined, FileImageOutlined, FileTextOutlined, VideoCameraOutlined
 import { useWidgetContext } from "./context/widgetContext.js"
 
 
-// FIXME: input cursors problem
-// FIXME: Every time the parent attrs are changed a remount happens, which causes input cursor to go to the end
 /**
  * 
  * @param {boolean} isOpen 
@@ -33,7 +31,6 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
     const [toolbarOpen, setToolbarOpen] = useState(isOpen)
     const [toolbarAttrs, setToolbarAttrs] = useState({})
 
-    // TODO: From here
     const focusedInputRef = useRef()
 
     const [cursorPos, setCursorPos] = useState(0) // store cursor position for focused input so during remount if the cursor position goes to end we can use this
@@ -145,7 +142,6 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
         }
 
         if (focusedInputRef.current?.input) {
-            console.log("handling change: ", focusedInputRef.current.input.selectionStart)
             setCursorPos(focusedInputRef.current.input.selectionStart);
         }else{
             setCursorPos(0)
@@ -294,6 +290,18 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
     }
 
 
+    const renderCustomTool = (val) => {
+        return (
+            // NOTE: custom components must accept value and onChange
+            <val.Component 
+                {...val.toolProps}
+                value={val.value}
+                onChange={(value) => handleChange(value, val.onChange)}>
+
+            </val.Component>
+        )
+    }
+
     const renderTool = (keyName, val) => {
 
         return (
@@ -360,6 +368,7 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
                 )}
 
                 {val.tool === Tools.INPUT_RADIO_LIST && (
+                    // FIXME: problem with maximum recursion error
                     <DynamicRadioInputList
                         defaultInputs={val.value.inputs}
                         defaultSelected={val.value.selectedRadio}
@@ -375,6 +384,12 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
                 {
                     val.tool === Tools.UPLOADED_LIST && (
                         renderUploadDropDown(val, val?.toolProps?.filterOptions || null)
+                    )
+                }
+
+                {
+                    val.tool === Tools.CUSTOM && (
+                        renderCustomTool(val)
                     )
                 }
 

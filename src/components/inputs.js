@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react"
-import { Input, Button, Space, Radio } from "antd"
+import { Input, Button, Space, Radio, InputNumber } from "antd"
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons"
 import { SearchOutlined, CloseCircleFilled } from '@ant-design/icons'
 
@@ -162,6 +162,97 @@ export const DynamicRadioInputList = React.memo(({defaultInputs=[""], defaultSel
 
             <Button type="dashed" onClick={addInput} icon={<PlusOutlined />}>
                 Add Input
+            </Button>
+        </div>
+    )
+})
+
+
+/**
+ * defaultWeightMapping structure: {0: {gridNo: 0, weight: 0}}
+ */
+export const DynamicGridWeightInput = React.memo(({value, onChange, gridInputProps, weightInputProps}) => {
+    
+    const [weightMapping, setWeightMapping] = useState(value)  // Initialize with one input
+
+    useEffect(() => {
+        setWeightMapping(value || {})
+    }, [value])
+
+
+    useEffect(() => {
+
+        if(onChange){
+            onChange(weightMapping)
+        }
+        
+    }, [weightMapping])
+
+    // Add a new input
+    const addInput = () => {
+
+        const newObjectIndex = Object.keys(weightMapping).length
+        setWeightMapping({...weightMapping, [newObjectIndex]: {gridNo: 0, weight: 0}})
+    }
+
+    // Remove an input by index, but keep the first one
+    const removeInput = (index) => {
+        const newInputs = { ...weightMapping }; // Create a shallow copy
+        delete newInputs[index]; // Remove the entry by key
+        setWeightMapping(newInputs); // Update state
+    }
+
+    // Update input value
+    const handleGridNoChange = (index, gridNo, weight) => {
+        const newInputs = {...weightMapping}
+        newInputs[index] = {
+            weight,
+            gridNo
+        }
+        setWeightMapping(newInputs)
+    }
+
+
+    return (
+        <div>
+            {weightMapping && Object.entries(weightMapping).map(([idx, {weight, gridNo}], index) => (
+                <Space key={index} style={{ display: "flex", marginBottom: 8 }} align="baseline">
+
+                    <div className="tw-flex tw-flex-col tw-gap-2">
+                        { index === 0 &&
+                            <span>Grid no</span>
+                        }
+                        <InputNumber
+                            value={gridNo}
+                            min={0}
+                            onChange={(value) => handleGridNoChange(idx, value, weight)}
+                            placeholder={`Input ${index + 1}`}
+                            {...gridInputProps}
+                        />
+                    </div>
+                    <div className="tw-flex tw-flex-col tw-gap-2">
+                        { index === 0 &&
+                            <span>Weight</span>
+                        }
+                        <InputNumber
+                            min={0}
+                            value={weight}
+                            onChange={(value) => handleGridNoChange(idx, gridNo, value)}
+                            placeholder={`Input ${index + 1}`}
+                            {...weightInputProps}
+                        />
+                    </div>
+                    {/* {index !== 0 && (  // Do not show delete button for the first input */}
+                        <div>
+                            <MinusCircleOutlined className="tw-text-xl tw-text-red-500" 
+                                onClick={() => removeInput(index)} />
+                        </div>
+                    {/* )} */}
+                </Space>
+            ))}
+
+            <Button type="dashed" onClick={addInput} icon={<PlusOutlined />}>
+                Add Weight
             </Button>
         </div>
     )

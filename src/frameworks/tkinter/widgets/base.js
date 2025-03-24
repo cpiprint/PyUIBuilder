@@ -1,6 +1,9 @@
+import lo from 'lodash'
+
 import { Layouts, PosType } from "../../../canvas/constants/layouts"
 import Tools from "../../../canvas/constants/tools"
 import Widget from "../../../canvas/widgets/base"
+import { DynamicGridWeightInput } from "../../../components/inputs"
 import { convertObjectToKeyValueString, isNumeric, removeKeyFromObject } from "../../../utils/common"
 import { randomArrayChoice } from "../../../utils/random"
 import { Tkinter_TO_WEB_CURSOR_MAPPING } from "../constants/cursor"
@@ -33,6 +36,7 @@ export class TkinterBase extends Widget {
  
     getLayoutCode(){
         const {layout: parentLayout, direction, gap, align="start"} = this.getParentLayout()
+
 
         const absolutePositioning = this.getAttrValue("positioning")  
 
@@ -125,8 +129,63 @@ export class TkinterBase extends Widget {
         return layoutManager
     }
 
+
+    getGridLayoutConfigurationCode = (variableName) => {
+        const {layout: currentLayout} = this.getLayout()
+
+        let columnConfigure = []
+        let rowConfigure = []
+
+        if (currentLayout === Layouts.GRID){
+
+            const rowWeights = this.getAttrValue("gridWeights.rowWeights")
+            const colWeights = this.getAttrValue("gridWeights.colWeights")
+
+            if (rowWeights){
+                const correctedRowWeight = Object.fromEntries(
+                    Object.entries(rowWeights).map(([_, { gridNo, weight }]) => [gridNo, weight])
+                );// converts the format : {index: {gridNo, weight}} to {gridNo: weight}
+
+                const groupByWeight = Object.entries(correctedRowWeight).reduce((acc, [gridNo, weight]) => {
+                                                if (!acc[weight]) 
+                                                    acc[weight] = []; // Initialize array if it doesn't exist
+                                                
+                                                acc[weight].push(Number(gridNo)); // Convert key to number and add it to the array
+                                                return acc;
+                                        }, {})
+            
+                Object.entries(groupByWeight).forEach(([weight, indices]) => {
+                    rowConfigure.push(`${variableName}.grid_rowconfigure(index=[${indices.join(",")}], weight=${weight})`)
+                })
+            }
+
+            if (colWeights){
+                const correctedColWeight = Object.fromEntries(
+                    Object.entries(colWeights).map(([_, { gridNo, weight }]) => [gridNo, weight])
+                );// converts the format : {index: {gridNo, weight}} to {gridNo: weight}
+
+                const groupByWeight = Object.entries(correctedColWeight).reduce((acc, [gridNo, weight]) => {
+                                                if (!acc[weight]) 
+                                                    acc[weight] = []; // Initialize array if it doesn't exist
+                                                
+                                                acc[weight].push(Number(gridNo)); // Convert key to number and add it to the array
+                                                return acc;
+                                        }, {})
+            
+                Object.entries(groupByWeight).forEach(([weight, indices]) => {
+                    columnConfigure.push(`${variableName}.grid_columnconfigure(index=[${indices.join(",")}], weight=${weight})`)
+                })
+            }
+            
+        }
+
+        console.log("configuration: ", rowConfigure, columnConfigure)
+
+        return [...rowConfigure, ...columnConfigure]
+
+    }
+
     getPackAttrs = () => {
-        // NOTE: tis returns (creates) a new object everytime causing unncessary renders
         return ({
             side: this.state.packAttrs.side,
             anchor: this.state.packAttrs.anchor,
@@ -135,6 +194,29 @@ export class TkinterBase extends Widget {
 
     getPackSide(){
         return this.state.packAttrs.side
+    }
+
+    /**
+     * A simple function that returns a mapping for grid sticky tkinter
+     */
+    getGridStickyStyling(sticky){
+
+        const styleMapping = {
+            [GRID_STICKY.N]: { alignSelf: "start", justifySelf: "unset", placeSelf: "unset" },  // Align to top
+            [GRID_STICKY.S]: { alignSelf: "end", justifySelf: "unset", placeSelf: "unset" },    // Align to bottom
+            [GRID_STICKY.E]: { justifySelf: "end", alignSelf: "unset", placeSelf: "unset" },  // Align to right
+            [GRID_STICKY.W]: { justifySelf: "start", alignSelf: "unset", placeSelf: "unset" }, // Align to left
+            [GRID_STICKY.NS]: { alignSelf: "stretch", justifySelf: "unset", placeSelf: "unset" }, // Stretch vertically
+            [GRID_STICKY.EW]: { justifySelf: "stretch", alignSelf: "unset", placeSelf: "unset" }, // Stretch horizontally
+            [GRID_STICKY.NE]: { alignSelf: "start", justifySelf: "end", placeSelf: "unset"  }, 
+            [GRID_STICKY.SE]: { alignSelf: "end", justifySelf: "end", placeSelf: "unset" },   
+            [GRID_STICKY.NW]: { alignSelf: "start", justifySelf: "start", placeSelf: "unset"  }, 
+            [GRID_STICKY.SW]: { alignSelf: "end", justifySelf: "start", placeSelf: "unset"  },  
+            [GRID_STICKY.NEWS]: { placeSelf: "stretch", alignSelf: "unset", justifySelf: "unset" } // Stretch in all directions
+        };
+
+        return styleMapping[sticky]
+
     }
 
     setParentLayout(layout){
@@ -381,8 +463,16 @@ export class TkinterBase extends Widget {
                             
                                     this.setAttrValue("gridManager.sticky", value)
                                     
+                                    const widgetStyling = {
+                                        ...this.getGridStickyStyling(value)
+                                    }
+                                    this.updateState({
+                                        widgetOuterStyling: widgetStyling
+                                    })
+                                    // this.setW
+
                                 }
-                            },
+                            }
                         }
                     }
                 }
@@ -553,6 +643,7 @@ export class TkinterBase extends Widget {
      */
     renderTkinterLayout(){
         const {layout, direction, gap} = this.getLayout()
+
         if (layout === Layouts.FLEX){
 
 
@@ -605,9 +696,19 @@ export class TkinterBase extends Widget {
                             onChange: (value) => {
                                 this.setAttrValue("gridConfig.noOfRows", value)
 
+                                const gridWeights = this.getAttrValue("gridConfig.rowWeights") 
+
+                                let gridTemplateRows = `repeat(${value}, max-content)`
+
+                                if (gridWeights){
+                                    gridTemplateRows = Array.from({ length: value }, (_, i) =>
+                                        `${gridWeights[i + 1]}fr` || "max-content"
+                                    ).join(" ") // creates "max-content max-content 1fr 3fr" depending on value
+                                }
+
                                 const widgetStyle = {
                                     ...this.state.widgetInnerStyling,
-                                    gridTemplateRows: `repeat(${value}, max-content)`
+                                    gridTemplateRows: gridTemplateRows
                                 }
 
                                 this.updateState({
@@ -633,7 +734,70 @@ export class TkinterBase extends Widget {
                                 })
                             }
                         },    
+                        
                     },
+                    gridWeights: {
+                        label: "Grid weights",
+                        display: "vertical",
+                        rowWeights: {
+                            label: "Row weights",
+                            tool: Tools.CUSTOM,
+                            toolProps: { 
+                                        // placeholder: "weight", 
+                                        // defaultWeightMapping: this.getAttrValue("gridWeights.rowWeights"),
+                                     },
+                            value: undefined,
+                            Component: DynamicGridWeightInput, 
+                            onChange: (value) => {
+
+                                if (!value) return
+
+
+                                this.setAttrValue("gridWeights.rowWeights", value)
+                                
+                                const noOfRows = this.getAttrValue("gridConfig.noOfRows")
+
+
+                                const gridTemplateRows = Array.from({ length: noOfRows }, (_, i) => {
+                                    const row = value[i] // Get the row object
+                                    return row ? `${row.weight}fr` : "max-content"; // Use weight if available
+                                }).join(" ") // creates "max-content max-content 1fr 3fr" depending on value
+
+
+                                this.setWidgetInnerStyle("gridTemplateRows", gridTemplateRows)
+                            }
+                        },
+                        colWeights: {
+                            label: "Column weights",
+                            tool: Tools.CUSTOM,
+                            toolProps: { 
+                                        // placeholder: "weight", 
+                                        // defaultWeightMapping: {0: {weight: 0, gridNo: 0}}
+                                     },
+                            value: undefined,
+                            Component: DynamicGridWeightInput, 
+                            onChange: (value) => {
+
+                                if (!value) return
+
+                                this.setAttrValue("gridWeights.colWeights", value)
+                                
+                                const noOfCols = this.getAttrValue("gridConfig.noOfCols")
+
+
+                                const gridTemplateCol = Array.from({ length: noOfCols }, (_, i) => {
+                                    const col = value[i] // Get the row object
+                                    return col ? `${col.weight}fr` : "max-content"; // Use weight if available
+                                }).join(" ") // creates "max-content max-content 1fr 3fr" depending on value
+
+
+                                this.setWidgetInnerStyle("gridTemplateColumns", gridTemplateCol)
+                                // this.setW
+
+                            }
+                        }
+                    }
+                    
                 }
             }
             this.updateState((prevState) => ({...prevState, ...updates}))

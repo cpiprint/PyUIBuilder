@@ -63,7 +63,8 @@ class MainWindow extends TkinterBase{
         return [
                 `${variableName} = tk.Tk()`,
                 `${variableName}.config(bg="${backgroundColor}")`,
-                `${variableName}.title("${this.getAttrValue("title")}")`
+                `${variableName}.title("${this.getAttrValue("title")}")`,
+                ...this.getGridLayoutConfigurationCode(variableName)
             ]
     }
 

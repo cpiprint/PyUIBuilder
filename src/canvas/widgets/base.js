@@ -230,10 +230,7 @@ class Widget extends React.Component {
         if (this.state.attrs.styling.backgroundColor)
             this.setWidgetInnerStyle('backgroundColor', this.state.attrs.styling?.backgroundColor.value || "#fff")
 
-        this.load(this.props.initialData || {}, () => {
-            console.log("component remounted: ", this.__id)
-
-        }) // load the initial data
+        this.load(this.props.initialData || {}) // load the initial data
 
         // The elementRect is received only after the elemet is added so, it may not be accurate so use resize handler
         // this.resizeObserver = new MutationObserver(this.handleResizeEvents)
@@ -777,13 +774,6 @@ class Widget extends React.Component {
      * @param {string} value - Value of the style
      */
     setWidgetInnerStyle(key, value) {
-
-        // FIXME: this one clashing with other setWidgetInner style
-
-        const widgetStyle = {
-            ...this.state.widgetInnerStyling,
-            [key]: value
-        }
 
         this.setState((prevState) => ({
             widgetInnerStyling: {

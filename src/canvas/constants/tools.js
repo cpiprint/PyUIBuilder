@@ -11,6 +11,8 @@ const Tools = {
 
     LAYOUT_MANAGER: "layout_manager",
     UPLOADED_LIST: "uploaded_list",
+
+    CUSTOM: "Custom"
 }
 
 

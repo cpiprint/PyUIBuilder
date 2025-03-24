@@ -46,7 +46,8 @@ class TopLevel extends Widget{
         return [
                 `${variableName} = tk.Toplevel(master=${parent})`,
                 `${variableName}.config(bg="${backgroundColor}")`,
-                `${variableName}.title("${this.getAttrValue("title")}")`
+                `${variableName}.title("${this.getAttrValue("title")}")`,
+                ...this.getGridLayoutConfigurationCode(variableName)
             ]
     }
 
