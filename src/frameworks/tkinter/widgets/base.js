@@ -13,7 +13,7 @@ import { GRID_STICKY, JUSTIFY, RELIEF } from "../constants/styling"
 
 // FIXME: grid sticky may clash with flex sticky when changing layout, check it once
 // FIXME: widget items should add width and height in tkinter code especially in frame
-
+// TODO: width and height aren't really fixed
 export class TkinterBase extends Widget {
 
     static requiredImports = ['import tkinter as tk']
@@ -124,8 +124,30 @@ export class TkinterBase extends Widget {
 
         }else if (parentLayout === Layouts.GRID){
             const row = this.getAttrValue("gridManager.row")
-            const col = this.getAttrValue("gridManager.column")
-            layoutManager = `grid(row=${row-1}, column=${col-1})` // unlike css grid tkinter grid starts from 0
+            const column = this.getAttrValue("gridManager.column")
+            const rowSpan = this.getAttrValue("gridManager.rowSpan")
+            const columnSpan = this.getAttrValue("gridManager.columnSpan")
+
+            const sticky = this.getAttrValue("gridManager.sticky")
+
+            const config = {
+                row: row-1, // unlike css grid tkinter grid starts from 0
+                column: column-1, // unlike css grid tkinter grid starts from 0 
+            }
+
+            if (rowSpan > 1){
+                config['rowspan'] = rowSpan
+            }
+
+            if (columnSpan > 1){
+                config['columnspan'] = columnSpan
+            }
+
+            if (sticky !== ""){
+                config['sticky'] = sticky
+            }
+
+            layoutManager = `grid(${convertObjectToKeyValueString(config)})` 
         }
 
         return layoutManager
@@ -202,17 +224,17 @@ export class TkinterBase extends Widget {
     getGridStickyStyling(sticky){
 
         const styleMapping = {
-            [GRID_STICKY.N]: { alignSelf: "start", justifySelf: "unset", placeSelf: "unset" },  // Align to top
-            [GRID_STICKY.S]: { alignSelf: "end", justifySelf: "unset", placeSelf: "unset" },    // Align to bottom
-            [GRID_STICKY.E]: { justifySelf: "end", alignSelf: "unset", placeSelf: "unset" },  // Align to right
-            [GRID_STICKY.W]: { justifySelf: "start", alignSelf: "unset", placeSelf: "unset" }, // Align to left
-            [GRID_STICKY.NS]: { alignSelf: "stretch", justifySelf: "unset", placeSelf: "unset" }, // Stretch vertically
-            [GRID_STICKY.EW]: { justifySelf: "stretch", alignSelf: "unset", placeSelf: "unset" }, // Stretch horizontally
-            [GRID_STICKY.NE]: { alignSelf: "start", justifySelf: "end", placeSelf: "unset"  }, 
-            [GRID_STICKY.SE]: { alignSelf: "end", justifySelf: "end", placeSelf: "unset" },   
-            [GRID_STICKY.NW]: { alignSelf: "start", justifySelf: "start", placeSelf: "unset"  }, 
-            [GRID_STICKY.SW]: { alignSelf: "end", justifySelf: "start", placeSelf: "unset"  },  
-            [GRID_STICKY.NEWS]: { placeSelf: "stretch", alignSelf: "unset", justifySelf: "unset" } // Stretch in all directions
+            [GRID_STICKY.N]: { alignSelf: "start", justifySelf: "center" }, 
+            [GRID_STICKY.S]: { alignSelf: "end", justifySelf: "center" },   
+            [GRID_STICKY.E]: {  alignSelf: "center", justifySelf: "end" }, 
+            [GRID_STICKY.W]: {  alignSelf: "center", justifySelf: "start" },
+            [GRID_STICKY.NS]: { alignSelf: "stretch", justifySelf: "center" }, // Stretch vertically
+            [GRID_STICKY.EW]: { alignSelf: "center", justifySelf: "stretch"  }, // Stretch horizontally
+            [GRID_STICKY.NE]: { alignSelf: "start", justifySelf: "end" }, // Top-right
+            [GRID_STICKY.SE]: { alignSelf: "end", justifySelf: "end" },   // Bottom-right
+            [GRID_STICKY.NW]: { alignSelf: "start", justifySelf: "start" }, // Top-left
+            [GRID_STICKY.SW]: { alignSelf: "end", justifySelf: "start" },  // Bottom-left
+            [GRID_STICKY.NEWS]: { placeSelf: "stretch" } // Stretch in all directions
         };
 
         return styleMapping[sticky]
@@ -456,13 +478,19 @@ export class TkinterBase extends Widget {
                                     this.setAttrValue("gridManager.sticky", value)
                                     
                                     
-                                    this.updateState((prev) => ({
-                                        widgetOuterStyling: {
-                                            ...prev.widgetOuterStyling,    
-                                            ...this.getGridStickyStyling(value)
-                                        }
-                                    }), () => {
-                                        console.log("updated grid sticky: ", this.state.widgetOuterStyling, this.getGridStickyStyling(value), value)
+                                    this.updateState((prev) => {
+                                        
+                                        const { alignSelf, justifySelf, placeSelf, ...restStates } = prev.widgetOuterStyling; // Remove these properties
+
+                                        // TODO: fix  outer width and height, it should be set to auto else, it won't stretch
+                                        return ({
+                                                    widgetOuterStyling: {
+                                                        ...restStates,   
+                                                        width: "auto",
+                                                        height: "auto",
+                                                        ...this.getGridStickyStyling(value)
+                                                    }
+                                                })
                                     })
 
                                     // this.setW
@@ -844,12 +872,27 @@ export class TkinterBase extends Widget {
         let fillX = this.getAttrValue("flexManager.fillX") || false
         let fillY = this.getAttrValue("flexManager.fillY") || false
 
+        const {layout: parentLayout} = (this.getParentLayout() || {})
+
         if (fillX){
             width = "100%"
         }
 
         if (fillY){
             height = "100%"
+        }
+
+        if (parentLayout && parentLayout === Layouts.GRID){
+            const sticky = this.getAttrValue("gridManager.sticky")
+
+            if (sticky === GRID_STICKY.NEWS){
+                width = "100%"
+                height = "100%"
+            }else if (sticky === GRID_STICKY.WE){
+                width = "100%"
+            }else if (sticky === GRID_STICKY.NS){
+                height = "100%"
+            }
         }
         
         return {width, height, minWidth, minHeight}
