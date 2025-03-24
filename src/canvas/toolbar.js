@@ -142,7 +142,7 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
         }
 
         if (focusedInputRef.current?.input) {
-            setCursorPos(focusedInputRef.current.input.selectionStart);
+            setCursorPos(focusedInputRef.current.input.selectionStart)
         }else{
             setCursorPos(0)
         }

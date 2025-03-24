@@ -144,7 +144,7 @@ export class TkinterBase extends Widget {
             }
 
             if (sticky !== ""){
-                config['sticky'] = sticky
+                config['sticky'] = `"${sticky}"`
             }
 
             layoutManager = `grid(${convertObjectToKeyValueString(config)})` 
@@ -186,14 +186,14 @@ export class TkinterBase extends Widget {
             if (colWeights){
                 const correctedColWeight = Object.fromEntries(
                     Object.entries(colWeights).map(([_, { gridNo, weight }]) => [gridNo-1, weight]) //  tkinter grid starts from 0, so -1
-                );// converts the format : {index: {gridNo, weight}} to {gridNo: weight}
+                ) // converts the format : {index: {gridNo, weight}} to {gridNo: weight}
 
                 const groupByWeight = Object.entries(correctedColWeight).reduce((acc, [gridNo, weight]) => {
                                                 if (!acc[weight]) 
-                                                    acc[weight] = []; // Initialize array if it doesn't exist
+                                                    acc[weight] = [] // Initialize array if it doesn't exist
                                                 
-                                                acc[weight].push(Number(gridNo)); // Convert key to number and add it to the array
-                                                return acc;
+                                                acc[weight].push(Number(gridNo)) // Convert key to number and add it to the array
+                                                return acc
                                         }, {})
             
                 Object.entries(groupByWeight).forEach(([weight, indices]) => {
@@ -482,12 +482,9 @@ export class TkinterBase extends Widget {
                                         
                                         const { alignSelf, justifySelf, placeSelf, ...restStates } = prev.widgetOuterStyling; // Remove these properties
 
-                                        // TODO: fix  outer width and height, it should be set to auto else, it won't stretch
                                         return ({
                                                     widgetOuterStyling: {
                                                         ...restStates,   
-                                                        width: "auto",
-                                                        height: "auto",
                                                         ...this.getGridStickyStyling(value)
                                                     }
                                                 })
@@ -685,7 +682,6 @@ export class TkinterBase extends Widget {
         const { layout, direction, grid = { rows: 1, cols: 1 }, gap = 10, align } = value
 
         // console.log("layout value: ", value)
-        // FIXME: In grid layout the layout doesn't adapt to the size of the child if resized
 
         let widgetStyle = {
             ...this.state.widgetInnerStyling,

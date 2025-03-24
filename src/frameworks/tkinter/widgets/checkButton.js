@@ -127,11 +127,14 @@ export class RadioButton extends TkinterWidgetBase{
     // FIXME: the radio buttons are not visible because of the default heigh provided
 
     static widgetType = "radio_button"
+    static displayName = "Radio Button"
     
     constructor(props) {
         super(props)
 
         this.minSize = {width: 50, height: 30}
+        
+        let newAttrs = removeKeyFromObject("layout", this.state.attrs)
         
         this.state = {
             ...this.state,
@@ -139,13 +142,15 @@ export class RadioButton extends TkinterWidgetBase{
             fitContent: { width: true, height: true },
             widgetName: "Radio button",
             attrs: {
-                ...this.state.attrs,
+                 ...newAttrs,
                 radios: {
                     label: "Radio Group",
                     tool: Tools.INPUT_RADIO_LIST,
-                    value: {inputs: ["default"], selectedRadio: -1},
+                    value: {inputs: ["default"], selectedRadio: null},
                     onChange: ({inputs, selectedRadio}) => {
-                        this.setAttrValue("radios", {inputs, selectedRadio})
+                        this.setAttrValue("radios", {inputs, selectedRadio}, () => {
+                            console.log("attribute set: ", this.state.attrs.radios, {inputs, selectedRadio},)
+                        })
                     }
                 }
 

@@ -87,19 +87,20 @@ export const DynamicInputList = () => {
 }
 
 
-export const DynamicRadioInputList = React.memo(({defaultInputs=[""], defaultSelected=null, onChange}) => {
-    const [inputs, setInputs] = useState([""])  // Initialize with one input
-    const [selectedRadio, setSelectedRadio] = useState(null)  // Tracks selected radio button
+export const DynamicRadioInputList = React.memo(({defaultInputs, defaultSelected=null, onChange}) => {
+    const [inputs, setInputs] = useState(defaultInputs || [""])  // Initialize with one input
+    const [selectedRadio, setSelectedRadio] = useState(defaultSelected)  // Tracks selected radio button
 
     useEffect(() => {
 
-        setInputs(defaultInputs)
+        setInputs(defaultInputs || [""])
 
     }, [defaultInputs])
 
     useEffect(() => {
 
         setSelectedRadio(defaultSelected)
+        
     }, [defaultSelected])
 
     useEffect(() => {

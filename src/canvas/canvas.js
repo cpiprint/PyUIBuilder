@@ -224,8 +224,6 @@ class Canvas extends React.Component {
             }
         }
 
-        console.log("inner widget: ", innerWidget, target)
-
         return innerWidget
     }
 
@@ -248,7 +246,7 @@ class Canvas extends React.Component {
     openToolbar = (widget) => {
         this.setState({
             // selectedWidget: selectedWidget,
-            toolbarAttrs: widget.getToolbarAttrs(),
+            toolbarAttrs: widget?.getToolbarAttrs(),
             toolbarOpen: true
         })
 
