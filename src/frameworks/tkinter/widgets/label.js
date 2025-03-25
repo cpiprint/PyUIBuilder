@@ -88,10 +88,22 @@ class Label extends TkinterWidgetBase{
         return requirements
     }
 
+    getConfigCode(){
+        const config = super.getConfigCode()
+
+        const anchor = this.getAttrValue("styling.anchor")
+
+        if (anchor)
+            config['anchor'] = `"${anchor}"`
+
+        return config
+    }
+
     generateCode(variableName, parent){
 
 
         const labelText = this.getAttrValue("labelWidget")
+
         const config = convertObjectToKeyValueString(this.getConfigCode())
         const image = this.getAttrValue("imageUpload")
 
