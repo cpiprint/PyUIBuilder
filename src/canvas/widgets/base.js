@@ -220,7 +220,7 @@ class Widget extends React.Component {
 
     componentDidMount() {
 
-        this.setLayout({layout: Layouts.FLEX, gap: 10})
+        this.setLayout({layout: Layouts.PLACE, gap: 10})
 
         // if (this.state.attrs.layout){
         //     this.setLayout(this.state.attrs.layout.value)

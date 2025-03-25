@@ -20,7 +20,11 @@ export const ANCHOR = [
     "s",
     "e",
     "w",
-    "center"
+    "center",
+    "ne", 
+    "se", 
+    "sw",
+    "nw",
 ]
 
 

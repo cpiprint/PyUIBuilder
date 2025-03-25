@@ -1,6 +1,7 @@
 import Tools from "../../../canvas/constants/tools"
 import { convertObjectToKeyValueString } from "../../../utils/common"
 import { getPythonAssetPath } from "../../utils/pythonFilePath"
+import { ANCHOR } from "../constants/styling"
 import { TkinterWidgetBase } from "./base"
 
 
@@ -20,6 +21,26 @@ class Label extends TkinterWidgetBase{
             size: { width: 80, height: 40 },
             attrs: {
                 ...this.state.attrs,
+                styling: {
+                    ...this.state.attrs.styling,
+                    anchor: {
+                        label: "Text align",
+                        tool: Tools.SELECT_DROPDOWN,
+                        options: ANCHOR.map((val) => ({value: val, label: val})),
+                        value: "",
+                        onChange: (value) => {
+                            
+                            this.setAttrValue("styling.anchor", value)
+
+                            this.setState((prevState) => ({
+                                widgetInnerStyle: {
+                                    ...prevState,
+                                    ...this.getAnchorStyle(value)
+                                }
+                            }))
+                        }
+                    }
+                },
                 labelWidget: {
                     label: "Text",
                     tool: Tools.INPUT, 
@@ -109,6 +130,22 @@ class Label extends TkinterWidgetBase{
         })
     }
 
+    getAnchorStyle = (anchor) => {
+        const anchorStyles = {
+            n: { justifyContent: 'center', alignItems: 'flex-start' },
+            s: { justifyContent: 'center', alignItems: 'flex-end' },
+            e: { justifyContent: 'flex-end', alignItems: 'center' },
+            w: { justifyContent: 'flex-start', alignItems: 'center' },
+            ne: { justifyContent: 'flex-end', alignItems: 'flex-start' },
+            se: { justifyContent: 'flex-end', alignItems: 'flex-end' },
+            nw: { justifyContent: 'flex-start', alignItems: 'flex-start' },
+            sw: { justifyContent: 'flex-start', alignItems: 'flex-end' },
+            center: { justifyContent: 'center', alignItems: 'center' }
+        }
+      
+        return anchorStyles[anchor] || anchorStyles["w"];
+    }
+
     renderContent(){
 
         const image = this.getAttrValue("imageUpload")
@@ -121,7 +158,7 @@ class Label extends TkinterWidgetBase{
                         minHeight: '100%', // Force the height to 100% of the parent
                     }}
                 >
-                <div className="tw-p-2 tw-w-full tw-h-full  tw-flex tw-place-content-center tw-place-items-center " 
+                <div className="tw-p-2 tw-w-full tw-h-full tw-flex tw-place-content-center tw-place-items-center " 
                         ref={this.styleAreaRef}
                         style={this.getInnerRenderStyling()}>
                     {/* {this.props.children} */}
@@ -130,7 +167,10 @@ class Label extends TkinterWidgetBase{
                             <img src={image.previewUrl} className="tw-bg-contain tw-w-full tw-h-full" />
                         )
                     }
-                    <div className="" style={{color: this.getAttrValue("styling.foregroundColor")}}>
+                    <div className={`tw-flex ${!image ? "tw-w-full tw-h-full" : ""}`} style={{
+                            color: this.getAttrValue("styling.foregroundColor"),
+                            ...this.getAnchorStyle(this.getAttrValue("styling.anchor"))
+                        }}>
                         {this.getAttrValue("labelWidget")}
                     </div>
                 </div>
