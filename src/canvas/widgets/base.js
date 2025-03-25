@@ -253,7 +253,8 @@ class Widget extends React.Component {
         if (!lo.isEqual(lo.pick(prevState, compareAttrs), lo.pick(this.state, compareAttrs))){
             // THIS IS inefficeint
             // this.props.requestThisWidgetDataUpdate(this.__id)
-            setTimeout(() => this.props.requestWidgetDataUpdate(this.__id), 1)
+            // setTimeout(() => this.props.requestWidgetDataUpdate(this.__id), 1)
+            this.props.requestWidgetDataUpdate(this.__id)
         }
         // call update widgets
 

@@ -25,13 +25,12 @@ export class TkinterBase extends Widget {
         
         this.state = {
             ...this.state,
-            packAttrs: {
+            packAttrs: { // This is required as during flex layout change remount happens and the state updates my not function as expected
                 side: "top",
-                anchor: "nw"
+                anchor: "nw",
             }
         }
 
-        this.getPackSide = this.getPackSide.bind(this)
         this.renderTkinterLayout = this.renderTkinterLayout.bind(this)
     }
 
@@ -211,11 +210,8 @@ export class TkinterBase extends Widget {
         return ({
             side: this.state.packAttrs.side,
             anchor: this.state.packAttrs.anchor,
+            expand: this.getAttrValue("flexManager.expand"),
         })
-    }
-
-    getPackSide(){
-        return this.state.packAttrs.side
     }
 
     /**
@@ -347,32 +343,29 @@ export class TkinterBase extends Widget {
                                 onChange: (value) => {
                                     this.setAttrValue("flexManager.side", value, () => {
                                         this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, side: value}}), () => {
+                                           
+                                            // this.props.parentWidgetRef.current.forceRerender()
                                             this.props.requestWidgetDataUpdate(this.props.parentWidgetRef.current.__id)
                                             this.stateChangeSubscriberCallback() // call this to notify the toolbar that the widget has changed state
-                                            // this.props.parentWidgetRef.current.forceRerender()
                                         })
+                                      
+
                                     })
 
                                     
                                     // console.log("updateing state: ", value, this.props.parentWidgetRef.current)
                                 }
                             },
-                            // expand: {
-                            //     label: "Expand",
-                            //     tool: Tools.CHECK_BUTTON,
-                            //     value: false,
-                            //     onChange: (value) => {
-                            //         this.setAttrValue("flexManager.expand", value)
-                                    
-                            //         const widgetStyle = {
-                            //             ...this.state.widgetOuterStyling,
-                            //             flexGrow: value ? 1 : 0,
-                            //         }
-                            //         this.updateState({
-                            //             widgetOuterStyling: widgetStyle,
-                            //         })
-                            //     }
-                            // },
+                            expand: {
+                                label: "Expand",
+                                tool: Tools.CHECK_BUTTON,
+                                value: false,
+                                onChange: (value) => {
+                                    this.setAttrValue("flexManager.expand", value)
+                                  
+                                    // this.setWidgetOuterStyle(value ? 1 : 0)
+                                }
+                            },
                             
                         }
                     }
@@ -467,7 +460,6 @@ export class TkinterBase extends Widget {
                                 }
                             },
                             sticky: {
-                                // TODO: from here
                                 label: "Sticky",
                                 tool: Tools.SELECT_DROPDOWN,
                                 toolProps: { placeholder: "Sticky", },
@@ -580,7 +572,7 @@ export class TkinterBase extends Widget {
             ...baseStyle, alignSelf: "stretch",   // Forces stretching in grid rows
             justifySelf: "stretch", // Forces stretching in grid columns
             flexGrow: (fillX || fillY) ? 1 : 0
-            };
+        }
     }
       
 
@@ -590,7 +582,7 @@ export class TkinterBase extends Widget {
      * @param {*} index 
      * @returns 
      */
-    renderPackWidgetsRecursively = (widgets, index = 0, lastSide="") => {
+    renderPackWidgetsRecursively = (widgets, index = 0, lastSide="", previousExpandValue=0) => {
 
         if (index >= widgets.length) return null
 
@@ -600,7 +592,10 @@ export class TkinterBase extends Widget {
         if (!widgetRef) return null // Ensure ref exists before accessing
         
         const side = widgetRef.getPackAttrs()?.side || "top"
-        
+        const expand = widgetRef.getPackAttrs()?.expand || false
+
+        console.log("rerendering; ", side, expand)
+
         const direction = (s) => {
             return  (s === "bottom"
                         ? "column-reverse"
@@ -613,8 +608,21 @@ export class TkinterBase extends Widget {
           
         const currentWidgetDirection = direction(side)
 
-
         const isSameSide = lastSide === side
+        
+        let expandValue =  0 // the first element will be given highest priority when expanding if expand is True
+
+        if (expand){
+            if (isSameSide){
+                expandValue = previousExpandValue // if its the same side then its value is same as the previous else widget length - index
+            }else{
+                expandValue = widgets.length - index
+                previousExpandValue = expandValue
+            }
+            
+        }
+
+
         lastSide = side; // Update last side for next recursion
 
         // console.log("current widget direction: ", isSameSide, currentWidgetDirection)
@@ -627,35 +635,53 @@ export class TkinterBase extends Widget {
                             flexDirection: direction,
                             width: "100%"
                     }}>{widget}</div> */}
-                    <div className="tw-flex tw-justify-center tw-items-center tw-w-full">
+                    <div className="tw-flex tw-justify-center tw-items-center "
+                        style={{
+                            flexGrow: expandValue,
+                            // flexShrink: 0, // Prevent collapsing
+                        }}
+                        >
                         {widget}
                     </div>
 
                     {/* <WidgetOuter key={index}>{widget}</WidgetOuter> */}
-                    {this.renderPackWidgetsRecursively(widgets, index + 1, side)}
+                    {this.renderPackWidgetsRecursively(widgets, index + 1, side, previousExpandValue)}
                 </>
             )
           }
         
+          // FIXME: side and expand aren't working together
           // If next widget has a different side, create a new container for it
           return (
-                <div data-pack-container={side} style={{
-                    display: "flex",
-                    flexDirection: currentWidgetDirection,
-                    width: "100%",
-                    height: "100%"
-                }}>
+                <div data-pack-container={side} 
+                    // className={`${expand ? "tw-h-full tw-w-full" : ""}
+                    //             `}
+                    style={{
+                        display: "flex",
+                        flexDirection: currentWidgetDirection,
+                        // width: "100%",
+                        // height: "100%",
+                        flexGrow: expandValue
+                        // FIXME: the flex should only grow when expand is true, by default every thing should grow, but when there a expand
+                    }}>
 
-                    <div className={`tw-flex tw-justify-center tw-items-center 
-                                        ${(["top", "bottom"].includes(side)) ? "tw-w-full" : "tw-h-full"}`}>
+                    <div className={`tw-flex
+                                       
+                                        ${(["top", "bottom"].includes(side)) ? "tw-justify-center" : "tw-items-center"}
+                                        `
+                                    }
+                                        style={{
+                                            flexGrow: expandValue,
+                                        }}
+                                        >
                         {widget}
                     </div>
-                    {this.renderPackWidgetsRecursively(widgets, index + 1, side)}
+                    {this.renderPackWidgetsRecursively(widgets, index + 1, side, previousExpandValue)}
                 </div>
                
           );
       
-    };
+    }
       
 
     /**

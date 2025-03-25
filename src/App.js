@@ -33,6 +33,8 @@ import TkMainWindow from './frameworks/tkinter/widgets/mainWindow'
 import CTkMainWindow from './frameworks/customtk/widgets/mainWindow' 
 import TreeviewContainer from './sidebar/treeviewContainer'
 import { WidgetContextProvider } from './canvas/context/widgetContext'
+import { isChromium } from './utils/system'
+import { Modal } from 'antd'
 
 
 function App() {
@@ -45,6 +47,8 @@ function App() {
 	const [projectName, setProjectName] = useState('untitled project')
 	const [UIFramework, setUIFramework] = useState(FrameWorks.TKINTER)
 
+	// const [notChromiumAlert, setShowNotChromiumAlert] = useState(false) // if the user isn't using a chromium based browser alerts the user
+
     // const [uploadedAssets, setUploadedAssets] = useState([]) //  a global storage for assets, since redux can't store files(serialize files)
 
 	const [sidebarWidgets, setSidebarWidgets] = useState(TkinterWidgets || [])
@@ -54,6 +58,21 @@ function App() {
 
 	// NOTE: the below reference is no longer required
 	const [canvasWidgets, setCanvasWidgets] = useState([]) // contains the reference to the widgets inside the canvas
+
+	useEffect(() => {
+
+		isChromium().then((isChrome) => {
+
+			if (!isChrome){
+				Modal.warning({
+					title: "Not Chromium browser",
+					content: "We recommend using Chromium based browser such as Chrome, Brave, Edge etc."
+				})
+			}
+		})
+		
+
+	}, [])
 
 	const sidebarTabs = [
 		{
@@ -254,20 +273,21 @@ function App() {
                     onOk={handleOk} okType={okButtonType} onCancel={handleCancel}>
                 <p>Are you sure you want to change the framework? This will clear the canvas.</p>
             </Modal> */}
+				
 
-				<WidgetContextProvider>
-					<DragProvider>
-						<div className="tw-w-full tw-h-[94vh] tw-flex">
-							<Sidebar tabs={sidebarTabs}/>
-							
-							{/* <ActiveWidgetProvider> */}
-							<Canvas ref={canvasRef} widgets={canvasWidgets} 
-									/>
-							{/* </ActiveWidgetProvider> */}
-						</div>
-						{/* dragOverlay (dnd-kit) helps move items from one container to another */}
-					</DragProvider>
-				</WidgetContextProvider>
+			<WidgetContextProvider>
+				<DragProvider>
+					<div className="tw-w-full tw-h-[94vh] tw-flex">
+						<Sidebar tabs={sidebarTabs}/>
+						
+						{/* <ActiveWidgetProvider> */}
+						<Canvas ref={canvasRef} widgets={canvasWidgets} 
+								/>
+						{/* </ActiveWidgetProvider> */}
+					</div>
+					{/* dragOverlay (dnd-kit) helps move items from one container to another */}
+				</DragProvider>
+			</WidgetContextProvider>
 		</div>
 	)
 }
