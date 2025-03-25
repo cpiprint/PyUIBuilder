@@ -171,6 +171,7 @@ const CanvasToolBar = memo(({ isOpen, widgetType, }) => {
                     placeholder="select content"
                     showSearch
                     className="tw-w-full"
+                    notFoundContent="Start uploading from uploads tab"
                     value={val.value?.name || ""}
                     onChange={(value) =>  {
 

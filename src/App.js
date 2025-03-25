@@ -46,8 +46,8 @@ function App() {
 
 	const [projectName, setProjectName] = useState('untitled project')
 	const [UIFramework, setUIFramework] = useState(FrameWorks.TKINTER)
-
-	// const [notChromiumAlert, setShowNotChromiumAlert] = useState(false) // if the user isn't using a chromium based browser alerts the user
+	
+	const [shownNotChromiumAlert, setShownNotChromiumAlert] = useState(false) // if the user isn't using a chromium based browser alerts the user
 
     // const [uploadedAssets, setUploadedAssets] = useState([]) //  a global storage for assets, since redux can't store files(serialize files)
 
@@ -61,6 +61,10 @@ function App() {
 
 	useEffect(() => {
 
+		if (shownNotChromiumAlert){
+			return
+		}
+
 		isChromium().then((isChrome) => {
 
 			if (!isChrome){
@@ -68,11 +72,12 @@ function App() {
 					title: "Not Chromium browser",
 					content: "We recommend using Chromium based browser such as Chrome, Brave, Edge etc."
 				})
+				setShownNotChromiumAlert(true)
 			}
 		})
 		
 
-	}, [])
+	}, [shownNotChromiumAlert])
 
 	const sidebarTabs = [
 		{
