@@ -31,7 +31,26 @@ export class TkinterBase extends Widget {
             }
         }
 
-        this.renderTkinterLayout = this.renderTkinterLayout.bind(this)
+        this.renderTkinterLayout = this.renderTkinterLayout.bind(this) // this must be called if droppableTags is not set to null
+
+        const originalRenderContent = this.renderContent.bind(this);
+        this.renderContent = () => {
+            this._calledRenderTkinterLayout = false
+
+            const content = originalRenderContent()
+
+            if (
+                this.droppableTags !== null &&
+                this.droppableTags !== undefined &&
+                !this._calledRenderTkinterLayout
+            ) {
+                throw new Error(
+                `class ${this.constructor.name}: renderTkinterLayout() must be called inside renderContent() when droppableTags is not null`
+                )
+            }
+
+            return content
+        }
     }
 
  
@@ -374,7 +393,6 @@ export class TkinterBase extends Widget {
                                 value: this.state.packAttrs.anchor,
                                 onChange: (value) => {
                                     this.setAttrValue("flexManager.anchor", value, () => {
-                                       console.log("set anchor: ", this.state.attrs.flexManager) 
                                         // this.props.parentWidgetRef.current.forceRerender()
                                     })   
                                     this.updateState((prevState) => ({packAttrs: {...prevState.packAttrs, anchor: value}}), () => {
@@ -652,6 +670,7 @@ export class TkinterBase extends Widget {
      * Helps with pack layout manager and grid manager
      */
     renderTkinterLayout(){
+        this._calledRenderTkinterLayout = true // NOTE: this is set so subclass are forced to call this method if droppable tags are not null
         const {layout, direction, gap} = this.getLayout()
 
         if (layout === Layouts.FLEX){
@@ -674,7 +693,7 @@ export class TkinterBase extends Widget {
         if (layout === Layouts.GRID){
 
 
-            const {gridManager, flexManager, positioning, ...restAttrs} =  this.state.attrs
+            const {positioning, ...restAttrs} =  this.state.attrs
 
             const updates = {
                 attrs: {
@@ -1075,7 +1094,7 @@ export class TkinterWidgetBase extends TkinterBase{
 
                             //     widgetInnerStyling: widgetStyle
                             // })
-                            this.setAttrValue("padding.padX", value)
+                            this.setAttrValue("padding.padY", value)
                         }
                     },
                 },

@@ -137,7 +137,7 @@ class TopLevel extends TkinterBase{
                 <div className="tw-p-2 tw-w-full tw-h-full tw-content-start"
                     ref={this.styleAreaRef}
                     style={this.state.widgetInnerStyling}>
-                    {this.props.children}
+                    {this.renderTkinterLayout()}
                 </div>
             </div>
         )

@@ -69,7 +69,7 @@ class Frame extends TkinterBase{
 
                             //     widgetInnerStyling: widgetStyle
                             // })
-                            this.setAttrValue("padding.padX", value)
+                            this.setAttrValue("padding.padY", value)
                         }
                     },
                 },
@@ -132,8 +132,6 @@ class Frame extends TkinterBase{
 
         const {layout} = this.getParentLayout()
 
-        console.log("parent layout: ", layout)
-
         const config = {
             bg: `"${bg}"` 
         }
@@ -174,7 +172,7 @@ class Frame extends TkinterBase{
                 <div className="tw-p-2 tw-w-full tw-h-full tw-content-start" 
                     ref={this.styleAreaRef}
                     style={this.getInnerRenderStyling()}>
-                    {this.props.children}
+                    {this.renderTkinterLayout()} {/*This is required for pack layouts, so if your widget accepts child widgets, ensure to add this */}
                 </div>
             </div>
         )
