@@ -78,7 +78,7 @@ function Premium({ children, className = "" }) {
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-x-circle-fill tw-text-red-600 tw-text-base"></i>
                                     <span>Premium widgets &nbsp;
-                                        <span className="tw-text-sm">(eg: tab widget, multi-page support, 3rd party widget library support etc)</span>
+                                        <span className="tw-text-sm">(eg: tab widget, file upload, multi-page support, 3rd party widget library support etc)</span>
                                     </span>
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
@@ -157,7 +157,7 @@ function Premium({ children, className = "" }) {
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
                                     <span>Premium widgets &nbsp;
-                                    <span className="tw-text-sm">(eg: tab widget, multi-page support, 3rd party widget library support etc)</span>
+                                    <span className="tw-text-sm">(eg: tab widget, file upload, multi-page support, 3rd party widget library support etc)</span>
                                     </span>
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
@@ -246,7 +246,7 @@ function Premium({ children, className = "" }) {
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
                                     <span>Premium widgets &nbsp;
-                                    <span className="tw-text-sm">(eg: tab widget, multi-page support, 3rd party widget library support etc)</span>
+                                    <span className="tw-text-sm">(eg: tab widget, file upload, multi-page support, 3rd party widget library support etc)</span>
                                     </span>
                                 </li>
                                 <li className="tw-flex tw-place-items-center tw-gap-2">

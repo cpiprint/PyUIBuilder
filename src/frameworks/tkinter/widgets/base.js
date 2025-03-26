@@ -527,74 +527,6 @@ export class TkinterBase extends Widget {
         return updates
     }
 
-    getFlexLayoutStyle = (side, anchor) => {
-        // NOTE: may no longer be required
-        // let baseStyle = { display: "flex", width: "100%", height: "100%", ...this.getPackAnchorStyle(anchor) }
-        let baseStyle = { }
-
-        const rowStyle = {
-            display: "flex",
-            gap: "10px",
-          }
-
-        const columnStyle = {
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-        }
-
-        switch (side) {
-            case "top":
-                return { gridColumn: "1 / -1", alignSelf: "stretch", ...baseStyle, ...columnStyle };
-            case "bottom":
-                return { gridColumn: "1 / -1", alignSelf: "stretch", ...baseStyle, ...columnStyle };
-            case "left":
-                return { gridRow: "2", gridColumn: "1", justifySelf: "stretch", ...baseStyle, ...rowStyle };
-            case "right":
-                return { gridRow: "2", gridColumn: "3", justifySelf: "stretch", ...baseStyle, ...rowStyle };
-            case "center":
-                return { gridRow: "2", gridColumn: "2", alignSelf: "center", justifySelf: "center", ...baseStyle, };
-            default:
-                return {};
-        }
-        
-    }
-
-    /**
-     * Pack manager has anchor parameter
-     * @param {*} anchor 
-     */
-    getPackAnchorStyle = (anchor, isColumn) => {
-        // NOTE: may no longer be required
-        const styleMap = {
-          nw: { justifyContent: "flex-start", alignItems: "flex-start" },
-          ne: { justifyContent: "flex-end", alignItems: "flex-start" },
-          sw: { justifyContent: "flex-start", alignItems: "flex-end" },
-          se: { justifyContent: "flex-end", alignItems: "flex-end" },
-          center: { justifyContent: "center", alignItems: "center" }
-        }
-        // return styleMap[anchor] || {}
-
-        const baseStyle = styleMap[anchor] || {};
-        const fillX = this.getAttrValue("flexManager.fillX")
-        const fillY = this.getAttrValue("flexManager.fillY")
-        
-        if (fillX) {
-            return { ...baseStyle, width: "100%", flexGrow: isColumn ? 0 : 1 }; 
-        } 
-        if (fillY) {
-            return { ...baseStyle, height: "100%", flexGrow: isColumn ? 1 : 0 };
-        } 
-        if (fillX && fillY) {
-            return { ...baseStyle, width: "100%", height: "100%", flexGrow: 1 };
-        }
-
-        return {
-            ...baseStyle, alignSelf: "stretch",   // Forces stretching in grid rows
-            justifySelf: "stretch", // Forces stretching in grid columns
-            flexGrow: (fillX || fillY) ? 1 : 0
-        }
-    }
       
 
     /**
@@ -612,7 +544,7 @@ export class TkinterBase extends Widget {
     
         const { side = "top", expand = false, anchor } = widgetRef.getPackAttrs() || {};
     
-        console.log("rerendering:", side, expand);
+        // console.log("rerendering:", side, expand);
     
         const directionMap = {
             top: "column",
@@ -635,7 +567,6 @@ export class TkinterBase extends Widget {
     
         lastSide = side; // Update last side for recursion
         
-        // 🟢 Mapping Tkinter anchors to Flexbox styles
         const anchorStyles = {
             n: { alignItems: "flex-start", justifyContent: "center" }, // Top-center
             s: { alignItems: "flex-end", justifyContent: "center" },   // Bottom-center
@@ -739,7 +670,6 @@ export class TkinterBase extends Widget {
     setLayout(value) {
         const { layout, direction, grid = { rows: 1, cols: 1 }, gap = 10, align } = value
 
-        // FIXME: when the layout changes the data is lost
 
         if (layout === Layouts.GRID){
 

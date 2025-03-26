@@ -1,5 +1,7 @@
+import { Layouts } from "../../../canvas/constants/layouts"
 import Tools from "../../../canvas/constants/tools"
 import Widget from "../../../canvas/widgets/base"
+import { convertObjectToKeyValueString } from "../../../utils/common"
 import {TkinterBase} from "./base"
 
 
@@ -120,13 +122,42 @@ class Frame extends TkinterBase{
         this.setAttrValue("styling.backgroundColor", "#EDECEC")
     }
 
+    getConfigCode(){
+        const bg = this.getAttrValue("styling.backgroundColor")
+
+        const fitWidth = this.state.fitContent.width
+        const fitHeight = this.state.fitContent.height
+
+        const {width, height} = this.getSize()
+
+        const {layout} = this.getParentLayout()
+
+        console.log("parent layout: ", layout)
+
+        const config = {
+            bg: `"${bg}"` 
+        }
+
+        if (layout !== Layouts.PLACE){
+            if (!fitWidth){
+                config['width'] = width
+            }
+
+            if (!fitHeight){
+                config['height'] = height
+            }
+        }
+
+        return config
+    }
+
     generateCode(variableName, parent){
 
-        const bg = this.getAttrValue("styling.backgroundColor")
+        const config = convertObjectToKeyValueString(this.getConfigCode())
 
         return [
                 `${variableName} = tk.Frame(master=${parent})`,
-                `${variableName}.config(bg="${bg}")`,
+                `${variableName}.config(${config})`,
                 `${variableName}.${this.getLayoutCode()}`,
                 ...this.getGridLayoutConfigurationCode(variableName)
             ]
