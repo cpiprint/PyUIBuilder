@@ -626,6 +626,11 @@ export class TkinterBase extends Widget {
         const isVertical = ["top", "bottom"].includes(side);
     
         let expandValue = expand ? (isSameSide ? previousExpandValue : widgets.length - index) : 1;
+        
+        if ((expand && previousExpandValue === 0) || (expand && expandValue === 0)){
+            expandValue = 1 // if there is expand it should expand
+        }
+
         if (expand && !isSameSide) previousExpandValue = expandValue;
     
         lastSide = side; // Update last side for recursion
