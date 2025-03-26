@@ -136,7 +136,7 @@ class Widget extends React.Component {
                     label: "Layout",
                     tool: Tools.LAYOUT_MANAGER, // the tool to display, can be either HTML ELement or a constant string
                     value: {
-                        layout: "flex",
+                        layout: Layouts.PLACE,
                         direction: "row",
                         // grid: {
                         //     rows: 12,
@@ -243,6 +243,7 @@ class Widget extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        
         if (prevProps !== this.props) {
             this.canvasMetaData = this.props.canvasMetaData
         }
@@ -704,7 +705,7 @@ class Widget extends React.Component {
 
     getLayout(){
 
-        return this.state?.attrs?.layout?.value || Layouts.FLEX
+        return this.getAttrValue("layout") || Layouts.PLACE
     }
 
     setLayout(value) {
@@ -734,12 +735,12 @@ class Widget extends React.Component {
         //     widgetStyle["placeContent"] = "unset"
         // }
 
-        this.updateState({
-            widgetInnerStyling: widgetStyle
+        this.setAttrValue("layout", value, () => {
+            this.updateState({
+                widgetInnerStyling: widgetStyle
+            })
+            this.props.onLayoutUpdate({parentId: this.__id, parentLayout: value})// inform children about the layout update
         })
-
-        this.setAttrValue("layout", value)
-        this.props.onLayoutUpdate({parentId: this.__id, parentLayout: value})// inform children about the layout update
 
     }
 

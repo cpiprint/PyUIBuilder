@@ -1,3 +1,4 @@
+import Tools from "../../../canvas/constants/tools"
 import Widget from "../../../canvas/widgets/base"
 import {TkinterBase} from "./base"
 
@@ -17,7 +18,99 @@ class Frame extends TkinterBase{
         this.state = {
             ...this.state,
             fitContent: {width: true, height: true},
-            widgetName: "Frame"
+            widgetName: "Frame",
+            attrs: {
+                ...this.state.attrs,
+                padding: {
+                    label: "padding",
+                    padX: {
+                        label: "Pad X",
+                        tool: Tools.NUMBER_INPUT,
+                        toolProps: {min: 0, max: 140},
+                        value: null,
+                        onChange: (value) => {
+                            // this.setWidgetInnerStyle("paddingLeft", `${value}px`)
+                            // this.setWidgetInnerStyle("paddingRight", `${value}px`)
+
+                            // const widgetStyle = {
+                               
+                            // }
+                            this.setState((prevState) => ({
+
+                                widgetInnerStyling: {
+                                    ...prevState.widgetInnerStyling,
+                                    paddingLeft: `${value}px`,
+                                    paddingRight: `${value}px`
+                                }
+                            }))
+
+
+                            this.setAttrValue("padding.padX", value)
+                        }
+                    },
+                    padY: {
+                        label: "Pad Y",
+                        tool: Tools.NUMBER_INPUT,
+                        toolProps: {min: 0, max: 140},
+                        value: null,
+                        onChange: (value) => {
+
+                            this.setState((prevState) => ({
+
+                                widgetInnerStyling: {
+                                    ...prevState.widgetInnerStyling,
+                                    paddingTop: `${value}px`,
+                                    paddingBottom: `${value}px`
+                                }
+                            }))
+                            // this.setState({
+
+                            //     widgetInnerStyling: widgetStyle
+                            // })
+                            this.setAttrValue("padding.padX", value)
+                        }
+                    },
+                },
+                margin: {
+                    label: "Margin",
+                    marginX: {
+                        label: "Margin X",
+                        tool: Tools.NUMBER_INPUT,
+                        toolProps: {min: 0, max: 140},
+                        value: null,
+                        onChange: (value) => {
+
+
+                            this.updateState((prev) => ({
+                                widgetOuterStyling: {
+                                    ...prev.widgetOuterStyling,
+                                    marginLeft: `${value}px`,
+                                    marginRight: `${value}px`
+                                },
+                            }))
+                            this.setAttrValue("margin.marginX", value)
+                        }
+                    },
+                    marginY: {
+                        label: "Margin Y",
+                        tool: Tools.NUMBER_INPUT,
+                        toolProps: {min: 0, max: 140},
+                        value: null,
+                        onChange: (value) => {
+
+                            this.updateState((prev) => ({
+                                widgetOuterStyling: {
+                                    ...prev.widgetOuterStyling,
+                                    marginTop: `${value}px`,
+                                    marginBottom: `${value}px`
+                                },
+                            }))
+
+                            this.setAttrValue("margin.marginY", value)
+                        }
+                    },
+                },  
+            }
         }
 
     }

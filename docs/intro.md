@@ -10,7 +10,7 @@ Let's start with the basics of UI
 
 ![Layout basics](./assets/basics.jpg)
 
-1. The sidebar on the left will have multiple buttons, each button will provide you with necessary tools.
+1. The sidebar on the left will have multiple tabs, each tabs will provide you with necessary tools.
 2. The Place where you drag and drop widgets is the canvas
 3. The toolbar will only appear if a widget is selected.
 
@@ -26,7 +26,7 @@ Things you can do on canvas.
 4. Delete widgets using `del` key or right clicking on the widget
 
 ## Project name
-By default all project's are named untitled project, you can change this from the header input next to export code.
+By default all project's are named `"untitled project"`, you can change this from the header input next to export code.
 
 ## Selecting a UI library
 You can select the UI library from the header dropdown. Once selected changing the UI library in between your work, will erase the canvas.

@@ -1259,30 +1259,37 @@ class Canvas extends React.Component {
     }
 
     updateWidgetAndChildren = (widgetId) => {
-         const serializeWidgetRecursively = (widget) => {
-        const widgetObj = this.getWidgetById(widget.id)?.current;
-        if (!widgetObj) return widget; // If no widget reference found, return unchanged
-
-        return {
-            ...widget,
-            initialData: {
-                ...widget.initialData,
-                ...widgetObj.serialize()
-            },
-            children: widget.children?.map(serializeWidgetRecursively) || [] // Recursively serialize children
+        const serializeWidgetRecursively = (widget) => {
+            const widgetObj = this.getWidgetById(widget.id)?.current;
+            if (!widgetObj) return widget; // If no widget reference found, return unchanged
+            return {
+                ...widget,
+                initialData: {
+                    ...widget.initialData,
+                    ...widgetObj.serialize()
+                },
+                children: widget.children?.map(serializeWidgetRecursively) || [] // Recursively serialize children
+            };
         };
-    };
+
 
         this.setWidgets(prevWidgets => {
             const updateWidgets = (widgets) => {
-                return widgets.map(widget => 
-                    widget.id === widgetId ? serializeWidgetRecursively(widget) : widget
-                );
-            };
+                return widgets.map(widget => {
+                    if (widget.id === widgetId) {
+                        return serializeWidgetRecursively(widget)
+                    }
+                    // Search inside children recursively
+                    return {
+                        ...widget,
+                        children: updateWidgets(widget.children || [])
+                    }
+                })
+            }
 
-            return updateWidgets(prevWidgets);
-        });
-    };
+            return updateWidgets(prevWidgets)
+        })
+    }
     
 
     renderWidget = (widget) => {
