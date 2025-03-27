@@ -38,11 +38,7 @@ function Premium({ children, className = "" }) {
                     If you find this tool useful and want to fund and support it's development, consider buying a <b>one time license</b>.
                     <br />
                     <br />
-                    I am working on PYUI builder full time to help you easily build GUI's in python. However as a solo-dev, its super hard 
-                    to keep working on it without enough funding. 
-                    <br />
-                    <br />
-                    By buying pre-order license, I get to complete this faster and you get discounted price, advance features, priority support, early access, upcoming features, and &nbsp;
+                    By pre-ordering license, you get discounted price, advance features, priority support, early access, upcoming features, and &nbsp;
                     <a
                         href="https://github.com/PaulleDemon/PyUIBuilder/blob/main/roadmap.md"
                         target="_blank"
