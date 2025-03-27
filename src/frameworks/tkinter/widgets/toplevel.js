@@ -104,8 +104,8 @@ class TopLevel extends TkinterBase{
         return ({
             widgetName: toolBarAttrs.widgetName,
             title: this.state.attrs.title,
+            logo: this.state.attrs.logo,
             size: toolBarAttrs.size,
-
             ...this.state.attrs,
 
         })

@@ -12,8 +12,6 @@ import { ANCHOR, GRID_STICKY, JUSTIFY, RELIEF } from "../constants/styling"
 
 
 // FIXME: grid sticky may clash with flex sticky when changing layout, check it once
-// FIXME: widget items should add width and height in tkinter code especially in frame
-// TODO: width and height aren't really fixed
 export class TkinterBase extends Widget {
 
     static requiredImports = ['import tkinter as tk']
@@ -693,7 +691,7 @@ export class TkinterBase extends Widget {
         if (layout === Layouts.GRID){
 
 
-            const {positioning, ...restAttrs} =  this.state.attrs
+            const {...restAttrs} =  this.state.attrs
 
             const updates = {
                 attrs: {
@@ -811,6 +809,12 @@ export class TkinterBase extends Widget {
             }
             this.updateState((prevState) => ({...prevState, ...updates}))
 
+        }else if (layout === Layouts.FLEX){
+            const {gridConfig, gridWeights, ...restAttrs} =  this.state.attrs
+            
+            console.log("Flex: ", restAttrs)
+         
+            this.updateState((prevState) => ({attrs: {...restAttrs}}))
         }
 
         this.props.onLayoutUpdate({parentId: this.__id, parentLayout: value})// inform children about the layout update
@@ -1215,7 +1219,7 @@ export class TkinterWidgetBase extends TkinterBase{
             config["pady"] = this.getAttrValue("margin.marginY")
         }
 
-        // FIXME: add width and height, the scales may not be correct as the width and height are based on characters in pack and grid not pixels
+        // FIXME: add width and height, the scales may not be correct as the width and height are based on characters in label and grid not pixels
         // if (!this.state.fitContent.width){
         //     config["width"] = this.state.size.width
         // }

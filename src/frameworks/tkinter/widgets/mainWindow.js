@@ -111,8 +111,8 @@ class MainWindow extends TkinterBase{
             id: this.__id,
             widgetName: toolBarAttrs.widgetName,
             title: this.state.attrs.title,
+            logo: this.state.attrs.logo,
             size: toolBarAttrs.size,
-
             ...this.state.attrs,
 
         })
