@@ -61,21 +61,23 @@ function App() {
 
 	useEffect(() => {
 
-		if (shownNotChromiumAlert){
-			return
+		if (!shownNotChromiumAlert){
+			// this modal may rerender twice only in dev mode because of how react works
+			isChromium().then((isChrome) => {
+
+				if (!isChrome){
+					Modal.warning({
+						title: "Use Chromium browser",
+						onOk: () => setShownNotChromiumAlert(true),
+						content: (<span>We recommend using Chromium based browser such as Chrome, Brave, Edge etc for best results. 
+									<br />
+									Join us on 
+									<a href="https://discord.gg/dHXjrrCA7G" target='_blank' rel='noreferrer noopener'> Discord</a> for help and updates</span>)
+					})
+				}
+			})
 		}
-
-		isChromium().then((isChrome) => {
-
-			if (!isChrome){
-				Modal.warning({
-					title: "Not Chromium browser",
-					content: "We recommend using Chromium based browser such as Chrome, Brave, Edge etc."
-				})
-				setShownNotChromiumAlert(true)
-			}
-		})
-		
+		setShownNotChromiumAlert(true)		
 
 	}, [shownNotChromiumAlert])
 

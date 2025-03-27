@@ -145,7 +145,7 @@ function Premium({ children, className = "" }) {
                                 Support open-source development 🚀. Plus, get added benefits.
                             </p>
                             <hr />
-                            <ul className="tw-mt-4 tw-flex tw-flex-col tw-gap-3 tw-text-xl tw-text-gray-600">
+                            <ul className="tw-mt-4 tw-flex tw-flex-col tw-gap-3 tw-text-xl tw-text-black">
                                 <li className="tw-flex tw-place-items-center tw-gap-2">
                                     <i className="bi bi-check-circle-fill tw-text-green-600 tw-text-base"></i>
                                     <span>Access to web-based editor</span>

@@ -4,7 +4,7 @@
  */
 import { useEffect, useRef, useMemo, useState } from "react";
 
-import { BookOutlined, CloseCircleFilled, CrownFilled, GithubFilled, ShareAltOutlined } from "@ant-design/icons";
+import { BookOutlined, CloseCircleFilled, CrownFilled, DiscordFilled, GithubFilled, ShareAltOutlined } from "@ant-design/icons";
 
 import KO_FI from "../assets/logo/ko-fi.png"
 import Premium from "./utils/premium";
@@ -88,6 +88,11 @@ function Sidebar({tabs}){
                 }
 
                 <div className="tw-flex tw-flex-col tw-place-content-items tw-place-items-center tw-gap-3 tw-mt-auto">
+                    <a href="https://discord.gg/dHXjrrCA7G" target="_blank"
+                        title="discord invite"
+                        rel="noopener noreferrer" className="tw-text-2xl tw-cursor-pointer tw-text-gray-800">
+                        <DiscordFilled />
+                    </a>
                     <Premium className="tw-text-2xl tw-bg-purple-700 tw-text-center 
                                     tw-w-[35px] tw-h-[35px] tw-rounded-md 
                                     tw-cursor-pointer tw-text-white 
@@ -107,9 +112,9 @@ function Sidebar({tabs}){
                         rel="noopener noreferrer" className="tw-text-2xl tw-cursor-pointer tw-text-black">
                         <GithubFilled />
                     </a>
-                    <a href="https://ko-fi.com/artpaul" className="tw-cursor-pointer ">
+                    {/* <a href="https://ko-fi.com/artpaul" className="tw-cursor-pointer ">
                         <img src={KO_FI} alt="ko-fi" className="tw-w-[30px] tw-h-[30px]"/>
-                    </a>
+                    </a> */}
                 </div>
             </div>
 
