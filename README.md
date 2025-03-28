@@ -30,7 +30,7 @@ https://github.com/user-attachments/assets/ac91aa98-843d-4578-b646-88e66bc113de
 <sub>**Don't like background music? fell free to mute it**</sub>
 
 ## Try PyUIBuilder
-Try [PyUIBuilder](https://pyuibuilder.pages.dev/)
+Try [PyUIBuilder](https://pyuibuilder.com)
 
 ## Table of contents
 
@@ -53,7 +53,7 @@ Try [PyUIBuilder](https://pyuibuilder.pages.dev/)
 
 
 ## Docs - Getting started
-Read the docs on the [Docs page](https://pyuibuilder-docs.pages.dev/)
+Read the docs on the [Docs page](https://docs.pyuibuilder.com/)
 
 ## Example app
 
@@ -109,7 +109,7 @@ While there are a lot of features, here are few you need to know.
 * Framework agnostic - Can outputs code in multiple frameworks.
 * Pre-built UI widgets
 * Plugins to extend 3rd party UI libraries
-* Supports layout managers, such as flex, grid and absolute positioning [read docs](https://pyuibuilder-docs.pages.dev/)
+* Supports layout managers, such as flex, grid and absolute positioning [read docs](https://docs.pyuibuilder.com/)
 * Generates python Code.
 * Support to upload local assets.
 * Generates requirements.txt file when needed
