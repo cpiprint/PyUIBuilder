@@ -90,7 +90,7 @@ function Sidebar({tabs}){
                 <div className="tw-flex tw-flex-col tw-place-content-items tw-place-items-center tw-gap-3 tw-mt-auto">
                     <a href="https://discord.gg/dHXjrrCA7G" target="_blank"
                         title="discord invite"
-                        rel="noopener noreferrer" className="tw-text-2xl tw-cursor-pointer tw-text-gray-800">
+                        rel="noopener noreferrer" className="tw-text-3xl tw-cursor-pointer tw-text-[#5562EA]">
                         <DiscordFilled />
                     </a>
                     <Premium className="tw-text-2xl tw-bg-purple-700 tw-text-center 
