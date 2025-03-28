@@ -659,7 +659,7 @@ export class TkinterBase extends Widget {
                 {this.renderPackWidgetsRecursively(widgets, index + 1, side, previousExpandValue)}
             </div>
         );
-    };
+    }
     
       
 
@@ -842,18 +842,6 @@ export class TkinterBase extends Widget {
         
         const {layout: parentLayout, direction, gap} = this.getParentLayout() || {}
 
-        // if (parentLayout === Layouts.FLEX){
-        //     const fillX = this.getAttrValue("flexManager.fillX")
-        //     const fillY = this.getAttrValue("flexManager.fillY")
-
-        //     // This is needed if fillX or fillY is true, as the parent is applied flex-grow
-
-        //     if (fillX || fillY){
-        //         width = "100%"
-        //         height = "100%"
-        //     }
-
-        // }
         
         const styling = {
             ...this.state.widgetInnerStyling,

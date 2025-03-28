@@ -116,6 +116,22 @@ class Label extends CustomTkWidgetBase{
         })
     }
 
+    getAnchorStyle = (anchor) => {
+        const anchorStyles = {
+            n: { justifyContent: 'center', alignItems: 'flex-start' },
+            s: { justifyContent: 'center', alignItems: 'flex-end' },
+            e: { justifyContent: 'flex-end', alignItems: 'center' },
+            w: { justifyContent: 'flex-start', alignItems: 'center' },
+            ne: { justifyContent: 'flex-end', alignItems: 'flex-start' },
+            se: { justifyContent: 'flex-end', alignItems: 'flex-end' },
+            nw: { justifyContent: 'flex-start', alignItems: 'flex-start' },
+            sw: { justifyContent: 'flex-start', alignItems: 'flex-end' },
+            center: { justifyContent: 'center', alignItems: 'center' }
+        }
+      
+        return anchorStyles[anchor] || anchorStyles["w"];
+    }
+
     renderContent(){
 
         const image = this.getAttrValue("imageUpload")
@@ -137,7 +153,10 @@ class Label extends CustomTkWidgetBase{
                             <img src={image.previewUrl} className="tw-bg-contain tw-w-full tw-h-full" />
                         )
                     }
-                    <div className="" style={{color: this.getAttrValue("styling.foregroundColor")}}>
+                    <div className={`tw-flex ${!image ? "tw-w-full tw-h-full" : ""}`} style={{
+                                        color: this.getAttrValue("styling.foregroundColor"),
+                                        ...this.getAnchorStyle(this.getAttrValue("styling.anchor"))
+                                        }}>
                         {this.getAttrValue("labelWidget")}
                     </div>
                 </div>
