@@ -20,5 +20,25 @@ export const ANCHOR = [
     "s",
     "e",
     "w",
-    "center"
+    "center",
+    "ne", 
+    "se", 
+    "sw",
+    "nw",
 ]
+
+
+export const GRID_STICKY = {
+    N: "n",
+    S: "s",
+    E: "e",
+    W: "w",
+    WE: "we",
+    NS: "ns",
+    NW: "nw",
+    NE: "ne",
+    SW: "sw",
+    SE: "se",
+    NEWS: "news",
+    NONE: "",
+}

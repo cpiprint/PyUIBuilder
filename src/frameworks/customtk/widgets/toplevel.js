@@ -1,8 +1,10 @@
 import Widget from "../../../canvas/widgets/base"
 import Tools from "../../../canvas/constants/tools"
+import { getPythonAssetPath } from "../../utils/pythonFilePath"
+import { CustomTkBase } from "./base"
 
 
-class TopLevel extends Widget{
+class TopLevel extends CustomTkBase{
 
     static widgetType = "toplevel"
     static displayName = "Top Level"
@@ -27,6 +29,13 @@ class TopLevel extends Widget{
                     toolProps: {placeholder: "Window title", maxLength: 40}, 
                     value: "Top level",
                     onChange: (value) => this.setAttrValue("title", value)
+                },
+                logo: {
+                    label: "Toplevel Logo",
+                    tool: Tools.UPLOADED_LIST, 
+                    toolProps: {filterOptions: ["image/jpg", "image/jpeg", "image/png"]}, 
+                    value: "",
+                    onChange: (value) => this.setAttrValue("logo", value)
                 }
 
             }
@@ -42,11 +51,49 @@ class TopLevel extends Widget{
 
         const backgroundColor = this.getAttrValue("styling.backgroundColor")
 
-        return [
-                `${variableName} = ctk.CTkToplevel(master=${parent})`,
-                `${variableName}.configure(fg_color="${backgroundColor}")`,
-                `${variableName}.title("${this.getAttrValue("title")}")`
-            ]
+        const logo = this.getAttrValue("logo")
+
+        const {width, height} = this.getSize()
+
+        const code = [
+            `${variableName} = ctk.CTkToplevel(master=${parent})`,
+            `${variableName}.configure(fg_color="${backgroundColor}")`,
+            `${variableName}.title("${this.getAttrValue("title")}")`,
+            `${variableName}.geometry("${width}x${height}")`,
+
+            ...this.getGridLayoutConfigurationCode(variableName)
+        ]
+
+        if (logo?.name){
+            
+            // code.push(`\n`)
+            code.push(`${variableName}_img = Image.open(${getPythonAssetPath(logo.name, "image")})`)
+            code.push(`${variableName}_img = ImageTk.PhotoImage(${variableName}_img)`)
+            code.push(`${variableName}.iconphoto(False, ${variableName}_img)`)
+            // code.push("\n")
+        }
+
+        return code
+    }
+
+    getImports(){
+        const imports = super.getImports()
+        
+        if (this.getAttrValue("logo"))
+            imports.push("import os", "from PIL import Image, ImageTk", )
+
+        return imports
+    }
+
+
+    getRequirements(){
+        const requirements = super.getRequirements()
+
+        
+        if (this.getAttrValue("logo"))
+            requirements.push("pillow")
+
+        return requirements
     }
 
     getToolbarAttrs(){
@@ -55,8 +102,8 @@ class TopLevel extends Widget{
         return ({
             widgetName: toolBarAttrs.widgetName,
             title: this.state.attrs.title,
+            logo: this.state.attrs.logo,
             size: toolBarAttrs.size,
-
             ...this.state.attrs,
 
         })
@@ -80,7 +127,7 @@ class TopLevel extends Widget{
                 <div className="tw-p-2 tw-w-full tw-h-full tw-content-start" 
                     ref={this.styleAreaRef}
                     style={this.state.widgetInnerStyling}>
-                    {this.props.children}
+                    {this.renderTkinterLayout()}
                 </div>
             </div>
         )

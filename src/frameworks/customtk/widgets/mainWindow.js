@@ -1,12 +1,20 @@
 import Widget from "../../../canvas/widgets/base"
 import Tools from "../../../canvas/constants/tools"
 import { CustomTkBase } from "./base"
+import { getPythonAssetPath } from "../../utils/pythonFilePath"
 
 
 class MainWindow extends CustomTkBase{
 
     static widgetType = "main_window"
     static displayName = "Main Window"
+
+
+    static initialSize = {
+        width: 700,
+        height: 400
+    }
+
 
     constructor(props) {
         super(props)
@@ -27,6 +35,13 @@ class MainWindow extends CustomTkBase{
                     toolProps: {placeholder: "Window title", maxLength: 40}, 
                     value: "Main Window",
                     onChange: (value) => this.setAttrValue("title", value)
+                },
+                logo: {
+                    label: "Window Logo",
+                    tool: Tools.UPLOADED_LIST, 
+                    toolProps: {filterOptions: ["image/jpg", "image/jpeg", "image/png"]}, 
+                    value: "",
+                    onChange: (value) => this.setAttrValue("logo", value)
                 }
 
             }
@@ -43,12 +58,48 @@ class MainWindow extends CustomTkBase{
     generateCode(variableName, parent){
 
         const backgroundColor = this.getAttrValue("styling.backgroundColor")
+        const logo = this.getAttrValue("logo")
 
-        return [
-                `${variableName} = ctk.CTk()`,
-                `${variableName}.configure(fg_color="${backgroundColor}")`,
-                `${variableName}.title("${this.getAttrValue("title")}")`
-            ]
+        const {width, height} = this.getSize()
+
+        const code = [
+            `${variableName} = ctk.CTk()`,
+            `${variableName}.configure(fg_color="${backgroundColor}")`,
+            `${variableName}.title("${this.getAttrValue("title")}")`, 
+            `${variableName}.geometry("${width}x${height}")`,
+            ...this.getGridLayoutConfigurationCode(variableName)
+        ]
+
+        if (logo?.name){
+            
+            // code.push(`\n`)
+            code.push(`${variableName}_img = Image.open(${getPythonAssetPath(logo.name, "image")})`)
+            code.push(`${variableName}_img = ImageTk.PhotoImage(${variableName}_img)`)
+            code.push(`${variableName}.iconphoto(False, ${variableName}_img)`)
+            // code.push("\n")
+        }
+
+        return code
+    }
+
+    getImports(){
+        const imports = super.getImports()
+        
+        if (this.getAttrValue("logo"))
+            imports.push("import os", "from PIL import Image, ImageTk", )
+
+        return imports
+    }
+
+
+    getRequirements(){
+        const requirements = super.getRequirements()
+
+        
+        if (this.getAttrValue("logo"))
+            requirements.push("pillow")
+
+        return requirements
     }
 
     getToolbarAttrs(){
@@ -58,8 +109,8 @@ class MainWindow extends CustomTkBase{
             id: this.__id,
             widgetName: toolBarAttrs.widgetName,
             title: this.state.attrs.title,
+            logo: this.state.attrs.logo,
             size: toolBarAttrs.size,
-
             ...this.state.attrs,
 
         })
@@ -83,7 +134,7 @@ class MainWindow extends CustomTkBase{
                 <div className="tw-p-2 tw-w-full tw-relative tw-h-full tw-overflow-hidden tw-content-start" 
                         ref={this.styleAreaRef}
                         style={this.state.widgetInnerStyling}>
-                    {this.props.children}
+                    {this.renderTkinterLayout()}
                 </div>
             </div>
         )
