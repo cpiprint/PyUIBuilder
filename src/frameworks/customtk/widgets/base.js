@@ -94,18 +94,18 @@ export class CustomTkBase extends Widget {
 
             if (packSide === "" || packSide === "top"){
                 
-                config['side'] = `tk.TOP`
+                config['side'] = `ctk.TOP`
             
             }else if (packSide === "left"){
                 
-                config['side'] = `tk.LEFT`
+                config['side'] = `ctk.LEFT`
     
             }else if (packSide === "right"){
 
-                config['side'] = `tk.RIGHT`
+                config['side'] = `ctk.RIGHT`
 
             }else{
-                config['side'] = `tk.BOTTOM`
+                config['side'] = `ctk.BOTTOM`
             }
 
             // if (gap > 0){
