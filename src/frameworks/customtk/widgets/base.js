@@ -811,8 +811,6 @@ export class CustomTkBase extends Widget {
         }else if (layout === Layouts.FLEX){
             const {gridConfig, gridWeights, ...restAttrs} =  this.state.attrs
             
-            console.log("Flex: ", restAttrs)
-         
             this.updateState((prevState) => ({attrs: {...restAttrs}}))
         }
 
@@ -938,6 +936,7 @@ export class CustomTkBase extends Widget {
             pos
         }
         
+        const {layout} = attrs
 
         this.setState(newData,  () => {
             let layoutAttrs = this.setParentLayout(parentLayout).attrs || {}
@@ -973,6 +972,10 @@ export class CustomTkBase extends Widget {
             if (selected){
                 this.select()
             } 
+
+            if (layout){
+                this.setLayout(layout)
+            }
         })  
 
 

@@ -214,13 +214,14 @@ class Widget extends React.Component {
 
         this.stateUpdateCallback = null // allowing other components such as toolbar to subscribe to changes in this widget
         this.resizeObserver = null
+        
+        this.setLayout({layout: Layouts.PLACE, gap: 10})
 
 
     }
 
     componentDidMount() {
 
-        this.setLayout({layout: Layouts.PLACE, gap: 10})
 
         // if (this.state.attrs.layout){
         //     this.setLayout(this.state.attrs.layout.value)
@@ -704,8 +705,7 @@ class Widget extends React.Component {
     }
 
     getLayout(){
-
-        return this.getAttrValue("layout") || Layouts.PLACE
+        return this.getAttrValue("layout") || {layout: Layouts.PLACE}
     }
 
     setLayout(value) {

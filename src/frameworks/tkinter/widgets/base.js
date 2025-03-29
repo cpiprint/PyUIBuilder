@@ -812,8 +812,6 @@ export class TkinterBase extends Widget {
         }else if (layout === Layouts.FLEX){
             const {gridConfig, gridWeights, ...restAttrs} =  this.state.attrs
             
-            console.log("Flex: ", restAttrs)
-         
             this.updateState((prevState) => ({attrs: {...restAttrs}}))
         }
 
@@ -938,6 +936,8 @@ export class TkinterBase extends Widget {
             ...layoutUpdates,
             pos
         }
+
+        const {layout} = attrs
         
 
         this.setState(newData,  () => {
@@ -965,7 +965,7 @@ export class TkinterBase extends Widget {
 
             
             if (newAttrs?.styling?.backgroundColor){
-                // TODO: find a better way to apply innerStyles
+                // TODO: find a better way to apply innerStyles (we may not need this anymore)
                 this.setWidgetInnerStyle("backgroundColor", newAttrs.styling.backgroundColor.value)
             }
             this.updateState({ attrs: newAttrs }, callback)
@@ -974,6 +974,10 @@ export class TkinterBase extends Widget {
             if (selected){
                 this.select()
             } 
+
+            if (layout){
+                this.setLayout(layout)
+            }
         })  
 
 
