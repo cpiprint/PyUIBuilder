@@ -161,6 +161,17 @@ class Frame extends CustomTkBase{
             ]
     }
 
+    getToolbarAttrs(){
+        const {layout, ...toolBarAttrs} = super.getToolbarAttrs()
+        // places layout at the end
+        return ({
+            id: this.__id,
+            ...toolBarAttrs,
+            padding: this.state.attrs.padding,
+            margin: this.state.attrs.margin,
+            layout
+        })
+    } 
     
     renderContent(){
         // console.log("bounding rect: ", this.getBoundingRect())

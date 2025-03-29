@@ -686,8 +686,13 @@ export class CustomTkBase extends Widget {
     setLayout(value) {
         const { layout, direction, grid = { rows: 1, cols: 1 }, gap = 10, align } = value
 
+        const gridRow = this.getAttrValue("gridConfig.noOfRows") || 3 // suppose its loaded using this.load, we need this
+        const gridCol = this.getAttrValue("gridConfig.noOfCols") || 3
 
         if (layout === Layouts.GRID){
+
+            const rowWeight = this.getAttrValue("gridWeights.rowWeights") || undefined // suppose its loaded via this.load
+            const colWeight = this.getAttrValue("gridWeights.colWeights") || undefined // suppose its loaded via this.load
 
 
             const {...restAttrs} =  this.state.attrs
@@ -702,7 +707,7 @@ export class CustomTkBase extends Widget {
                             label: "No of rows",
                             tool: Tools.NUMBER_INPUT, 
                             toolProps: { placeholder: "no of rows", max: 1000, min: 1 },
-                            value: 3,
+                            value: gridRow,
                             onChange: (value) => {
                                 this.setAttrValue("gridConfig.noOfRows", value)
 
@@ -728,7 +733,7 @@ export class CustomTkBase extends Widget {
                             label: "No of cols",
                             tool: Tools.NUMBER_INPUT, 
                             toolProps: { placeholder: "no of cols", max: 1000, min: 1 },
-                            value: 3,
+                            value: gridCol,
                             onChange: (value) => {
                                 this.setAttrValue("gridConfig.noOfCols", value)
 
@@ -752,7 +757,7 @@ export class CustomTkBase extends Widget {
                                         // placeholder: "weight", 
                                         // defaultWeightMapping: this.getAttrValue("gridWeights.rowWeights"),
                                      },
-                            value: undefined,
+                            value: rowWeight,
                             Component: DynamicGridWeightInput, 
                             onChange: (value) => {
 
@@ -780,7 +785,7 @@ export class CustomTkBase extends Widget {
                                         // placeholder: "weight", 
                                         // defaultWeightMapping: {0: {weight: 0, gridNo: 0}}
                                      },
-                            value: undefined,
+                            value: colWeight,
                             Component: DynamicGridWeightInput, 
                             onChange: (value) => {
 
