@@ -162,14 +162,17 @@ class Frame extends TkinterBase{
     }
 
     getToolbarAttrs(){
-        const {layout, ...toolBarAttrs} = super.getToolbarAttrs()
+        const {layout, gridConfig, gridWeights, ...toolBarAttrs} = super.getToolbarAttrs()
+
         // places layout at the end
         return ({
             id: this.__id,
             ...toolBarAttrs,
             padding: this.state.attrs.padding,
             margin: this.state.attrs.margin,
-            layout
+            layout,
+            gridConfig,
+            gridWeights
         })
     }    
 

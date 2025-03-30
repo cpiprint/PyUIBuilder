@@ -889,6 +889,18 @@ export class CustomTkBase extends Widget {
 
     }
 
+    getToolbarAttrs(){
+        const {layout, gridConfig, gridWeights, ...toolBarAttrs} = super.getToolbarAttrs()
+
+        // places layout at the end
+        return ({
+            id: this.__id,
+            ...toolBarAttrs,
+            layout,
+            gridConfig,
+            gridWeights
+        })
+    }
 
     serialize(){
         return ({

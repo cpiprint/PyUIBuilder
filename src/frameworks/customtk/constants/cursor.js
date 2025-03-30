@@ -2,6 +2,7 @@
 
 export const Tkinter_TO_WEB_CURSOR_MAPPING = {
     
+    "": "",
     "arrow": "default",
     "circle": "wait",
     "clock": "wait",
