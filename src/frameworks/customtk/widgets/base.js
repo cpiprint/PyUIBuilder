@@ -574,11 +574,13 @@ export class CustomTkBase extends Widget {
     
         let expandValue = expand ? (isSameSide ? previousExpandValue : widgets.length - index) : 1;
         
-        if ((expand && previousExpandValue === 0) || (expand && expandValue === 0)){
+        if (expand && expandValue === 0){
             expandValue = 1 // if there is expand it should expand
         }
-
-        if (expand && !isSameSide) previousExpandValue = expandValue;
+     
+        if ((expand && !isSameSide) || (expand && previousExpandValue === 0)){
+             previousExpandValue = expandValue;
+        }
     
         lastSide = side; // Update last side for recursion
         

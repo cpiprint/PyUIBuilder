@@ -41,6 +41,8 @@ class Widget extends React.Component {
     static requirements = [] // requirements for the widgets (libraries) eg: tkvideoplayer, tktimepicker
     static requiredImports = [] // import statements
 
+    static requiredCustomPyFiles = [] //  custom widgets inside of pythonWidgets don't add .py at the end
+
     // static contextType = ActiveWidgetContext
 
     constructor(props) {
@@ -185,6 +187,7 @@ class Widget extends React.Component {
 
         this.getImports = this.getImports.bind(this)
         this.getRequirements = this.getRequirements.bind(this)
+        this.getRequiredCustomPyFiles = this.getRequiredCustomPyFiles.bind(this)
 
         // this.openRenaming = this.openRenaming.bind(this)
 
@@ -214,8 +217,6 @@ class Widget extends React.Component {
 
         this.stateUpdateCallback = null // allowing other components such as toolbar to subscribe to changes in this widget
         this.resizeObserver = null
-        
-
 
     }
 
@@ -426,6 +427,10 @@ class Widget extends React.Component {
 
     getImports(){
         return this.constructor.requiredImports
+    }
+
+    getRequiredCustomPyFiles(){
+        return this.constructor.requiredCustomPyFiles
     }
 
     generateCode(){
@@ -918,6 +923,8 @@ class Widget extends React.Component {
             pos
         }
 
+        const {layout} = attrs
+
         this.setState(newData,  () => {
             // Updates attrs
             let newAttrs = { ...this.state.attrs }
@@ -949,6 +956,10 @@ class Widget extends React.Component {
 
             if (selected){
                 this.select()
+            }
+
+            if (layout){
+                this.setLayout(layout)
             } 
         })  
 

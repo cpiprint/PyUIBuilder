@@ -570,17 +570,29 @@ export class TkinterBase extends Widget {
         }
     
         const currentWidgetDirection = directionMap[side] || "column"; // Default to "column"
-        const isSameSide = lastSide === side;
         const isVertical = ["top", "bottom"].includes(side);
-    
-        let expandValue = expand ? (isSameSide ? previousExpandValue : widgets.length - index) : 1;
         
-        if ((expand && previousExpandValue === 0) || (expand && expandValue === 0)){
+        const isSameSide = lastSide === side
+        const isOppositeSide = ((lastSide === "top" && side === "bottom") || (lastSide === "left" && side === "right"))
+
+        const isDiagonal = (!isSameSide && !isOppositeSide && lastSide !== "") // bottom and right, top and left
+
+        let expandValue = expand ? ((isSameSide || isOppositeSide) ? previousExpandValue : (widgets.length - index) + 1) : (previousExpandValue > 0) ? 0 : 1
+        
+        if (expand && expandValue === 0){
             expandValue = 1 // if there is expand it should expand
         }
 
-        if (expand && !isSameSide) previousExpandValue = expandValue;
-    
+        if (expand && isDiagonal){
+            expandValue = 1
+        }
+        
+        // TODO: if previous expand value is greater than 0 and current doesn't have expand then it should be 0
+
+        if ((expand && !isSameSide) || (expand && previousExpandValue === 0)){
+             previousExpandValue = expandValue;
+        }
+
         lastSide = side; // Update last side for recursion
         
         const anchorStyles = {
@@ -627,11 +639,12 @@ export class TkinterBase extends Widget {
         return (
             <div
                 data-pack-container={side}
-                className={`tw-flex ${isVertical ? "!tw-h-full" : "!tw-w-full"}`} 
+                className={`tw-flex tw-flex-auto`} 
+                // className={`tw-flex ${isVertical ? "!tw-h-full" : "!tw-w-full"}`} 
                 style={{
                     display: "flex",
                     flexDirection: currentWidgetDirection,
-                    flexGrow: expand ? expandValue : 1, //((widgets.length - 1) === index) ? 1 : 0, // last index will always have flex-grow 1
+                    flexGrow: expandValue, //((widgets.length - 1) === index) ? 1 : 0, // last index will always have flex-grow 1
                     flexShrink: expand ? 0 : 1,
                     flexBasis: "auto",
                     minWidth: isVertical ? "0" : "auto",
