@@ -561,7 +561,8 @@ export class TkinterBase extends Widget {
         const { side = "top", expand = false, anchor } = widgetRef.getPackAttrs() || {};
     
         // console.log("rerendering:", side, expand);
-    
+
+
         const directionMap = {
             top: "column",
             bottom: "column-reverse",
@@ -587,7 +588,7 @@ export class TkinterBase extends Widget {
             expandValue = 1
         }
         
-        // TODO: if previous expand value is greater than 0 and current doesn't have expand then it should be 0
+        // TODO: if the child widget as fillx or y use flex grow
 
         if ((expand && !isSameSide) || (expand && previousExpandValue === 0)){
              previousExpandValue = expandValue;
@@ -610,7 +611,10 @@ export class TkinterBase extends Widget {
 
 
         const stretchClass = isVertical ? "tw-flex-grow" : "tw-h-full"; // Allow only horizontal growth for top/bottom
-    
+        // TODO: if previous expand value is greater than 0 and current doesn't have expand then it should be 0
+
+        // const fill = this.getAttrValue("flexManager.fillX") || this.getAttrValue("flexManager.fillY")
+
         if (isSameSide) {
             return (
                 <>

@@ -12,7 +12,7 @@ class Label extends TkinterWidgetBase{
     static widgetType = "label"
     static displayName = "Label"
 
-    static requiredCustomPyFiles = ["imageLabel"]
+    // static requiredCustomPyFiles = ["imageLabel"]
 
     constructor(props) {
         super(props)
@@ -104,9 +104,18 @@ class Label extends TkinterWidgetBase{
         const imports = super.getImports()
         
         if (this.getAttrValue("imageUpload"))
-            imports.push("import os", "from PIL import Image, ImageTk", )
+            imports.push("import os", "from PIL import Image, ImageTk", "from customWidgets.imageLabel import ImageLabel")
 
         return imports
+    }
+
+    getRequiredCustomPyFiles(){
+        const requiredCustomFiles = super.getRequiredCustomPyFiles()
+        
+        if (this.getAttrValue("imageUpload"))
+            requiredCustomFiles.push("imageLabel")
+
+        return requiredCustomFiles
     }
 
     getRequirements(){
@@ -161,10 +170,10 @@ class Label extends TkinterWidgetBase{
         const code = []
 
         if (image?.name){
-            code.push(`${variableName}_img = Image.open(${getPythonAssetPath(image.name, "image")})`)
-            code.push(`${variableName}_img = ImageTk.PhotoImage(${variableName}_img)`)
+            // code.push(`${variableName}_img = Image.open(${getPythonAssetPath(image.name, "image")})`)
+            // code.push(`${variableName}_img = ImageTk.PhotoImage(${variableName}_img)`)
             // code.push("\n")
-            labelInitialization = `${variableName} = tk.Label(master=${parent}, image=${variableName}_img, text="${labelText}", compound=tk.TOP)`
+            labelInitialization = `${variableName} = ImageLabel(master=${parent}, image_path=${getPythonAssetPath(image.name, "image")}, text="${labelText}", compound=tk.TOP, mode="${this.getAttrValue("imageSize.mode")}")`
         }
 
         // code.push("\n")

@@ -14,6 +14,9 @@ import "./styles/index.css";
 
 import { FileUploadProvider } from "./contexts/fileUploadContext";
 
+window.React = React
+
+
 const originalSetItem = localStorage.setItem;
 // triggers itemsChaned event whenever the item in localstorage is chanegd.
 localStorage.setItem = function (key, value) {

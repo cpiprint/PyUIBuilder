@@ -35,8 +35,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "start": "env-cmd -e development cross-env NODE_ENV=development webpack serve",
+    "build": "env-cmd -e production cross-env NODE_ENV=production webpack",
     "build:local": "GENERATE_SOURCEMAP=false env-cmd -e production react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -66,9 +66,11 @@
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
+    "@svgr/webpack": "^8.1.0",
     "ajv": "^7.2.4",
     "babel-loader": "^10.0.0",
     "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^13.0.0",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.2",
     "docsify-cli": "^4.4.4",

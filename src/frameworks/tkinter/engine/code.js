@@ -159,7 +159,6 @@ async function generateTkinterCode(projectName, widgetList=[], widgetRefs=[], as
         })
     }
 
-    // TODO: add empty __init__ file
     for (let customWidget of customPythonWidgets){
 
         let [fileName, extension] = customWidget.split(".")
@@ -169,12 +168,19 @@ async function generateTkinterCode(projectName, widgetList=[], widgetRefs=[], as
         }
             
         
-        const fileContent = pythonFiles(`./${fileName}`);
+        const fileContent = pythonFiles(`./${fileName}`).default
         
-        console.log("file name: ", fileContent.default, pythonFiles(`./${fileName}`))
         createFileList.push({
             fileData: new Blob([fileContent], { type: "text/plain" }),
             fileName: fileName,
+            folder: "customWidgets"
+        })
+    }
+
+    if (customPythonWidgets.length > 0){
+        createFileList.push({
+            fileData: new Blob([''], { type: "text/plain" }),
+            fileName: '__init__.py',
             folder: "customWidgets"
         })
     }

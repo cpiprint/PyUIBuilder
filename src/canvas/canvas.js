@@ -19,7 +19,8 @@ import { removeDuplicateObjects } from "../utils/common"
 
 
 // import DotsBackground from "../assets/background/dots.svg"
-import { ReactComponent as DotsBackground } from "../assets/background/dots.svg"
+// import { ReactComponent as DotsBackground } from "../assets/background/dots.svg"
+import DotsBackground from "../assets/background/dots.svg";
 
 import DroppableWrapper from "../components/draggable/droppable"
 
