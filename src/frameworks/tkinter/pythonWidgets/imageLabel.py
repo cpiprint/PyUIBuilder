@@ -45,7 +45,7 @@ class ImageLabel(tk.Label):
         """Debounce resizing to prevent rapid execution."""
         if self.resize_job:
             self.after_cancel(self.resize_job)
-        self.resize_job = self.after(50, self.force_resize)  # Debounce
+        self.resize_job = self.after(1, self.force_resize)  # Debounce
 
     def force_resize(self):
         """Resize image using actual widget size."""
