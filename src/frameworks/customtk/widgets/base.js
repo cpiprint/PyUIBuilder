@@ -58,13 +58,35 @@ export class CustomTkBase extends Widget {
         const absolutePositioning = this.getAttrValue("positioning")  
 
         let layoutManager = `pack()`
+        const marginX = this.getAttrValue("margin.marginX")
+        const marginY = this.getAttrValue("margin.marginY")
+
+        const paddingX = this.getAttrValue("padding.padX")
+        const paddingY = this.getAttrValue("padding.padY")
+        
+        let config = {}
+
+        if (marginX){
+            config["padx"] = marginX
+        }
+
+        if (marginY){
+            config["pady"] = marginY
+        }
+
+        if (paddingX){
+            config["ipadx"] = paddingX
+        }
+
+        if (paddingY){
+            config["ipady"] = paddingY
+        }
 
         if (parentLayout === Layouts.PLACE || absolutePositioning){
 
-            const config = {
-                x: Math.trunc(this.state.pos.x),
-                y: Math.trunc(this.state.pos.y),
-            }
+           
+            config['x'] = Math.trunc(this.state.pos.x)
+            config['y'] = Math.trunc(this.state.pos.y)
 
             config["width"] = Math.trunc(this.state.size.width)
             config["height"] = Math.trunc(this.state.size.height)
@@ -83,12 +105,6 @@ export class CustomTkBase extends Widget {
         }else if (parentLayout === Layouts.FLEX){
 
             const packSide = this.getAttrValue("flexManager.side")
-
-            const marginX = this.getAttrValue("margin.marginX")
-            const marginY = this.getAttrValue("margin.marginY")
-
-            const paddingX = this.getAttrValue("padding.padX")
-            const paddingY = this.getAttrValue("padding.padY")
 
             const config = {}
 
@@ -113,21 +129,6 @@ export class CustomTkBase extends Widget {
             //     config["pady"] = gap
             // }
 
-            if (marginX){
-                config["padx"] = marginX
-            }
-
-            if (marginY){
-                config["pady"] = marginY
-            }
-
-            if (paddingX){
-                config["ipadx"] = paddingX
-            }
-
-            if (paddingY){
-                config["ipady"] = paddingY
-            }
             
             // if (align === "start"){
             //     config["anchor"] = "'nw'"
@@ -167,10 +168,8 @@ export class CustomTkBase extends Widget {
 
             const sticky = this.getAttrValue("gridManager.sticky")
 
-            const config = {
-                row: row-1, // unlike css grid tkinter grid starts from 0
-                column: column-1, // unlike css grid tkinter grid starts from 0 
-            }
+            config['row'] = row - 1
+            config['column'] = column - 1
 
             if (rowSpan > 1){
                 config['rowspan'] = rowSpan
@@ -1221,23 +1220,23 @@ export class CustomTkWidgetBase extends CustomTkBase{
         if (this.getAttrValue("cursor"))
             config["cursor"] = `"${this.getAttrValue("cursor")}"`
 
-        if (this.getAttrValue("padding.padX")){
-            // inner padding
-            config["ipadx"] = this.getAttrValue("padding.padX")
-        }
+        // if (this.getAttrValue("padding.padX")){
+        //     // inner padding
+        //     config["ipadx"] = this.getAttrValue("padding.padX")
+        // }
 
-        if (this.getAttrValue("padding.padY")){
-            config["ipady"] = this.getAttrValue("padding.padY")
-        }
+        // if (this.getAttrValue("padding.padY")){
+        //     config["ipady"] = this.getAttrValue("padding.padY")
+        // }
 
 
-        if (this.getAttrValue("margin.marginX")){
-            config["padx"] = this.getAttrValue("margin.marginX")
-        }
+        // if (this.getAttrValue("margin.marginX")){
+        //     config["padx"] = this.getAttrValue("margin.marginX")
+        // }
 
-        if (this.getAttrValue("margin.marginY")){
-            config["pady"] = this.getAttrValue("margin.marginY")
-        }
+        // if (this.getAttrValue("margin.marginY")){
+        //     config["pady"] = this.getAttrValue("margin.marginY")
+        // }
 
         // FIXME: add width and height, the scales may not be correct as the width and height are based on characters in pack and grid not pixels
 
