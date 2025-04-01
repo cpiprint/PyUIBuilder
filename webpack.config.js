@@ -11,9 +11,14 @@ const fs = require('fs');
 
 const isProduction = process.env.NODE_ENV === "production";
 
-// Load .env-cmdrc.json based on NODE_ENV
-const envFile = `.env-cmdrc.json`;
-const envConfig = JSON.parse(fs.readFileSync(envFile, 'utf8'))[process.env.NODE_ENV] || {};
+// Load environment variables
+let envConfig = {};
+if (!isProduction && fs.existsSync(".env-cmdrc.json")) {
+  const envFile = JSON.parse(fs.readFileSync(".env-cmdrc.json", "utf8"));
+  envConfig = envFile[process.env.NODE_ENV] || {};
+} else {
+  envConfig = Object.fromEntries(Object.entries(process.env));
+}
 
 // Convert JSON to a format Webpack understands
 const envKeys = Object.keys(envConfig).reduce((prev, next) => {
