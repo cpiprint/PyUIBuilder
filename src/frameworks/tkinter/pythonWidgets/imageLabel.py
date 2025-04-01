@@ -2,6 +2,8 @@
 # Made using PyUibuilder: https://pyuibuilder.com
 # MIT License - keep the copy of this license
 
+# By default Label grows to fit the image, which isn't ideal for many use cases (image should grow to fit/cover the image instead)
+
 import tkinter as tk
 from PIL import Image, ImageTk
 
