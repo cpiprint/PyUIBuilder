@@ -33,7 +33,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: isProduction ? "js/[name].[contenthash].js" : "js/[name].js",
-    publicPath: "/",
+    publicPath: "./",
   },
 
   module: {
@@ -86,11 +86,6 @@ module.exports = {
           { from: 'public', to: '', noErrorOnMissing: true, globOptions: { ignore: ['**/index.html'] }}, // Copies everything else from public to dist
         ],
     }),
-
-    new webpack.EnvironmentPlugin({
-      REACT_APP_ANALYTICS_SCRIPT_ID: process.env.REACT_APP_ANALYTICS_SCRIPT_ID || '', // Default empty value
-      API_URL: 'https://default.api.com'
-    })
   
   ],
 
