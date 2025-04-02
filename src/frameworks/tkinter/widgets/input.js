@@ -41,7 +41,7 @@ export class Input extends TkinterWidgetBase{
         const config = convertObjectToKeyValueString(this.getConfigCode())
 
         return [
-                `${variableName} = tk.Entry(master=${parent}, text="${placeHolderText}")`,
+                `${variableName} = tk.Entry(master=${parent})`,
                 `${variableName}.config(${config})`,
                 `${variableName}.${this.getLayoutCode()}`
             ]
