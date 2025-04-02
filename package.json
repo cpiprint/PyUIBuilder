@@ -40,8 +40,8 @@
   },
   "scripts": {
     "start": "env-cmd -e development cross-env NODE_ENV=development webpack serve",
-    "build": "env-cmd -e production cross-env NODE_ENV=production webpack",
-    "build:local": "GENERATE_SOURCEMAP=false env-cmd -e production react-scripts build",
+    "build": "cross-env NODE_ENV=production webpack",
+    "build:local": "env-cmd -e production cross-env NODE_ENV=production webpack",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start:tailwind": "cross-env NODE_ENV=development tailwindcss --postcss -i ./landingpages/tailwind/tailwind.css -o ./landingpages/tailwind/tailwind-runtime.css -w",
