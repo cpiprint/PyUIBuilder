@@ -6,7 +6,8 @@
     "node": ">=18"
   },
   "overrides": {
-    "picomatch": "^3.0.0"
+    "picomatch": "^3.0.0",
+    "postcss-selector-parser": "7.1.0"
   },
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
@@ -70,7 +71,8 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
     "@svgr/webpack": "^8.1.0",
-    "ajv": "^7.2.4",
+    "@types/react": "^18.3.20",
+    "ajv": "^8.17.1",
     "babel-loader": "^10.0.0",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^13.0.0",
