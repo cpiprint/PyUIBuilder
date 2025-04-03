@@ -27,7 +27,7 @@ Build Python GUI's with ease of Drag and drop builders.
 
 https://github.com/user-attachments/assets/ac91aa98-843d-4578-b646-88e66bc113de
 
-<sub>**Don't like background music? fell free to mute it**</sub>
+<sub>**Don't like background music? feel free to mute it**</sub>
 
 ## Try PyUIBuilder
 Try [PyUIBuilder](https://pyuibuilder.com)
@@ -51,6 +51,9 @@ Try [PyUIBuilder](https://pyuibuilder.com)
 - [Author](#author)
 
 
+## Tutorials
+1. Youtube - [PyUibuilder playlist](https://youtube.com/playlist?list=PL0VamwghCfX-KXtGKGLak-C_-Jcx_eOiK&si=vnVr8vdU_JkIEL2f)
+2. [Creating sign up form Blog](https://medium.com/python-in-plain-english/create-tkinter-guis-using-tkinter-gui-builder-pyuibuilder-a7422489c55e)
 
 ## Docs - Getting started
 Read the docs on the [Docs page](https://docs.pyuibuilder.com/)
@@ -123,7 +126,6 @@ While there are a lot of features, here are few you need to know.
 
 ## Roadmap
 Here are some of the upcoming features.
-* Treeview on the sidebar
 * Support for Event Handlers
 * Kivy Framework support
 * Pyqt/PySide Support
@@ -131,13 +133,13 @@ Here are some of the upcoming features.
 
 To learn more/ see upcoming features visit [roadmap](./roadmap.md)
  
-To stay in loop, subscribe to the free [newsletter](https://paulfreeman.substack.com/subscribe?utm_source=Github-Pybuilder)
+To stay in loop, subscribe to the free [newsletter](https://tally.so/r/mVDY7N)
 
 ## License - Fund the development
 
-Help fund open-source work and development of this and upcoming projects by purchasing a one-time license.
+Help fund development of this and upcoming projects by purchasing a one-time license.
 
-Purchasing License will allow me to focus on development of this tool and provide you access to more advance features, early access and more.
+Purchasing License will give you discounted price and provide you access to more advance features, early access and more.
 
 The discount's will be available for limited time only on pre-orders.
 
@@ -148,6 +150,7 @@ The discount's will be available for limited time only on pre-orders.
 | **Lifetime license** (one-time  purchase)                         | 👍️                 | ✅                                                        | ✅                                                          |
 | **Early access** to upcoming features                             | ❌                 | ✅                                                        | ✅                                                          |
 | **Downloadable Electron App** (upcoming)                          | ❌                 | ✅                                                        | ✅                                                          |
+| **Premium widgets**(tabbed widget, scroll widget etc) (upcoming)                          | ❌                 | ✅                                                        | ✅                                                          |
 | **Run Preview live**(upcoming)                                    | ❌                 | ✅                                                        | ✅                                                          |
 | **Save and Load UI files** (upcoming)                             | ❌                 | ✅                                                        | ✅                                                          |
 | **Load 3rd party plugins locally**                                | ❌                 | ✅                                                        | ✅                                                          |
