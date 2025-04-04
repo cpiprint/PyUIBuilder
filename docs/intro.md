@@ -5,6 +5,16 @@
   This page is still under work in progress. This page will be updated from time to time. This contains the basic documentation for PYUIBuilder
 </div>
 
+## Resources
+
+- [Youtube Tutorials](https://youtube.com/playlist?list=PL0VamwghCfX-KXtGKGLak-C_-Jcx_eOiK&si=1LagzyjBaifqDcND)
+
+- [Create a signup form](https://medium.com/python-in-plain-english/create-tkinter-guis-using-tkinter-gui-builder-pyuibuilder-a7422489c55e)
+
+- [Discord invite](https://discord.gg/dHXjrrCA7G)
+
+- [basic pack Layout tutorial - Tkinter](https://www.youtube.com/watch?v=rbW1iJO1psk) 
+
 ## UI Basics
 Let's start with the basics of UI
 
@@ -43,10 +53,9 @@ Every widget has its own attributes, some of the attributes may be common.
 
    1. Flex(also known as pack)
    2. Grid
-   3. Absolute/Place
+   3. Absolute/Place (flex)
    
    The parents of the child widgets controls the layout. The layout properties such as grid position will be available to the child under the grid-manager/flex-manager section.
-
 
 All Widgets attributes are available on the toolbar. 
 The toolbar contains collapsible, which can be opened to modify the widgets attributes such 
@@ -126,10 +135,10 @@ flex-manager / grid-manager.
 
 ### Flex
 Flex is similar to pack in tkinter, the widgets will be arranged horizontally/vertically
-depending on the flex-direction
+depending on the side. You can use anchor to position within the side. [Understanding the working of pack](https://www.youtube.com/watch?v=rbW1iJO1psk)
 
 ### Grid
-Grid is a 2d layout manager, you can position each widget by clicking on widget -> toolbar -> grid-manager
+Grid is a 2d layout manager, you can position each widget by clicking on widget(the child) -> toolbar -> grid-manager. You'll also have to define the no of rows and cols using grid configure accord and Grid weight accord on the parent.
 
 ![grid-manager](./assets/grid-manager.png)
 
@@ -139,7 +148,7 @@ You can use position absolute for specific widget by checking the absolute posit
 
 ![Absolute positioning](./assets/absolute-position.png)
 
-### Swapping widgets on flex layout
+### Swapping widgets on flex layout {WIP}
 
 You can swap widget by bringing the widget near the edge of the other widget. 
 
