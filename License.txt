@@ -678,7 +678,7 @@ For more information on this, and how to apply and follow the GNU AGPL, see
 --------------------------
 
 License for non-commercial use in short
-* You are free fork, modify and redistribute it given the original or derived works is kept free and open-source and under the same licese.
+* You are free fork, modify and redistribute it given the original or derived works is kept free and source-available and under the same licese.
 * Another restriction is you can't redistribute in binary or executable formats without asking me first.
 * If you plan on making money on this work or derived work you need permission first.
 
@@ -689,7 +689,7 @@ Read the full license below.
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, modify, merge, publish, and distribute the source code, subject to the following conditions:
 
 2. Derived Work License
-Any modifications, derivative works, or copies of the Software must retain this license. All derivative works must be open-sourced under the same license terms. You are not permitted to relicense or sub-license any portion of the Software under a different license without explicit prior written permission from the original author.
+Any modifications, derivative works, or copies of the Software must retain this license. All derivative works must be source-available and under the same license terms. You are not permitted to relicense or sub-license any portion of the Software under a different license without explicit prior written permission from the original author.
 
 3. Distribution Restriction on Executables
 You are not permitted to distribute the Software in compiled, executable, or binary form without prior written consent from the original author. This applies to both original and derivative works.
