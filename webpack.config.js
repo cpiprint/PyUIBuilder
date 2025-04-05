@@ -38,7 +38,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: isProduction ? "js/[name].[contenthash].js" : "js/[name].js",
-    publicPath: "./",
+    publicPath: isProduction ? "./" : "/",
   },
 
   module: {

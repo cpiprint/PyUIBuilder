@@ -4,11 +4,12 @@
  */
 import { useEffect, useRef, useMemo, useState } from "react";
 
-import { BookOutlined, CloseCircleFilled, CrownFilled, DiscordFilled, GithubFilled, ShareAltOutlined } from "@ant-design/icons";
+import { BookOutlined, CloseCircleFilled, CrownFilled, DiscordFilled, GithubFilled, InfoCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
 
 import KO_FI from "../assets/logo/ko-fi.png"
 import Premium from "./utils/premium";
 import Share from "./utils/share";
+import { Tooltip } from "antd";
 
 
 
@@ -88,11 +89,21 @@ function Sidebar({tabs}){
                 }
 
                 <div className="tw-flex tw-flex-col tw-place-content-items tw-place-items-center tw-gap-3 tw-mt-auto">
-                    <a href="https://discord.gg/dHXjrrCA7G" target="_blank"
-                        title="discord invite"
-                        rel="noopener noreferrer" className="tw-text-3xl tw-cursor-pointer tw-text-[#5562EA]">
-                        <DiscordFilled />
-                    </a>
+                    
+                    <Tooltip title="About">
+                       <a href="https://about.pyuibuilder.com" target="_blank"
+                            title="discord invite"
+                            rel="noopener noreferrer" className="tw-text-2xl tw-text-black tw-cursor-pointer">
+                            <InfoCircleOutlined />
+                        </a>
+                    </Tooltip>  
+                    <Tooltip title="Discord invite">
+                        <a href="https://discord.gg/dHXjrrCA7G" target="_blank"
+                            title="discord invite"
+                            rel="noopener noreferrer" className="tw-text-3xl tw-cursor-pointer tw-text-[#5562EA]">
+                            <DiscordFilled />
+                        </a>
+                    </Tooltip>
                     <Premium className="tw-text-2xl tw-bg-purple-700 tw-text-center 
                                     tw-w-[35px] tw-h-[35px] tw-rounded-md 
                                     tw-cursor-pointer tw-text-white 
@@ -100,14 +111,20 @@ function Sidebar({tabs}){
                                     hover:tw-scale-[1.2]">
                         <CrownFilled />
                     </Premium>
+
                     <Share className="tw-cursor-pointer tw-text-xl">
-                        <ShareAltOutlined />
+                        <Tooltip title="Share">
+                            <ShareAltOutlined />
+                        </Tooltip>
                     </Share>
-                    <a className="tw-cursor-pointer tw-text-xl tw-text-gray-700" 
-                            href="https://docs.pyuibuilder.com/"
-                            target="_blank" rel="noopener noreferrer">
-                        <i className="bi bi-book-half"></i>
-                    </a>
+
+                    <Tooltip title="Docs">
+                        <a className="tw-cursor-pointer tw-text-xl tw-text-gray-700" 
+                                href="https://docs.pyuibuilder.com/"
+                                target="_blank" rel="noopener noreferrer">
+                            <i className="bi bi-book-half"></i>
+                        </a>
+                    </Tooltip>
                     <a href="https://github.com/PaulleDemon/PyUIBuilder" target="_blank"
                         rel="noopener noreferrer" className="tw-text-2xl tw-cursor-pointer tw-text-black">
                         <GithubFilled />
