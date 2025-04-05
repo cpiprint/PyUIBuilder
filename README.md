@@ -51,9 +51,10 @@ Try [PyUIBuilder](https://pyuibuilder.com)
 - [Author](#author)
 
 
-## Tutorials
+## Resources
 1. Youtube - [PyUibuilder playlist](https://youtube.com/playlist?list=PL0VamwghCfX-KXtGKGLak-C_-Jcx_eOiK&si=vnVr8vdU_JkIEL2f)
 2. [Creating sign up form Blog](https://medium.com/python-in-plain-english/create-tkinter-guis-using-tkinter-gui-builder-pyuibuilder-a7422489c55e)
+3. [Discord Invite](https://discord.gg/dHXjrrCA7G)
 
 ## Docs - Getting started
 Read the docs on the [Docs page](https://docs.pyuibuilder.com/)
