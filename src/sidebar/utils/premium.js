@@ -63,7 +63,7 @@ function Premium({ children, className = "" }) {
                                 <span className="tw-text-5xl tw-font-semibold">$0</span>
                             </h3>
                             <p className="tw-mt-3 tw-text-base tw-text-center tw-text-gray-600">
-                                Free to use forever, but for added features and to support open-source development, consider buying a lifetime license.
+                                Free to use forever, but for added features and to support development, consider buying a lifetime license.
                             </p>
                             <hr />
                             <ul className="tw-mt-4 tw-flex tw-flex-col tw-gap-3 tw-text-xl tw-text-gray-600">
@@ -142,7 +142,7 @@ function Premium({ children, className = "" }) {
                                 <span className="tw-text-2xl tw-text-gray-600">Forever</span>
                             </h3>
                             <p className="tw-mt-3 tw-text-center tw-text-gray-600">
-                                Support open-source development 🚀. Plus, get added benefits.
+                                Best for hobby users and people who want to learn basic UI development without PySide.
                             </p>
                             <hr />
                             <ul className="tw-mt-4 tw-flex tw-flex-col tw-gap-3 tw-text-xl tw-text-black">
@@ -231,7 +231,7 @@ function Premium({ children, className = "" }) {
                                 <span className="tw-text-2xl tw-text-gray-600">Forever</span>
                             </h3>
                             <p className="tw-mt-3 tw-text-center tw-text-gray-600">
-                                Support open-source development 🚀. Plus, get added benefits.
+                                Best for startups and teams and people who want to use internally or serves a commercial purpose and want support for PySide
                             </p>
                             <hr />
                             <ul className="tw-mt-4 tw-flex tw-flex-col tw-gap-3 tw-text-xl">
