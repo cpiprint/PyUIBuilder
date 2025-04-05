@@ -88,8 +88,8 @@ export class CustomTkBase extends Widget {
             config['x'] = Math.trunc(this.state.pos.x)
             config['y'] = Math.trunc(this.state.pos.y)
 
-            config["width"] = Math.trunc(this.state.size.width)
-            config["height"] = Math.trunc(this.state.size.height)
+            // config["width"] = Math.trunc(this.state.size.width)
+            // config["height"] = Math.trunc(this.state.size.height)
 
             // if (!this.state.fitContent.width){
             //     config["width"] = this.state.size.width
@@ -1017,6 +1017,7 @@ export class CustomTkWidgetBase extends CustomTkBase{
             ...this.state,
             attrs: {
                 ...newAttrs,
+                fitContent: {width: false, height: false},
                 styling: {
                     ...newAttrs.styling,
                     foregroundColor: {
@@ -1167,7 +1168,7 @@ export class CustomTkWidgetBase extends CustomTkBase{
                         label: "font size",
                         tool: Tools.NUMBER_INPUT,
                         toolProps: {min: 3, max: 140},
-                        value: null,
+                        value: undefined,
                         onChange: (value) => {
                             this.setWidgetInnerStyle("fontSize", `${value}px`)
                             this.setAttrValue("font.fontSize", value)
@@ -1196,6 +1197,12 @@ export class CustomTkWidgetBase extends CustomTkBase{
         const config = {
             fg_color: `"${this.getAttrValue("styling.backgroundColor")}"`,
         }
+
+        if (!this.state.fitContent.width)
+            config["width"] = Math.trunc(this.state.size.width)
+
+        if (!this.state.fitContent.height)
+            config["height"] = Math.trunc(this.state.size.height)
 
         if (this.getAttrValue("styling.foregroundColor")){
             config["text_color"] = `"${this.getAttrValue("styling.foregroundColor")}"`

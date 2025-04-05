@@ -31,8 +31,8 @@ class OptionMenu extends CustomTkWidgetBase{
                     label: "Default Value",
                     tool: Tools.INPUT,
                     value: "Select option",
-                    onChange: ({inputs, selectedRadio}) => {
-                        this.setAttrValue("options", {inputs, selectedRadio})
+                    onChange: (value) => {
+                        this.setAttrValue("defaultValue", value)
                     }
                 },
                 widgetOptions: {

@@ -88,15 +88,15 @@ export class TkinterBase extends Widget {
             config['x'] = Math.trunc(this.state.pos.x)
             config['y'] = Math.trunc(this.state.pos.y)
 
-            config["width"] = Math.trunc(this.state.size.width)
-            config["height"] = Math.trunc(this.state.size.height)
+            // config["width"] = Math.trunc(this.state.size.width)
+            // config["height"] = Math.trunc(this.state.size.height)
 
-            // if (!this.state.fitContent.width){
-            //     config["width"] = this.state.size.width
-            // }
-            // if (!this.state.fitContent.height){
-            //     config["height"] = this.state.size.height
-            // }
+            if (!this.state.fitContent.width){
+                config["width"] = Math.trunc(this.state.size.width)
+            }
+            if (!this.state.fitContent.height){
+                config["height"] = Math.trunc(this.state.size.height)
+            }
 
             const configStr = convertObjectToKeyValueString(config)
 
@@ -1034,6 +1034,7 @@ export class TkinterWidgetBase extends TkinterBase{
             ...this.state,
             attrs: {
                 ...newAttrs,
+                fitContent: {width: false, height: false},
                 styling: {
                     ...newAttrs.styling,
                     foregroundColor: {
@@ -1181,7 +1182,7 @@ export class TkinterWidgetBase extends TkinterBase{
                         label: "font size",
                         tool: Tools.NUMBER_INPUT,
                         toolProps: {min: 3, max: 140},
-                        value: null,
+                        value: 10,
                         onChange: (value) => {
                             this.setWidgetInnerStyle("fontSize", `${value}px`)
                             this.setAttrValue("font.fontSize", value)

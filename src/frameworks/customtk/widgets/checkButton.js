@@ -3,6 +3,8 @@ import Tools from "../../../canvas/constants/tools"
 import { convertObjectToKeyValueString, removeKeyFromObject } from "../../../utils/common"
 import { CheckSquareFilled } from "@ant-design/icons"
 import { CustomTkWidgetBase } from "./base"
+import { Layouts } from "../../../canvas/constants/layouts"
+import React from "react"
 
 
 export class CheckBox extends CustomTkWidgetBase{
@@ -132,6 +134,8 @@ export class RadioButton extends CustomTkWidgetBase{
 
         this.minSize = {width: 50, height: 30}
         
+        this.firstDivRef = React.createRef()
+
         this.state = {
             ...this.state,
             size: { width: 80, height: 30 },
@@ -180,7 +184,7 @@ export class RadioButton extends CustomTkWidgetBase{
             code.push(`\n`)
             code.push(`${radioBtnVariable} = ctk.CTkRadioButton(master=${parent}, variable=${variableName}_var, text="${radio_text}", value=${idx})`)
             code.push(`${radioBtnVariable}.configure(${convertObjectToKeyValueString(config)})`)
-            code.push(`${radioBtnVariable}.${this.getLayoutCode()}`)
+            code.push(`${radioBtnVariable}.${this.getLayoutCode({index: idx})}`)
         })
 
         const defaultSelected = radios.selectedRadio
@@ -191,6 +195,39 @@ export class RadioButton extends CustomTkWidgetBase{
         
         
         return code
+    }
+
+    /**
+     * 
+     * The index is required for pack as in pack every widget would be packed on top of each other in radio button
+     */
+    getLayoutCode({index=0}){
+        let layoutManager = super.getLayoutCode()
+
+        const {layout: parentLayout, direction, gap, align="start"} = this.getParentLayout()
+        const absolutePositioning = this.getAttrValue("positioning")  
+
+        
+        if (parentLayout === Layouts.PLACE || absolutePositioning){
+            const config = {}
+            
+            const elementRect = this.firstDivRef.current?.getBoundingClientRect()
+
+            config['x'] = Math.trunc(this.state.pos.x)
+            config['y'] = Math.trunc(this.state.pos.y)
+
+            if (elementRect?.height){
+                config['y'] = Math.trunc(config['y'] + (index * elementRect.height)) // the index is the radiobutton index
+            }
+
+            const configStr = convertObjectToKeyValueString(config)
+
+            layoutManager = `place(${configStr})`
+
+        }
+
+        return layoutManager
+
     }
 
     getToolbarAttrs(){
@@ -219,8 +256,12 @@ export class RadioButton extends CustomTkWidgetBase{
                 <div className="tw-flex tw-flex-col tw-gap-2 tw-w-fit tw-h-fit">
                     {
                         inputs.map((value, index) => {
+
+                            const ref = index === 0 ? this.firstDivRef : null
+
+
                             return (
-                                <div key={index} className="tw-flex tw-gap-2 tw-w-full tw-h-full tw-place-items-center ">
+                                <div key={index} ref={ref} className="tw-flex tw-gap-2 tw-w-full tw-h-full tw-place-items-center ">
                                     <div className="tw-border-solid tw-border-[#D9D9D9] tw-border-2
                                                     tw-min-w-[20px] tw-min-h-[20px] tw-w-[20px] tw-h-[20px] 
                                                     tw-text-blue-600 tw-flex tw-items-center tw-justify-center
