@@ -92,7 +92,7 @@ function Sidebar({tabs}){
                     
                     <Tooltip title="About">
                        <a href="https://about.pyuibuilder.com" target="_blank"
-                            title="discord invite"
+                            title="about"
                             rel="noopener noreferrer" className="tw-text-2xl tw-text-black tw-cursor-pointer">
                             <InfoCircleOutlined />
                         </a>
