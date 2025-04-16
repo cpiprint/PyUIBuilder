@@ -23,6 +23,7 @@ Build python GUIs like Webflow
 
 Build Python GUI's with ease of Drag and drop builders.
 
+<a href="https://www.producthunt.com/posts/pyui-builder?embed=true&utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-pyui&#0045;builder" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=949514&theme=light&period=daily&t=1744818177482" alt="PyUI&#0032;Builder - Build&#0032;Python&#0032;GUIs&#0032;like&#0032;Canva | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 
 https://github.com/user-attachments/assets/ac91aa98-843d-4578-b646-88e66bc113de
