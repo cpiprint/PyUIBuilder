@@ -33,7 +33,7 @@ const VideoPopUp = ({children, url}) => {
                 height={1000}
                 open={popUpOpen}>
                 <div className="tw-mt-5 tw-text-lg tw-min-w-[350px] tw-rounded-md tw-overflow-hidden tw-h-full  tw-w-full ">
-                    <iframe  src="https://www.youtube.com/embed/MkeMv0X-w_4?si=lJNCB18a2XKdY7Y6" 
+                    <iframe  src="https://www.youtube.com/embed/Lp2-ToDlqSk?si=dpUpg5ZBdUS8EVOw" 
                         className="tw-w-full tw-h-full"
                         title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
                     </iframe>
