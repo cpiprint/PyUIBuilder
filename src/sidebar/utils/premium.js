@@ -49,7 +49,7 @@ function Premium({ children, className = "" }) {
                     </a> 
                     <br />
                     <br />
-                    Premium features will start rolling out phase wise from mid of April, after which there would be a price increase.
+                    Premium features will start rolling out phase wise towards end of April, after which there would be a price increase.
                     
                    
                 </div>
