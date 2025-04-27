@@ -1,27 +1,30 @@
-# PyUIBuilder - Python GUI Builder
-Build python GUIs like Webflow
 
-<sub>Not affiliated to Webflow</sub>
+<p align="center"><img src="./repo-assets/logo/PyUi.png" alt="font tester logo" width="100" height="100"></p>
 
 <p align="center">
+ <h1> PyUIBuilder - Python GUI Builder
+</h1>
+</p>
+
+Build python GUIs like Canva
+
+<!-- <p align="center">
     <a href="https://twitter.com/share?url=https://github.com/PaulleDemon/PyUIBuilder&text=Check out PyUIBuilder tool">
         <img src="./repo-assets/share/1.png" height="35" />
     </a>
     <a href="https://www.reddit.com/submit?url=https://github.com/PaulleDemon/PyUIBuilder&title=Check out PyUIBuilder tool">
         <img src="./repo-assets/share/4.png" height="35" />
     </a>
-    <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://github.com/PaulleDemon/PyUIBuilder&title=check out PyUIBuilder tool">
+    <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://github.com/**PaulleDemon**/PyUIBuilder&title=check out PyUIBuilder tool">
         <img src="./repo-assets/share/2.png" height="35" />
     </a>
     <a href="https://youtube.com/">
+Build Python GUI's with ease of Drag and drop builders.
         <img src="./repo-assets/share/3.png" height="35" />
     </a>
-</p>
-
-<p><img src="./repo-assets/logo/PyUi.png" alt="font tester logo" width="100" height="100"></p>
+</p> -->
 
 
-Build Python GUI's with ease of Drag and drop builders.
 
 <a href="https://www.producthunt.com/posts/pyui-builder?embed=true&utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-pyui&#0045;builder" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=949514&theme=light&period=daily&t=1744818177482" alt="PyUI&#0032;Builder - Build&#0032;Python&#0032;GUIs&#0032;like&#0032;Canva | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
