@@ -169,7 +169,7 @@ The discount's will be available for limited time only on pre-orders.
 | **Support for PyQt/PySide frameworks** (upcoming)                 | ❌                 | ❌                                                        | ✅                                                          |
 | **More upcoming features and support**                            | ❓️                 | ✅                                                        | ✅                                                          |
 | **Price**                                                         | -                 | ~~$129~~ **$29** (save 77.52% for limited time on pre-order) | ~~180~~ **$49** (Save 72.78% for a limited time on pre-orders) |
-| Pre-order now!                                                    |                   | [Get license](https://ko-fi.com/s/4a3dffb3b9)                                          | [Get license](https://ko-fi.com/s/560a3b6b05)                                            |
+| Pre-order now!                                                    |                   | [Get license](https://about.pyuibuilder.com)                                          | [Get license](https://about.pyuibuilder.com)                                            |
 
 ## Newsletter
 
