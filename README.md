@@ -137,7 +137,6 @@ While there are a lot of features, here are few you need to know.
 ## Roadmap
 Here are some of the upcoming features.
 * Support for Event Handlers
-* Kivy Framework support
 * Pyqt/PySide Support
 * **Downloadable Electron app** and more.
 
@@ -160,16 +159,16 @@ The discount's will be available for limited time only on pre-orders.
 | **Lifetime license** (one-time  purchase)                         | 👍️                 | ✅                                                        | ✅                                                          |
 | **Early access** to upcoming features                             | ❌                 | ✅                                                        | ✅                                                          |
 | **Downloadable Electron App** (upcoming)                          | ❌                 | ✅                                                        | ✅                                                          |
-| **Premium widgets**(tabbed widget, scroll widget etc) (upcoming)                          | ❌                 | ✅                                                        | ✅                                                          |
+| **Premium widgets**(tabbed widget, scroll widget etc)                           | ❌                 | ✅                                                        | ✅                                                          |
 | **Run Preview live**(upcoming)                                    | ❌                 | ✅                                                        | ✅                                                          |
-| **Save and Load UI files** (upcoming)                             | ❌                 | ✅                                                        | ✅                                                          |
+| **Save and Load UI files**                            | ❌                 | ✅                                                        | ✅                                                          |
 | **Load 3rd party plugins locally**                                | ❌                 | ✅                                                        | ✅                                                          |
-| **Dark theme** (upcoming)                                         | ❌                 | ✅                                                        | ✅                                                          |
+| **Dark theme**                                         | ❌                 | ✅                                                        | ✅                                                          |
 | **Commercial Use**                                                | ✅                 | ❌                                                        | ✅                                                          |
 | **Support for PyQt/PySide frameworks** (upcoming)                 | ❌                 | ❌                                                        | ✅                                                          |
 | **More upcoming features and support**                            | ❓️                 | ✅                                                        | ✅                                                          |
 | **Price**                                                         | -                 | ~~$129~~ **$29** (save 77.52% for limited time on pre-order) | ~~180~~ **$49** (Save 72.78% for a limited time on pre-orders) |
-| Pre-order now!                                                    |                   | [Get license](https://about.pyuibuilder.com)                                          | [Get license](https://about.pyuibuilder.com)                                            |
+| order now!                                                    |                   | [Get license](https://about.pyuibuilder.com)                                          | [Get license](https://about.pyuibuilder.com)                                            |
 
 ## Newsletter
 

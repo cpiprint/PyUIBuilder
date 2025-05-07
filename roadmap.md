@@ -10,9 +10,9 @@ Any feature that has 👑 beside it, is meant only for [premium users](./README.
 - [ ] UI fixes and enhancement 
 - [ ] Documentation
 - [X] Tree view for elements on the canvas
-- [ ] Add text editor to support event handlers
-- [ ] Support for Event handlers
-- [ ] Support more pre-built widgets such as ttk.Notebook, multi-page etc.
+- [X] Add text editor to support event handlers
+- [X] Support for Event handlers
+- [X] Support more pre-built widgets such as ttk.Notebook, multi-page etc.
 - [ ] Rewrite DND for better feedback - (swappy/react-dnd-kit/ GSAP draggable) - least priority
 - [ ] Duplicate widgets
 
@@ -20,10 +20,10 @@ Any feature that has 👑 beside it, is meant only for [premium users](./README.
 - [ ] Add canvas support tools (lines, rect etc) (try fabricjs)
 - [ ] Initial version for Electron App exe 👑
 - [ ] Save files locally 👑
-- [ ] Load UI files 👑
-- [ ] Light/Dark theme 👑
+- [X] Load UI files 👑
+- [X] Light/Dark theme 👑
 - [ ] Run the preview 👑
-- [ ] Load templates 👑
+- [X] Load templates 👑
 
 ### 2.0.0
 - [ ] Support for more third party plugins
@@ -31,11 +31,8 @@ Any feature that has 👑 beside it, is meant only for [premium users](./README.
 - [ ] Allow creating components
 - [ ] Support for Kivy
 - [ ] Sharable Templates
-- [ ] Dark theme 👑
-
 
 ### 3.0.0
 - [ ] Allow 3rd party UI plugin developers
 - [ ] Allow Templates to be sharable
-- [ ] Node based System  (eg: like blender/ unity node system)
 - [ ] Support for PySide / PyQt 👑 (commercial license only)
