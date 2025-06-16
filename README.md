@@ -38,7 +38,9 @@ https://github.com/user-attachments/assets/57addb9c-d018-4be9-894d-c7cbce5ff55f
 <sub>**Don't like background music? feel free to mute it**</sub>
 
 ## Try PyUIBuilder
-Try [PyUIBuilder](https://pyuibuilder.com)
+**Try** [PyUIBuilder](https://pyuibuilder.com)
+
+**About** [About PyUiBuilder](https://about.pyuibuilder.com)
 
 ## Table of contents
 
@@ -164,7 +166,7 @@ The discount's will be available for limited time only on pre-orders.
 | **Save and Load UI files**                            | ❌                 | ✅                                                        | ✅                                                          |
 | **Load 3rd party plugins locally**                                | ❌                 | ✅                                                        | ✅                                                          |
 | **Dark theme**                                         | ❌                 | ✅                                                        | ✅                                                          |
-| **Commercial Use**                                                | ✅                 | ❌                                                        | ✅                                                          |
+| **Commercial Use**                                                | ❌                 | ❌                                                        | ✅                                                          |
 | **Support for PyQt/PySide frameworks** (upcoming)                 | ❌                 | ❌                                                        | ✅                                                          |
 | **More upcoming features and support**                            | ❓️                 | ✅                                                        | ✅                                                          |
 | **Price**                                                         | -                 | ~~$129~~ **$29** (save 77.52% for limited time on pre-order) | ~~180~~ **$49** (Save 72.78% for a limited time on pre-orders) |
