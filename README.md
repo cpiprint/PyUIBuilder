@@ -44,6 +44,20 @@ https://github.com/user-attachments/assets/57addb9c-d018-4be9-894d-c7cbce5ff55f
 
 [PyuiBuilder - Python GUI Builder](https://pyuibuilder.com/python-gui-builder)
 
+**Funding development:**
+<br>
+I am Paul, a solo-developer, which means I work on this project all by myself from design to coding to maintaing the project. I have been using a 7+ year old broken linux laptop, which has been a problem for me since I started this project. 
+I am trying to get a new laptop so, I can work without much issues. 
+<br/>
+<br/>
+so, if you'd like to support the development, you can [purchase a license](https://about.pyuibuilder.com/#pricing) with a one time payment, for a limited time, which will give you instant access to all the premium features
+for life.  Thank you for your support! appreciate it very much
+<br/>
+<br/>
+Best,
+<br/>
+Paul
+
 **Note:** premium features are being  added and maintained in private
 
 ## Table of contents
